@@ -18,13 +18,21 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
  *
  * @author Master801
  */
-@Mod(modid = ReTweakResources.RETWEAK_MOD, name = ReTweakResources.RETWEAK_MOD, version = ReTweakResources.RETWEAK_VERSION)
+@Mod(
+        modid = ReTweakResources.RETWEAK_MOD,
+        name = ReTweakResources.RETWEAK_MOD,
+        version = ReTweakResources.RETWEAK_VERSION
+)
 public final class ReTweakMod {
 
     @Instance(ReTweakResources.RETWEAK_MOD)
     public static ReTweakMod instance;
 
-    @SidedProxy(clientSide = ReTweakResources.RETWEAK_PROXY_CLIENT, serverSide = ReTweakResources.RETWEAK_PROXY_SERVER, modId = ReTweakResources.RETWEAK_MOD)
+    @SidedProxy(
+            clientSide = ReTweakResources.RETWEAK_PROXY_CLIENT,
+            serverSide = ReTweakResources.RETWEAK_PROXY_SERVER,
+            modId = ReTweakResources.RETWEAK_MOD
+    )
     public static Proxy proxy;
 
     @Metadata(ReTweakResources.RETWEAK_MOD)

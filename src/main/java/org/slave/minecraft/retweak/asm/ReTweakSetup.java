@@ -5,7 +5,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.minecraft.retweak.asm.discovery.ReTweakModDiscoverer;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.minecraft.retweak.resources.SupportedGameVersion;
+import org.slave.minecraft.retweak.tweaking.SupportedGameVersion;
 
 import java.io.File;
 import java.util.Map;
@@ -25,7 +25,10 @@ public final class ReTweakSetup implements IFMLCallHook {
     @Override
     public Void call() throws Exception {
         if (!ReTweakResources.RETWEAK_DIRECTORY.exists()) {
-            ReTweakResources.RETWEAK_LOGGER.warn("Could not find directory \"{}\"! Creating it now...", ReTweakResources.RETWEAK_DIRECTORY.getName());
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Could not find directory \"{}\"! Creating it now...",
+                    ReTweakResources.RETWEAK_DIRECTORY.getName()
+            );
             ReTweakResources.RETWEAK_DIRECTORY.mkdir();
         }
         findMods();
@@ -39,13 +42,16 @@ public final class ReTweakSetup implements IFMLCallHook {
                 File supportedGameVersionDir = null;
                 for(File subFile : subFiles) {
                     if (subFile.isDirectory() && subFile.getName().equals(supportedGameVersion.getDirectoryName())) {
-                        ReTweakResources.RETWEAK_LOGGER.debug("Found supported mods dir \"{}\"... searching it now for mods...", subFile.getName());
+                        ReTweakResources.RETWEAK_LOGGER.debug(
+                                "Found supported mods dir \"{}\"... searching it now for mods...",
+                                subFile.getName()
+                        );
                         supportedGameVersionDir = subFile;
                         break;
                     }
                 }
                 if (supportedGameVersionDir != null) {
-                    ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer();
+                    ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer(supportedGameVersion);
                     reTweakModDiscoverer.findModsInDir(supportedGameVersionDir);
                     reTweakModDiscoverer.identify();
                 }

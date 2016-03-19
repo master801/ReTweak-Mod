@@ -1,0 +1,3 @@
+Created-By: Master801
+FMLCorePlugin: org.slave.minecraft.retweak.asm.ReTweakASM
+FMLCorePluginContainsFMLMod: true

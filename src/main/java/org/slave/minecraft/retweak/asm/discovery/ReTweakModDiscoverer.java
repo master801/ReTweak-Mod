@@ -4,10 +4,12 @@ import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.FileListHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.ReflectionHelper;
-import org.slave.minecraft.retweak.resources.ReTweakModContainer;
+import org.slave.minecraft.retweak.tweaking.ReTweakModContainer;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
+import org.slave.minecraft.retweak.tweaking.SupportedGameVersion;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -23,9 +25,12 @@ import java.util.regex.Pattern;
  */
 public final class ReTweakModDiscoverer {
 
+    private final SupportedGameVersion supportedGameVersion;
+
     private final ArrayList<ReTweakModContainer> reTweakModContainers = new ArrayList<>();
 
-    public ReTweakModDiscoverer() {
+    public ReTweakModDiscoverer(SupportedGameVersion supportedGameVersion) {
+        this.supportedGameVersion = supportedGameVersion;
     }
 
     public void findModsInDir(File dir) throws NoSuchFieldException, IllegalAccessException {
@@ -40,7 +45,7 @@ public final class ReTweakModDiscoverer {
                 Matcher matcher = ((Pattern)ReflectionHelper.getFieldValue(ReflectionHelper.getField(ModDiscoverer.class, "zipJar"), null)).matcher(mod.getName());
                 if (matcher.matches()) {
                     ReTweakResources.RETWEAK_LOGGER.info("Found a candidate mod!");
-                    reTweakModContainers.add(new ReTweakModContainer(mod));
+                    reTweakModContainers.add(new ReTweakModContainer(supportedGameVersion, mod));
                 }
             } else {
                 ReTweakResources.RETWEAK_LOGGER.warn("Mod \"{}\" is not a file or is not a mod! ReTweak does not support this!", mod.getName());
@@ -48,8 +53,8 @@ public final class ReTweakModDiscoverer {
         }
     }
 
-    public void identify() {
-        //TODO
+    public void identify() throws IOException {
+        for(ReTweakModContainer reTweakModContainer : reTweakModContainers) reTweakModContainer.search();
     }
 
 }

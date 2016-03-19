@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.resources;
+package org.slave.minecraft.retweak.tweaking;
 
 /**
  * Created by Master801 on 3/19/2016 at 8:02 AM.
