@@ -14,8 +14,7 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        LaunchClassLoader launchClassLoader = (LaunchClassLoader)data.get("classLoader");
-        //TODO
+        ReTweakClassLoader.instance = new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"));
     }
 
     @Override

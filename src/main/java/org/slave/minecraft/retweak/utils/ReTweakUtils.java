@@ -5,5 +5,10 @@ package org.slave.minecraft.retweak.utils;
  *
  * @author Master801
  */
-public final class ReTweakMod {
+public final class ReTweakUtils {
+
+    private ReTweakUtils() {
+        throw new IllegalStateException();
+    }
+
 }
