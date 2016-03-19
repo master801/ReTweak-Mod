@@ -11,8 +11,8 @@ import java.util.Map;
  *
  * @author Master801
  */
-@Name("ReTweak-Mod")
-@TransformerExclusions({ "org.slave.minecraft.retweak.*" })
+@Name("ReTweak-Mod-ASM")
+@TransformerExclusions({ "org.slave.minecraft.retweak.asm.*" })
 public final class ReTweakASM implements IFMLLoadingPlugin {
 
     @Override
@@ -23,7 +23,7 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
     @Override
     public String getModContainerClass() {
-        return ReTweakModContainer.class.getCanonicalName();
+        return null;
     }
 
     @Override

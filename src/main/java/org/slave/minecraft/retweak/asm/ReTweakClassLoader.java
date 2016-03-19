@@ -30,7 +30,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         parent.addURL(mod.toURI().toURL());
     }
 
-    public static URLClassLoader getInstance() {
+    public static ReTweakClassLoader getInstance() {
         return ReTweakClassLoader.instance;
     }
 

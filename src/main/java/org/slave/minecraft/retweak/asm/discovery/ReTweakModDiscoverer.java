@@ -1,0 +1,55 @@
+package org.slave.minecraft.retweak.asm.discovery;
+
+import cpw.mods.fml.common.discovery.ModDiscoverer;
+import cpw.mods.fml.relauncher.FileListHelper;
+import org.slave.lib.helpers.ArrayHelper;
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.minecraft.retweak.resources.ReTweakModContainer;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * <p>
+ *     {@link cpw.mods.fml.common.discovery.ModDiscoverer}
+ * </p>
+ *
+ * Created by Master801 on 3/19/2016 at 8:58 AM.
+ *
+ * @author Master801
+ */
+public final class ReTweakModDiscoverer {
+
+    private final ArrayList<ReTweakModContainer> reTweakModContainers = new ArrayList<>();
+
+    public ReTweakModDiscoverer() {
+    }
+
+    public void findModsInDir(File dir) throws NoSuchFieldException, IllegalAccessException {
+        if (dir == null || !dir.exists() || !dir.isDirectory()) return;
+        File[] modList = dir.listFiles();
+        if (ArrayHelper.isNullOrEmpty(modList)) return;
+
+        modList = FileListHelper.sortFileList(modList);
+
+        for(File mod : modList) {
+            if (mod.isFile()) {
+                Matcher matcher = ((Pattern)ReflectionHelper.getFieldValue(ReflectionHelper.getField(ModDiscoverer.class, "zipJar"), null)).matcher(mod.getName());
+                if (matcher.matches()) {
+                    ReTweakResources.RETWEAK_LOGGER.info("Found a candidate mod!");
+                    reTweakModContainers.add(new ReTweakModContainer(mod));
+                }
+            } else {
+                ReTweakResources.RETWEAK_LOGGER.warn("Mod \"{}\" is not a file or is not a mod! ReTweak does not support this!", mod.getName());
+            }
+        }
+    }
+
+    public void identify() {
+        //TODO
+    }
+
+}
