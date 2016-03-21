@@ -8,10 +8,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.asm.transformers.BasicTransformer;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 /**
  * Created by Master801 on 3/19/2016 at 1:49 PM.
@@ -21,7 +21,7 @@ import org.slave.lib.asm.transformers.BasicTransformer;
 public final class LoaderTransformer extends BasicTransformer implements IClassTransformer {
 
     public LoaderTransformer() {
-        super(null);
+        super(ReTweakResources.RETWEAK_LOGGER);
     }
 
     @Override
@@ -38,6 +38,9 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
 
                 if (abstractInsnNode instanceof FieldInsnNode) {
                     FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
+
+                    //Injects our code after:
+                    //    discoverer = identifyMods();
                     if (fieldInsnNode.getOpcode() == Opcodes.PUTFIELD && fieldInsnNode.owner.equals("cpw/mods/fml/common/Loader") && fieldInsnNode.name.equals("discoverer") && fieldInsnNode.desc.equals("Lcpw/mods/fml/common/discovery/ModDiscoverer;")) {
                         InsnList injectionInstructions = new InsnList();
                         injectionInstructions.add(
@@ -46,20 +49,17 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
                         injectionInstructions.add(
                                 new FieldInsnNode(
                                         Opcodes.GETSTATIC,
-                                        "org/slave/minecraft/retweak/resources/ReTweakResources",
-                                        "RETWEAK_LOGGER",
-                                        "Lorg/apache/logging/log4j/Logger;"
+                                        "org/slave/minecraft/retweak/loading/ReTweakLoader",
+                                        "INSTANCE",
+                                        "Lorg/slave/minecraft/retweak/loading/ReTweakLoader;"
                                 )
                         );
                         injectionInstructions.add(
-                                new LdcInsnNode("Hello from Loader!")
-                        );
-                        injectionInstructions.add(
                                 new MethodInsnNode(
-                                        Opcodes.INVOKEINTERFACE,
-                                        "org/apache/logging/log4j/Logger",
-                                        "info",
-                                        "(Ljava/lang/String;)V",
+                                        Opcodes.INVOKEVIRTUAL,
+                                        "org/slave/minecraft/retweak/loading/ReTweakLoader",
+                                        "loadMods",
+                                        "()V",
                                         false
                                 )
                         );
@@ -68,7 +68,6 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
                 }
             }
         }
-
         return true;
     }
 
@@ -79,6 +78,11 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
 
     @Override
     protected boolean writeClassFile() {
+        return true;
+    }
+
+    @Override
+    protected boolean writeASMFile() {
         return true;
     }
 

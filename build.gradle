@@ -2,12 +2,12 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            name = 'forge'
+            url = 'http://files.minecraftforge.net/maven'
         }
         maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
     }
     dependencies {
@@ -43,6 +43,8 @@ jar {
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['sl4j-version']
     compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: project.properties['json-simple-version']
 }
 
 processResources {
@@ -51,7 +53,7 @@ processResources {
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        expand 'version': project.version, 'mcversion': project.minecraft.version
     }
 
     from(sourceSets.main.resources.srcDirs) {

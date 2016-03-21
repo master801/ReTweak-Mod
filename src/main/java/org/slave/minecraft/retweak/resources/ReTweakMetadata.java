@@ -2,7 +2,9 @@ package org.slave.minecraft.retweak.resources;
 
 import com.google.common.base.Joiner;
 import cpw.mods.fml.common.ModContainer;
+import net.minecraft.util.EnumChatFormatting;
 import org.slave.minecraft.library.api.Metadata;
+import org.slave.minecraft.library.helpers.ChatHelper;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.ReTweakMod;
 
@@ -21,7 +23,7 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String[] getAuthorList() {
         return new String[] {
-                "Master801"
+                ChatHelper.formatString("Master801", EnumChatFormatting.AQUA)
         };
     }
 
@@ -38,14 +40,13 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String getCredits() {
         return Joiner.on(System.lineSeparator()).join(new String[] {
-                "FyberOptic - Intermediary"
+                ChatHelper.formatString("FyberOptic - Intermediary", EnumChatFormatting.DARK_GREEN)
         });
     }
 
     @Override
     public String getDescription() {
         return Joiner.on(System.lineSeparator()).join(new String[] {
-                ""
         });
     }
 
@@ -56,12 +57,12 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getModID() {
-        return ModHelper.getReflectiveModID(ReTweakMod.class);
+        return ChatHelper.formatString(ModHelper.getReflectiveModID(ReTweakMod.class), EnumChatFormatting.DARK_AQUA);
     }
 
     @Override
     public String getModName() {
-        return ModHelper.getReflectiveModName(ReTweakMod.class);
+        return ChatHelper.formatString(ModHelper.getReflectiveModName(ReTweakMod.class), EnumChatFormatting.DARK_RED);
     }
 
     @Override
@@ -86,6 +87,7 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getModVersion() {
-        return ModHelper.getReflectiveModVersion(ReTweakMod.class);
+        return ChatHelper.formatString(ModHelper.getReflectiveModVersion(ReTweakMod.class), EnumChatFormatting.LIGHT_PURPLE);
     }
+
 }

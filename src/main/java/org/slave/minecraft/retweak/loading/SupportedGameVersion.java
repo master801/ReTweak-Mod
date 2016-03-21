@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.tweaking;
+package org.slave.minecraft.retweak.loading;
 
 /**
  * Created by Master801 on 3/19/2016 at 8:02 AM.

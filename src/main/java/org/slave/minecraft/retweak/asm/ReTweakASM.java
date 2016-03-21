@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 import org.slave.minecraft.retweak.asm.transformers.LoaderTransformer;
@@ -13,6 +14,7 @@ import java.util.Map;
  * @author Master801
  */
 @Name("ReTweak-Mod-ASM")
+@MCVersion("1.7.10")
 @TransformerExclusions({ "org.slave.minecraft.retweak.asm.*" })
 public final class ReTweakASM implements IFMLLoadingPlugin {
 

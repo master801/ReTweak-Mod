@@ -1,12 +1,12 @@
-package org.slave.minecraft.retweak.asm.discovery;
+package org.slave.minecraft.retweak.loading.discovery;
 
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.FileListHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.ReflectionHelper;
-import org.slave.minecraft.retweak.tweaking.ReTweakModContainer;
+import org.slave.minecraft.retweak.loading.ReTweakModCandidate;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.minecraft.retweak.tweaking.SupportedGameVersion;
+import org.slave.minecraft.retweak.loading.SupportedGameVersion;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,17 @@ public final class ReTweakModDiscoverer {
 
     private final SupportedGameVersion supportedGameVersion;
 
-    private final ArrayList<ReTweakModContainer> reTweakModContainers = new ArrayList<>();
+    private final ArrayList<ReTweakModCandidate> reTweakModCandidates = new ArrayList<>();
 
     public ReTweakModDiscoverer(SupportedGameVersion supportedGameVersion) {
         this.supportedGameVersion = supportedGameVersion;
     }
 
     public void findModsInDir(File dir) throws NoSuchFieldException, IllegalAccessException {
-        if (dir == null || !dir.exists() || !dir.isDirectory()) return;
+        if (dir == null || !dir.exists() || !dir.isDirectory()) {
+            ReTweakResources.RETWEAK_LOGGER.error("Invalid ReTweak mods directory!");
+            return;
+        }
         File[] modList = dir.listFiles();
         if (ArrayHelper.isNullOrEmpty(modList)) return;
 
@@ -45,7 +48,7 @@ public final class ReTweakModDiscoverer {
                 Matcher matcher = ((Pattern)ReflectionHelper.getFieldValue(ReflectionHelper.getField(ModDiscoverer.class, "zipJar"), null)).matcher(mod.getName());
                 if (matcher.matches()) {
                     ReTweakResources.RETWEAK_LOGGER.info("Found a candidate mod!");
-                    reTweakModContainers.add(new ReTweakModContainer(supportedGameVersion, mod));
+                    reTweakModCandidates.add(new ReTweakModCandidate(supportedGameVersion, mod));
                 }
             } else {
                 ReTweakResources.RETWEAK_LOGGER.warn("Mod \"{}\" is not a file or is not a mod! ReTweak does not support this!", mod.getName());
@@ -54,7 +57,11 @@ public final class ReTweakModDiscoverer {
     }
 
     public void identify() throws IOException {
-        for(ReTweakModContainer reTweakModContainer : reTweakModContainers) reTweakModContainer.search();
+        for(ReTweakModCandidate reTweakModContainer : reTweakModCandidates) reTweakModContainer.search();
+    }
+
+    public ArrayList<ReTweakModCandidate> getReTweakModCandidates() {
+        return reTweakModCandidates;
     }
 
 }

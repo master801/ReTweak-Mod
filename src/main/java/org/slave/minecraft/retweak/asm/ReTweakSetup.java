@@ -2,12 +2,10 @@ package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.slave.lib.helpers.ArrayHelper;
-import org.slave.minecraft.retweak.asm.discovery.ReTweakModDiscoverer;
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.minecraft.retweak.tweaking.SupportedGameVersion;
 
-import java.io.File;
 import java.util.Map;
 
 /**
@@ -19,44 +17,24 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        ReTweakClassLoader.instance = new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"));
+        //Set private field value
+        try {
+            ReflectionHelper.setFieldValue(
+                    ReflectionHelper.getField(
+                            ReTweakClassLoader.class,
+                            "instance"
+                    ),
+                    null,
+                    new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"))
+            );
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            ReTweakResources.RETWEAK_LOGGER.error("Failed to create class loader for ReTweak! ReTweak will not be able to load mods!");
+        }
     }
 
     @Override
     public Void call() throws Exception {
-        if (!ReTweakResources.RETWEAK_DIRECTORY.exists()) {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "Could not find directory \"{}\"! Creating it now...",
-                    ReTweakResources.RETWEAK_DIRECTORY.getName()
-            );
-            ReTweakResources.RETWEAK_DIRECTORY.mkdir();
-        }
-        findMods();
         return null;
-    }
-
-    private void findMods() throws Exception {
-        File[] subFiles = ReTweakResources.RETWEAK_DIRECTORY.listFiles();
-        if (!ArrayHelper.isNullOrEmpty(subFiles)) {
-            for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
-                File supportedGameVersionDir = null;
-                for(File subFile : subFiles) {
-                    if (subFile.isDirectory() && subFile.getName().equals(supportedGameVersion.getDirectoryName())) {
-                        ReTweakResources.RETWEAK_LOGGER.debug(
-                                "Found supported mods dir \"{}\"... searching it now for mods...",
-                                subFile.getName()
-                        );
-                        supportedGameVersionDir = subFile;
-                        break;
-                    }
-                }
-                if (supportedGameVersionDir != null) {
-                    ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer(supportedGameVersion);
-                    reTweakModDiscoverer.findModsInDir(supportedGameVersionDir);
-                    reTweakModDiscoverer.identify();
-                }
-            }
-        }
     }
 
 }
