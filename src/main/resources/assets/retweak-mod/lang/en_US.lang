@@ -1,0 +1,12 @@
+
+#GUI Config
+#-----------------------------------------
+
+#Categories
+retweak.gui.config.category.mods=Mods
+retweak.gui.config.category.1_2_5=1.2.5
+retweak.gui.config.category.1_4_6=1.4.6
+retweak.gui.config.category.1_4_7=1.4.7
+
+#Elements
+retweak.gui.config.element.enable=Enabled
