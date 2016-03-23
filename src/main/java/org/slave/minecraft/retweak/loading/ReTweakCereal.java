@@ -1,19 +1,14 @@
 package org.slave.minecraft.retweak.loading;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import org.slave.lib.helpers.ArrayHelper;
-import org.slave.lib.helpers.FileHelper;
-import org.slave.lib.helpers.StringHelper;
+import org.slave.lib.json.JSONConfig;
+import org.slave.lib.json.JSONType;
+import org.slave.lib.json.JSONUsage;
+import org.slave.lib.json.garden.JSONEnum;
+import org.slave.lib.json.garden.JSONTree;
+import org.slave.lib.json.garden.JSONTrunk;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Iterator;
 
 /**
  * Created by Master801 on 3/21/2016 at 12:39 PM.
@@ -28,9 +23,12 @@ public final class ReTweakCereal {
 
     public static final ReTweakCereal INSTANCE = new ReTweakCereal();
 
+    private JSONConfig<CocoaPuffs> jsonConfig = null;
+
     private ReTweakCereal() {
     }
 
+    /*
     public JSONArray initReTweakModConfig() throws IOException {
         if (!ReTweakCereal.RETWEAK_CONFIG_DIRECTORY.exists()) FileHelper.createDirectory(ReTweakCereal.RETWEAK_CONFIG_DIRECTORY);
         if (!ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) {
@@ -285,6 +283,69 @@ public final class ReTweakCereal {
         @Override
         public String toString() {
             return key;
+        }
+
+    }
+    */
+
+    public static final String MODS_IDENTIFIER = "mods";
+    public static final String SUPPORTED_GAME_VERSION_IDENTIFIER = "supported_game_version";
+
+    public JSONConfig<CocoaPuffs> getConfig() {
+        if (jsonConfig == null) {
+            JSONTree mod = new JSONTree(
+                    JSONUsage.ABSTRACT,
+                    ReTweakCereal.MODS_IDENTIFIER,
+                    JSONType.OBJECT,
+                    new JSONTrunk[] {
+                            CocoaPuffs.MODID,
+                            CocoaPuffs.ENABLE
+                    }
+            );
+
+            JSONTree supportedGameVersion = new JSONTree(
+                    JSONUsage.ABSTRACT,
+                    ReTweakCereal.SUPPORTED_GAME_VERSION_IDENTIFIER,
+                    JSONType.OBJECT,
+                    new JSONTrunk[] {
+                            CocoaPuffs.VERSION,
+                            mod
+                    }
+            );
+
+            JSONTree jsonTree = new JSONTree(
+                    JSONUsage.FUNCTIONAL,
+                    "main",//Functional, no need for static ID
+                    JSONType.ARRAY,
+                    new JSONTrunk[] {
+                            supportedGameVersion
+                    }
+            );
+            jsonConfig = new JSONConfig<>(
+                    CocoaPuffs.class,
+                    CocoaPuffs.ENABLE.entries(),
+                    jsonTree
+            );
+        }
+        return jsonConfig;
+    }
+
+    /**
+     * Created by Master801 on 3/22/2016 at 10:57 AM.
+     *
+     * @author Master801
+     */
+    public static final class CocoaPuffs extends JSONEnum<CocoaPuffs> {
+
+        public static final CocoaPuffs VERSION = new CocoaPuffs(JSONType.OBJECT, "version");
+
+        public static final CocoaPuffs MODID = new CocoaPuffs(JSONType.OBJECT, "modid");
+        public static final CocoaPuffs ENABLE = new CocoaPuffs(JSONType.OBJECT, "enable");
+
+        private static final long serialVersionUID = -8550136756616758730L;
+
+        private CocoaPuffs(JSONType JSONType, String jsonName) {
+            super(JSONType, jsonName);
         }
 
     }

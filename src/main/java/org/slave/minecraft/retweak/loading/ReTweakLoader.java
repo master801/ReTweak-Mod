@@ -1,8 +1,13 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.slave.lib.helpers.ArrayHelper;
+import org.slave.lib.json.garden.InvalidBranchException;
+import org.slave.lib.json.garden.JSONEnum;
+import org.slave.lib.json.garden.JSONPeach;
+import org.slave.lib.resources.Bulk;
 import org.slave.lib.resources.EnumMap;
 import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
+import org.slave.minecraft.retweak.loading.ReTweakCereal.CocoaPuffs;
 import org.slave.minecraft.retweak.loading.discovery.ReTweakModDiscoverer;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -10,7 +15,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -85,25 +92,80 @@ public final class ReTweakLoader {
                 }
             }
         }
-
-        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
-            try {
-                List<ReTweakModContainer> m = modContainers.get(supportedGameVersion);
-                ReTweakCereal.INSTANCE.writeReTweakModConfig(
-                        supportedGameVersion,
-                        m.toArray(new ReTweakModContainer[m.size()])
-                );
-            } catch(IOException e) {
-                ReTweakResources.RETWEAK_LOGGER.warn(
-                        "Failed to write ReTweak's mod configs!"
-                );
-            }
-        }
+        writeConfig();
     }
 
     public List<ReTweakModContainer> getModContainers(SupportedGameVersion supportedGameVersion) {
         if (supportedGameVersion == null) return Collections.emptyList();
         return modContainers.get(supportedGameVersion);
+    }
+
+    private void writeConfig() {
+        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
+            try {
+                List<ReTweakModContainer> reTweakModContainers = modContainers.get(supportedGameVersion);
+                /*
+                ReTweakCereal.INSTANCE.writeReTweakModConfig(
+                        supportedGameVersion,
+                        m.toArray(new ReTweakModContainer[m.size()])
+                );
+                */
+
+                JSONPeach[] mods = new JSONPeach[reTweakModContainers.size()];
+                for(int i = 0; i < mods.length; ++i) {
+                    ReTweakModContainer reTweakModContainer = reTweakModContainers.get(i);
+                    ArrayList<Entry<? extends JSONEnum, Object>> objects = new ArrayList<>();
+                    objects.add(
+                            new Bulk<JSONEnum, Object>(
+                                    CocoaPuffs.MODID,
+                                    reTweakModContainer.getModid()
+                            )
+                    );
+                    objects.add(
+                            new Bulk<JSONEnum, Object>(
+                                    CocoaPuffs.ENABLE,
+                                    Boolean.TRUE
+                            )
+                    );
+                    mods[i] = new JSONPeach(objects.toArray(new Entry[objects.size()]));
+                }
+
+                HashMap<String, JSONPeach[]> jsonPeaches = new HashMap<>();
+
+                jsonPeaches.put(
+                        ReTweakCereal.SUPPORTED_GAME_VERSION_IDENTIFIER,
+                        new JSONPeach[] {
+                                new JSONPeach(
+                                        new Entry[] {
+                                                new Bulk<>(
+                                                        CocoaPuffs.VERSION,
+                                                        supportedGameVersion.getDirectoryName()
+                                                )
+                                        }
+                                )
+                        }
+                );
+                jsonPeaches.put(
+                        ReTweakCereal.MODS_IDENTIFIER,
+                        mods
+                );
+
+                ReTweakCereal.INSTANCE.getConfig().stupidlySave(
+                        ReTweakCereal.RETWEAK_CONFIG_FILE,
+                        jsonPeaches
+                );
+            } catch(IOException e) {
+                ReTweakResources.RETWEAK_LOGGER.warn(
+                        "Failed to write ReTweak's mod configs!"
+                );
+            } catch(InvalidBranchException e) {
+                ReTweakResources.RETWEAK_LOGGER.warn(
+                        "ReTweak's file \"{}\" is invalid! Deleting...",
+                        ReTweakCereal.RETWEAK_CONFIG_FILE.getName()
+                );
+                ReTweakCereal.RETWEAK_CONFIG_FILE.delete();
+            }
+        }
     }
 
 }

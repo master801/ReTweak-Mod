@@ -12,7 +12,6 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.common.MinecraftForge;
 import org.slave.minecraft.library.api.network.proxy.Proxy;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -27,7 +26,7 @@ import org.slave.minecraft.retweak.resources.ReTweakStrings;
         modid = ReTweakStrings.RETWEAK_MOD,
         name = ReTweakStrings.RETWEAK_MOD,
         version = ReTweakStrings.RETWEAK_VERSION,
-        guiFactory = "org.slave.minecraft.retweak.client.config.ReTweakGUIFactory"
+        guiFactory = ReTweakStrings.RETWEAK_GUI_FACTORY
 )
 public final class ReTweakMod {
 
@@ -51,7 +50,6 @@ public final class ReTweakMod {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        MinecraftForge.EVENT_BUS.register(this);
         FMLCommonHandler.instance().bus().register(this);
     }
 
