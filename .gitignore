@@ -6,5 +6,8 @@
 *.ipr
 *.iws
 
+#Misc
+/libs
+
 #Gradle
 /.gradle
