@@ -66,7 +66,10 @@ public final class ReTweakMod {
             try {
                 ReTweakCereal.INSTANCE.update();
             } catch(IOException e) {
-                ReTweakResources.RETWEAK_LOGGER.warn("Caught an exception while saving the modifying the config file!", e);
+                ReTweakResources.RETWEAK_LOGGER.warn(
+                        "Caught an exception while modifying the config file!",
+                        e
+                );
             }
         }
     }

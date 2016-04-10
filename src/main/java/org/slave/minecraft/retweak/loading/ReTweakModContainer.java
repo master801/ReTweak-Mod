@@ -1,5 +1,7 @@
 package org.slave.minecraft.retweak.loading;
 
+import org.slave.minecraft.retweak.loading.fruit.ReTweakGrape;
+
 /**
  * <p>
  *     {@link cpw.mods.fml.common.ModContainer}
@@ -39,6 +41,13 @@ public final class ReTweakModContainer {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public ReTweakGrape toGrape() {
+        return new ReTweakGrape(
+                getModid(),
+                isEnabled()
+        );
     }
 
 }

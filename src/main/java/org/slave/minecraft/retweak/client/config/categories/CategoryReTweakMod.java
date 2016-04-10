@@ -38,10 +38,7 @@ public final class CategoryReTweakMod extends AbstractCategory {
                         ReTweakStrings.RETWEAK_CONFIG_ELEMENT_ENABLE,
                         Boolean.valueOf(reTweakModContainer.isEnabled()).toString(),
                         Type.BOOLEAN,
-                        new String[] {
-                                Boolean.TRUE.toString(),
-                                Boolean.FALSE.toString()
-                        }
+                        BasicConfigElement.VALID_BOOLEAN_VALUES
                 )
         ) {
 
