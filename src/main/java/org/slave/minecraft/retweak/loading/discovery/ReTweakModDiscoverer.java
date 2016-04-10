@@ -5,13 +5,12 @@ import cpw.mods.fml.relauncher.FileListHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.ReTweakModCandidate;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.minecraft.retweak.loading.SupportedGameVersion;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -24,6 +23,8 @@ import java.util.regex.Pattern;
  * @author Master801
  */
 public final class ReTweakModDiscoverer {
+
+    private static Pattern fmlZipJar = null;
 
     private final SupportedGameVersion supportedGameVersion;
     private final ArrayList<ReTweakModCandidate> reTweakModCandidates = new ArrayList<>();
@@ -40,12 +41,20 @@ public final class ReTweakModDiscoverer {
         File[] modList = dir.listFiles();
         if (ArrayHelper.isNullOrEmpty(modList)) return;
 
+        if (ReTweakModDiscoverer.fmlZipJar == null) {
+            ReTweakModDiscoverer.fmlZipJar = ReflectionHelper.getFieldValue(
+                    ReflectionHelper.getField(
+                            ModDiscoverer.class,
+                            "zipJar"
+                    ),
+                    null
+            );
+        }
         modList = FileListHelper.sortFileList(modList);
 
         for(File mod : modList) {
             if (mod.isFile()) {
-                Matcher matcher = ((Pattern)ReflectionHelper.getFieldValue(ReflectionHelper.getField(ModDiscoverer.class, "zipJar"), null)).matcher(mod.getName());
-                if (matcher.matches()) {
+                if (ReTweakModDiscoverer.fmlZipJar.matcher(mod.getName()).matches()) {
                     ReTweakResources.RETWEAK_LOGGER.info("Found a candidate mod!");//TODO Should be a debug message with more info
                     reTweakModCandidates.add(new ReTweakModCandidate(supportedGameVersion, mod));
                 }

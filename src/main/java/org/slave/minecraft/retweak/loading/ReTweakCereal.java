@@ -8,9 +8,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.slave.lib.helpers.FileHelper;
 import org.slave.minecraft.retweak.loading.fruit.ReTweakGrape;
+import org.slave.minecraft.retweak.loading.fruit.ReTweakGrape.ReTweakGrapeDeserializer;
 import org.slave.minecraft.retweak.loading.fruit.ReTweakGrape.ReTweakGrapeSerializer;
 import org.slave.minecraft.retweak.loading.fruit.ReTweakGrapeVine;
+import org.slave.minecraft.retweak.loading.fruit.ReTweakGrapeVine.ReTweakGrapeVineDeserializer;
 import org.slave.minecraft.retweak.loading.fruit.ReTweakGrapeVine.ReTweakGrapeVineSerializer;
+import org.slave.minecraft.retweak.loading.fruit.ReTweakPeach;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
@@ -39,7 +42,9 @@ public final class ReTweakCereal {
         gsonBuilder.setPrettyPrinting();
 
         gsonBuilder.registerTypeAdapter(ReTweakGrapeVine.class, new ReTweakGrapeVineSerializer());
+        gsonBuilder.registerTypeAdapter(ReTweakGrapeVine.class, new ReTweakGrapeVineDeserializer());
         gsonBuilder.registerTypeAdapter(ReTweakGrape.class, new ReTweakGrapeSerializer());
+        gsonBuilder.registerTypeAdapter(ReTweakGrape.class, new ReTweakGrapeDeserializer());
 
         gson = gsonBuilder.create();
     }
@@ -47,7 +52,7 @@ public final class ReTweakCereal {
     public void update() throws IOException {
         if (!ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) create();
 
-        boolean broken = false;
+        boolean broken = false, save = false;
         FileReader fileReader = new FileReader(ReTweakCereal.RETWEAK_CONFIG_FILE);
         JsonArray jsonArray = gson.fromJson(
                 fileReader,
@@ -56,8 +61,8 @@ public final class ReTweakCereal {
         for(JsonElement supportedGameVersionElement : jsonArray) {
             JsonObject supportedGameVersionObject = supportedGameVersionElement.getAsJsonObject();
 
-            JsonElement version = supportedGameVersionObject.get("version");
-            JsonArray mods = supportedGameVersionObject.getAsJsonArray("mods");
+            JsonElement version = supportedGameVersionObject.get(ReTweakPeach.JSON_MEMBER_NAME_VERSION);
+            JsonArray mods = supportedGameVersionObject.getAsJsonArray(ReTweakPeach.JSON_MEMBER_NAME_MODS);
 
             SupportedGameVersion supportedGameVersion = SupportedGameVersion.getFromVersion(version.getAsString());
             if (supportedGameVersion == null) {
@@ -66,6 +71,7 @@ public final class ReTweakCereal {
                         version.getAsString()
                 );
                 broken = true;
+                save = false;
                 break;
             }
 
@@ -74,12 +80,17 @@ public final class ReTweakCereal {
             for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
                 for(JsonElement element : mods) {
                     JsonObject mod = element.getAsJsonObject();
-                    if (mod.get("name").getAsString().equals(reTweakModContainer.getModid())) {
-                        mod.remove("enable");
-                        mod.add(
-                                "enable",
-                                new JsonPrimitive(reTweakModContainer.isEnabled())
-                        );
+                    if (mod.get(ReTweakPeach.JSON_MEMBER_NAME_NAME).getAsString().equals(reTweakModContainer.getModid())) {
+                        if (mod.get(ReTweakPeach.JSON_MEMBER_NAME_ENABLE).getAsBoolean() != reTweakModContainer.isEnabled()) {
+
+                            mod.remove(ReTweakPeach.JSON_MEMBER_NAME_ENABLE);
+                            mod.add(
+                                    ReTweakPeach.JSON_MEMBER_NAME_ENABLE,
+                                    new JsonPrimitive(reTweakModContainer.isEnabled())
+                            );
+                            save = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -95,20 +106,24 @@ public final class ReTweakCereal {
                     "ReTweak's config file was marked as broken, renamed to \"{}\". Please either fix or delete the config file.",
                     newName
             );
+            save = false;
         }
 
-        FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
-        gson.toJson(
-                jsonArray,
-                fileWriter
-        );
-        fileWriter.flush();
-        fileWriter.close();
+        if (save) {
+            FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
+            gson.toJson(
+                    jsonArray,
+                    fileWriter
+            );
+            fileWriter.flush();
+            fileWriter.close();
+        }
     }
 
     public void modify(final SupportedGameVersion supportedGameVersion, final List<ReTweakModContainer> reTweakModContainers) throws IOException {
         if (!ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) create();
 
+        boolean save = false;
         FileReader fileReader = new FileReader(ReTweakCereal.RETWEAK_CONFIG_FILE);
         JsonArray jsonArray = gson.fromJson(
                 fileReader,
@@ -118,35 +133,34 @@ public final class ReTweakCereal {
         for(JsonElement supportedGameVersionObject : jsonArray) {
             JsonObject jsonObject = supportedGameVersionObject.getAsJsonObject();
 
-            JsonElement versionObject = jsonObject.get("version");
-            JsonArray modsObject = jsonObject.get("mods").getAsJsonArray();
+            JsonElement versionObject = jsonObject.get(ReTweakPeach.JSON_MEMBER_NAME_VERSION);
+            JsonArray modsObject = jsonObject.get(ReTweakPeach.JSON_MEMBER_NAME_MODS).getAsJsonArray();
             if (versionObject.getAsString().equals(supportedGameVersion.getVersion())) {
                 for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
-                    boolean contains = false;
                     for(JsonElement modElement : modsObject) {
-                        if (modElement.getAsJsonObject().get("name").getAsString().equals(reTweakModContainer.getModid())) {
-                            contains = true;
+                        if (modElement.getAsJsonObject().get(ReTweakPeach.JSON_MEMBER_NAME_NAME).getAsString().equals(reTweakModContainer.getModid())) {
+                            modsObject.add(gson.toJsonTree(
+                                    reTweakModContainer.toGrape(),
+                                    ReTweakGrape.class
+                            ));
+                            save = true;
                             break;
                         }
-                    }
-                    if (!contains) {
-                        modsObject.add(gson.toJsonTree(
-                                reTweakModContainer.toGrape(),
-                                ReTweakGrape.class
-                        ));
                     }
                 }
             }
         }
         fileReader.close();
 
-        FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
-        gson.toJson(
-                jsonArray,
-                fileWriter
-        );
-        fileWriter.flush();
-        fileWriter.close();
+        if (save) {
+            FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
+            gson.toJson(
+                    jsonArray,
+                    fileWriter
+            );
+            fileWriter.flush();
+            fileWriter.close();
+        }
     }
 
     private void create() throws IOException {

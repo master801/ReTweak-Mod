@@ -1,8 +1,11 @@
 package org.slave.minecraft.retweak.loading.fruit;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
@@ -36,16 +39,8 @@ public final class ReTweakGrapeVine implements Serializable {
         return version;
     }
 
-    public List<ReTweakGrape> getMods() {
+    public Iterable<ReTweakGrape> getMods() {
         return mods;
-    }
-
-    public void setMods(List<ReTweakGrape> grapes) {
-        this.mods = grapes;
-    }
-
-    public void addMod(ReTweakGrape grape) {
-        if (mods != null) mods.add(grape);
     }
 
     public static final class ReTweakGrapeVineSerializer implements JsonSerializer<ReTweakGrapeVine> {
@@ -65,14 +60,37 @@ public final class ReTweakGrapeVine implements Serializable {
             }
 
             jsonElement.add(
-                    "version",
+                    ReTweakPeach.JSON_MEMBER_NAME_VERSION,
                     new JsonPrimitive(src.getVersion())
             );
             jsonElement.add(
-                    "mods",
+                    ReTweakPeach.JSON_MEMBER_NAME_MODS,
                     mods
             );
             return jsonElement;
+        }
+
+    }
+
+    public static final class ReTweakGrapeVineDeserializer implements JsonDeserializer<ReTweakGrapeVine> {
+
+        @Override
+        public ReTweakGrapeVine deserialize(final JsonElement json, final Type typeOfT, final JsonDeserializationContext context) throws JsonParseException {
+            JsonObject modObject = json.getAsJsonObject();
+            JsonObject version = modObject.getAsJsonObject(ReTweakPeach.JSON_MEMBER_NAME_VERSION);
+            JsonArray mods = modObject.getAsJsonArray(ReTweakPeach.JSON_MEMBER_NAME_MODS);
+
+            ReTweakGrapeVine grapeVine = new ReTweakGrapeVine();
+            grapeVine.version = version.getAsString();
+            grapeVine.mods = new ArrayList<>();
+            for(JsonElement jsonElement : mods) {
+                ReTweakGrape grape = context.deserialize(
+                        jsonElement.getAsJsonObject(),
+                        ReTweakGrapeVine.class
+                );
+                grapeVine.mods.add(grape);
+            }
+            return grapeVine;
         }
 
     }
