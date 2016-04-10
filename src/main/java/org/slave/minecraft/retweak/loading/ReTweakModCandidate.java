@@ -151,7 +151,7 @@ public final class ReTweakModCandidate {
      * Finds classes that have the {@link cpw.mods.fml.common.Mod} annotation
      */
     private void findModClass() throws IOException {
-        if (zipFile == null) throw new IllegalStateException("Zip File field not found! -- \"findMainClass\" was invoked before \"search\"!");
+        if (zipFile == null) throw new IllegalStateException("Zip File field not found! -- \"findModClass\" was invoked before \"search\"!");
 
         for(ZipEntry zipEntry : classes) {
             InputStream zipEntryInputStream = zipFile.getInputStream(zipEntry);
@@ -183,7 +183,7 @@ public final class ReTweakModCandidate {
         }
     }
 
-    public enum Type {
+    enum Type {
 
         ANNOTATION,
 

@@ -137,15 +137,21 @@ public final class ReTweakCereal {
             JsonArray modsObject = jsonObject.get(ReTweakPeach.JSON_MEMBER_NAME_MODS).getAsJsonArray();
             if (versionObject.getAsString().equals(supportedGameVersion.getVersion())) {
                 for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
+
+                    boolean contains = false;
                     for(JsonElement modElement : modsObject) {
                         if (modElement.getAsJsonObject().get(ReTweakPeach.JSON_MEMBER_NAME_NAME).getAsString().equals(reTweakModContainer.getModid())) {
-                            modsObject.add(gson.toJsonTree(
-                                    reTweakModContainer.toGrape(),
-                                    ReTweakGrape.class
-                            ));
-                            save = true;
+                            contains = true;
                             break;
                         }
+                    }
+
+                    if (!contains) {
+                        modsObject.add(gson.toJsonTree(
+                                reTweakModContainer.toGrape(),
+                                ReTweakGrape.class
+                        ));
+                        save = true;
                     }
                 }
             }

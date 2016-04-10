@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -24,6 +25,10 @@ import java.util.List;
 public final class ReTweakLoader {
 
     public static final ReTweakLoader INSTANCE = new ReTweakLoader();
+
+    private static final Pattern PATTERN_MOD_ID = Pattern.compile(
+            "( |\t)|(\r|\n)|\""
+    );
 
     private final EnumMap<SupportedGameVersion, ArrayList<ReTweakModContainer>> modContainers;
 
@@ -46,7 +51,9 @@ public final class ReTweakLoader {
      */
     public void loadMods() {
         if (!ReTweakResources.RETWEAK_MODS_DIRECTORY.exists()) {
-            ReTweakResources.RETWEAK_LOGGER.warn("Mods directory for ReTweak was not found, creating it now...");
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Mods directory for ReTweak was not found, creating it now..."
+            );
             //noinspection ResultOfMethodCallIgnored
             ReTweakResources.RETWEAK_MODS_DIRECTORY.mkdirs();
         }
@@ -73,12 +80,20 @@ public final class ReTweakLoader {
 
                         for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getReTweakModCandidates()) {
                             for(ReTweakModContainer reTweakModContainer : reTweakModCandidate.getModContainers()) {
+                                if (ReTweakLoader.PATTERN_MOD_ID.matcher(reTweakModContainer.getModid()).matches()) {
+                                    ReTweakResources.RETWEAK_LOGGER.warn(
+                                            "ReTweak will not load mod \"{}\" because its mod id matches pattern \"{}\".",
+                                            reTweakModContainer.getModid(),
+                                            ReTweakLoader.PATTERN_MOD_ID.toString()
+                                    );
+                                    continue;
+                                }
                                 modContainers.get(supportedGameVersion).add(reTweakModContainer);
                             }
                         }
                     } catch(IOException | IllegalAccessException | NoSuchFieldException e) {
                         ReTweakResources.RETWEAK_LOGGER.warn(
-                                "Failed to load ReTweak mods due to catching an exception! Exception: {}",
+                                "Failed to load ReTweak mods due to catching an exception!",
                                 e
                         );
                     }
