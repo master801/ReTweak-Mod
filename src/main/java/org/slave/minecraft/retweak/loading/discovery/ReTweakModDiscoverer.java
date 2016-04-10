@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 public final class ReTweakModDiscoverer {
 
     private final SupportedGameVersion supportedGameVersion;
-
     private final ArrayList<ReTweakModCandidate> reTweakModCandidates = new ArrayList<>();
 
     public ReTweakModDiscoverer(SupportedGameVersion supportedGameVersion) {

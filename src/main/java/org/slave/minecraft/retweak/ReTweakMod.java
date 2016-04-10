@@ -14,8 +14,11 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import org.slave.minecraft.library.api.network.proxy.Proxy;
 import org.slave.minecraft.library.helpers.ModHelper;
+import org.slave.minecraft.retweak.loading.ReTweakCereal;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.minecraft.retweak.resources.ReTweakStrings;
+
+import java.io.IOException;
 
 /**
  * Created by Master801 on 3/18/2016 at 9:09 PM.
@@ -60,7 +63,11 @@ public final class ReTweakMod {
     @SubscribeEvent
     public void onConfigChanged(OnConfigChangedEvent event) {
         if (event.modID.equals(ReTweakStrings.RETWEAK_MOD) && event.configID.equals(ReTweakStrings.RETWEAK_GUI_CONFIG_ID)) {
-            //TODO
+            try {
+                ReTweakCereal.INSTANCE.update();
+            } catch(IOException e) {
+                ReTweakResources.RETWEAK_LOGGER.warn("Caught an exception while saving the modifying the config file!", e);
+            }
         }
     }
 

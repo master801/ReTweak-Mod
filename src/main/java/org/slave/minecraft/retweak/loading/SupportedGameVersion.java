@@ -13,14 +13,21 @@ public enum SupportedGameVersion {
 
     V_1_4_7("1.4.7");
 
-    private final String directoryName;
+    private final String version;
 
-    SupportedGameVersion(final String directoryName) {
-        this.directoryName = directoryName;
+    SupportedGameVersion(final String version) {
+        this.version = version;
     }
 
-    public String getDirectoryName() {
-        return directoryName;
+    public String getVersion() {
+        return version;
+    }
+
+    public static SupportedGameVersion getFromVersion(String version) {
+        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
+            if (supportedGameVersion.getVersion().equals(version)) return supportedGameVersion;
+        }
+        return null;
     }
 
 }

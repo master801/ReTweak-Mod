@@ -1,14 +1,17 @@
 package org.slave.minecraft.retweak.loading;
 
-import org.slave.lib.json.JSONConfig;
-import org.slave.lib.json.JSONType;
-import org.slave.lib.json.JSONUsage;
-import org.slave.lib.json.garden.JSONEnum;
-import org.slave.lib.json.garden.JSONTree;
-import org.slave.lib.json.garden.JSONTrunk;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slave.lib.helpers.FileHelper;
+import org.slave.minecraft.retweak.loading.fruit.ReTweakGrapeVine;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Master801 on 3/21/2016 at 12:39 PM.
@@ -22,332 +25,44 @@ public final class ReTweakCereal {
     public static final File RETWEAK_CONFIG_FILE = new File(ReTweakCereal.RETWEAK_CONFIG_DIRECTORY, "mods.json");
 
     public static final ReTweakCereal INSTANCE = new ReTweakCereal();
-
-    private JSONConfig<CocoaPuffs> jsonConfig = null;
+    private final JsonFactory jsonFactory = new JsonFactory();
 
     private ReTweakCereal() {
     }
 
-    /*
-    public JSONArray initReTweakModConfig() throws IOException {
-        if (!ReTweakCereal.RETWEAK_CONFIG_DIRECTORY.exists()) FileHelper.createDirectory(ReTweakCereal.RETWEAK_CONFIG_DIRECTORY);
-        if (!ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) {
-            FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
+    public void update() throws IOException {
+        if (!ReTweakCereal.RETWEAK_CONFIG_FILE.getParentFile().exists() || !ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) create();
 
-            JSONArray jsonArray = new JSONArray();
-            for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) add(jsonArray, supportedGameVersion);
-            jsonArray.writeJSONString(fileWriter);
-
-            fileWriter.flush();
-            fileWriter.close();
-
-            return jsonArray;
-        } else {
-            return sanityChecks();
-        }
-    }
-
-    public void readReTweakModConfig() throws IOException {
-        initReTweakModConfig();
-        //TODO?
-    }
-
-    public void writeReTweakModConfig(SupportedGameVersion supportedGameVersion, ReTweakModContainer[] reTweakModContainers) throws IOException {
-        if (supportedGameVersion == null || ArrayHelper.isNullOrEmpty(reTweakModContainers)) return;
-        JSONArray jsonArray = initReTweakModConfig();
-
-        for(Object object : jsonArray) {
-            JSONObject gameVersion = (JSONObject)object;
-            if (gameVersion.get(Key.VERSION.toString()).equals(supportedGameVersion.getDirectoryName())) {
-                JSONArray mods = (JSONArray)gameVersion.get(Key.MODS.toString());
-
-                for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
-                    boolean exists = false;
-                    for(Object modObject : mods) {
-                        exists = ((JSONObject)modObject).get(Key.MODID.toString()).equals(reTweakModContainer.getModid());
-                        if (exists) break;
-                    }
-                    if (exists) {
-                        ReTweakResources.RETWEAK_LOGGER.debug("ReTweak's config file already contains mod \"{}\"! Skipping it...", reTweakModContainer.getModid());
-                        continue;
-                    }
-                    add(gameVersion, reTweakModContainer);
-                }
-            }
-        }
-
-        FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
-        jsonArray.writeJSONString(fileWriter);
-        fileWriter.flush();
-        fileWriter.close();
-    }
-
-    public void enable(ReTweakModContainer reTweakModContainer, Boolean enable) {
-        if (reTweakModContainer == null) return;
-        if (enable == null) enable = Boolean.TRUE;
         //TODO
     }
 
-    private void add(JSONObject supportedGameVersion, ReTweakModContainer reTweakModContainer) throws IOException {
-        if (supportedGameVersion.get(Key.VERSION.toString()) == null) return;
-        JSONArray mods = (JSONArray)supportedGameVersion.get(Key.MODS.toString());
-        if (mods == null) {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "Invalid ReTweak \"mods.json\" config file!"
-            );
-            return;
-        }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put(Key.ENABLE.toString(), Boolean.TRUE);
-        jsonObject.put(Key.MODID.toString(), reTweakModContainer.getModid());
-        mods.add(jsonObject);
+    public void modify(final SupportedGameVersion supportedGameVersion, final List<ReTweakModContainer> reTweakModContainers) throws IOException {
+        if (!ReTweakCereal.RETWEAK_CONFIG_FILE.getParentFile().exists() || !ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) create();
+
+        //TODO
     }
 
-    private void remove(JSONObject supportedGameVersion, ReTweakModContainer reTweakModContainer) throws IOException {
-        if (supportedGameVersion.get(Key.VERSION.toString()) == null) return;
-        JSONArray mods = (JSONArray)supportedGameVersion.get(Key.MODS.toString());
-        if (mods == null) {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "Invalid ReTweak \"mods.json\" config file!"
-            );
-            return;
+    private void create() throws IOException {
+        FileHelper.createDirectory(ReTweakCereal.RETWEAK_CONFIG_FILE.getParentFile());
+        FileOutputStream fileOutputStream = new FileOutputStream(ReTweakCereal.RETWEAK_CONFIG_FILE);
+
+        JsonGenerator jsonGenerator = jsonFactory.createGenerator(fileOutputStream).useDefaultPrettyPrinter();
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        ArrayList<ReTweakGrapeVine> grapeVines = new ArrayList<>();
+        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
+            grapeVines.add(new ReTweakGrapeVine(supportedGameVersion.getVersion()));
         }
-        for(Object object : mods) {
-            if (object instanceof JSONObject) {
-                String modid = (String)((JSONObject)object).get("modid");
-                if (!StringHelper.isNullOrEmpty(modid) && modid.equals(reTweakModContainer.getModid())) {
-                    mods.remove(object);
-                    break;
-                }
-            }
-        }
-    }
+        objectMapper.writeValue(
+                jsonGenerator,
+                grapeVines
+        );
 
-    private void add(JSONArray mainArray, SupportedGameVersion supportedGameVersion) throws IOException {
-        JSONObject jsonObject = new JSONObject();
+        jsonGenerator.flush();
+        jsonGenerator.close();
 
-        jsonObject.put(Key.VERSION.toString(), supportedGameVersion.getDirectoryName());
-        jsonObject.put(Key.MODS.toString(), new JSONArray());
-
-        mainArray.add(jsonObject);
-    }
-
-    private void remove(JSONArray mainArray, SupportedGameVersion supportedGameVersion) throws IOException {
-        Iterator iterator = mainArray.iterator();
-        while(iterator.hasNext()) {
-            JSONObject next = (JSONObject)iterator.next();
-
-            String version = (String)next.get(Key.VERSION.toString());
-            if (!StringHelper.isNullOrEmpty(version) && version.equals(supportedGameVersion.getDirectoryName())) {
-                iterator.remove();
-                break;
-            }
-
-        }
-    }
-
-    private void enable(JSONObject reTweakModContainer, boolean enable) {
-        if (reTweakModContainer.get(Key.MODID.toString()) == null) return;
-        reTweakModContainer.put(Key.ENABLE.toString(), enable);
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private JSONArray sanityChecks() throws IOException {
-        FileReader fileReader = new FileReader(ReTweakCereal.RETWEAK_CONFIG_FILE);
-
-        JSONArray jsonArray = null;
-        try {
-            jsonArray = (JSONArray)new JSONParser().parse(fileReader);
-        } catch(ParseException e) {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "ReTweak's \"mods.json\" file is invalid!"
-            );
-        } catch(ClassCastException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    "Excepted an array but got something else!\nInvalid \"mods.json\" file!\nDeleting..."
-            );
-            fileReader.close();
-            ReTweakCereal.RETWEAK_CONFIG_FILE.delete();
-            return null;
-        }
-        if (jsonArray == null) return null;
-
-        for(Object object : jsonArray) {
-            if (!(object instanceof JSONObject)) {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                        "Expected an object but got something else!\nInvalid \"mods.json\" file!\nDeleting..."
-                );
-                fileReader.close();
-                ReTweakCereal.RETWEAK_CONFIG_FILE.delete();
-                return null;
-            }
-
-            JSONObject jsonObject = (JSONObject)object;
-
-            Object version = jsonObject.get(Key.VERSION.toString());
-            Object mods = jsonObject.get(Key.MODS.toString());
-
-            if (version == null || !(version instanceof String)) {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                        "No key \"{}\" found for object \"{}\"!\nInvalid \"mods.json\" file!\nDeleting...",
-                        Key.VERSION,
-                        jsonObject
-                );
-                fileReader.close();
-                ReTweakCereal.RETWEAK_CONFIG_FILE.delete();
-                return null;
-            } else {
-                boolean exists = false;
-                for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
-                    if (supportedGameVersion.getDirectoryName().equals(version)) {
-                        exists = true;
-                        break;
-                    }
-                }
-                if (!exists) {
-                    ReTweakResources.RETWEAK_LOGGER.error(
-                            "Version \"{}\" is not supported!",
-                            version
-                    );
-                    fileReader.close();
-                    return null;
-                }
-            }
-            if (mods == null || !(mods instanceof JSONArray)) {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                        "No key \"{}\" found for object \"{}\"!\nInvalid \"mods.json\" file!\nDeleting...",
-                        Key.MODS,
-                        jsonObject
-                );
-                fileReader.close();
-                ReTweakCereal.RETWEAK_CONFIG_FILE.delete();
-                return null;
-            } else {
-                JSONArray modsArray = (JSONArray)mods;
-                Iterator iterator = modsArray.iterator();
-                while(iterator.hasNext()) {
-                    Object object_ = iterator.next();
-
-                    if (object_ == null || !(object_ instanceof JSONObject)) {
-                        ReTweakResources.RETWEAK_LOGGER.warn(
-                                "Invalid entry! Entry: {}",
-                                object_
-                        );
-                        continue;
-                    }
-
-                    JSONObject mod = (JSONObject)object_;
-
-                    Object modid = mod.get(Key.MODID.toString());
-                    Object enable = mod.get(Key.ENABLE.toString());
-
-                    if (modid == null) {
-                        fileReader.close();
-                        iterator.remove();//Remove this invalid entry
-
-                        //Rewrite it
-                        FileWriter fileWriter = new FileWriter(ReTweakCereal.RETWEAK_CONFIG_FILE);
-                        jsonArray.writeJSONString(fileWriter);
-                        fileWriter.flush();
-                        fileWriter.close();
-
-                        return null;
-                    }
-
-                    if (enable == null) mod.put(Key.ENABLE.toString(), Boolean.TRUE);//Write true if read as an invalid
-                }
-            }
-        }
-
-        fileReader.close();
-
-        return jsonArray;
-    }
-
-    private enum Key {
-
-        ENABLE("enable"),
-
-        VERSION("version"),
-
-        MODID("modid"),
-
-        MODS("mods");
-
-        private final String key;
-
-        Key(final String key) {
-            this.key = key;
-        }
-
-        @Override
-        public String toString() {
-            return key;
-        }
-
-    }
-    */
-
-    public static final String MODS_IDENTIFIER = "mods";
-    public static final String SUPPORTED_GAME_VERSION_IDENTIFIER = "supported_game_version";
-
-    public JSONConfig<CocoaPuffs> getConfig() {
-        if (jsonConfig == null) {
-            JSONTree mod = new JSONTree(
-                    JSONUsage.ABSTRACT,
-                    ReTweakCereal.MODS_IDENTIFIER,
-                    JSONType.OBJECT,
-                    new JSONTrunk[] {
-                            CocoaPuffs.MODID,
-                            CocoaPuffs.ENABLE
-                    }
-            );
-
-            JSONTree supportedGameVersion = new JSONTree(
-                    JSONUsage.ABSTRACT,
-                    ReTweakCereal.SUPPORTED_GAME_VERSION_IDENTIFIER,
-                    JSONType.OBJECT,
-                    new JSONTrunk[] {
-                            CocoaPuffs.VERSION,
-                            mod
-                    }
-            );
-
-            JSONTree jsonTree = new JSONTree(
-                    JSONUsage.FUNCTIONAL,
-                    "main",//Functional, no need for static ID
-                    JSONType.ARRAY,
-                    new JSONTrunk[] {
-                            supportedGameVersion
-                    }
-            );
-            jsonConfig = new JSONConfig<>(
-                    CocoaPuffs.class,
-                    CocoaPuffs.ENABLE.entries(),
-                    jsonTree
-            );
-        }
-        return jsonConfig;
-    }
-
-    /**
-     * Created by Master801 on 3/22/2016 at 10:57 AM.
-     *
-     * @author Master801
-     */
-    public static final class CocoaPuffs extends JSONEnum<CocoaPuffs> {
-
-        public static final CocoaPuffs VERSION = new CocoaPuffs(JSONType.OBJECT, "version");
-
-        public static final CocoaPuffs MODID = new CocoaPuffs(JSONType.OBJECT, "modid");
-        public static final CocoaPuffs ENABLE = new CocoaPuffs(JSONType.OBJECT, "enable");
-
-        private static final long serialVersionUID = -8550136756616758730L;
-
-        private CocoaPuffs(JSONType JSONType, String jsonName) {
-            super(JSONType, jsonName);
-        }
-
+        fileOutputStream.flush();
+        fileOutputStream.close();
     }
 
 }

@@ -33,8 +33,8 @@ public final class ReTweakModContainer {
         return version;
     }
 
-    void disable() {
-        enabled = false;
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public boolean isEnabled() {

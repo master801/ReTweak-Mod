@@ -36,7 +36,7 @@ public final class CategoryReTweakMods extends AbstractCategory {
                 modContainerElements.add(new CategoryReTweakMod(reTweakModContainer));
             }
 
-            elements.add(new AbstractCategory(ReTweakStrings.RETWEAK_CONFIG_CATEGORY_PREFIX + supportedGameVersion.getDirectoryName().replace('.', '_'), true, true) {
+            elements.add(new AbstractCategory(ReTweakStrings.RETWEAK_CONFIG_CATEGORY_PREFIX + supportedGameVersion.getVersion().replace('.', '_'), true, true) {
 
                 @Override
                 protected List<IConfigElement> getConfigElements() {

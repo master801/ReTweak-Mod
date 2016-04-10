@@ -34,9 +34,9 @@ minecraft {
 
 jar {
     manifest {
-        attributes 'Created-By' : 'Master801'
-        attributes 'FMLCorePlugin' : 'org.slave.minecraft.retweak.asm.ReTweakASM'
-        attributes 'FMLCorePluginContainsFMLMod' : 'true'
+        attributes 'Created-By': 'Master801'
+        attributes 'FMLCorePlugin': 'org.slave.minecraft.retweak.asm.ReTweakASM'
+        attributes 'FMLCorePluginContainsFMLMod': 'true'
     }
 }
 
@@ -45,17 +45,17 @@ dependencies {
     compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: project.properties['json-simple-version']
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: project.properties['jackson-version']
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: project.properties['jackson-version']
 
-    final String slaveLibPrefix = 'Slave-Lib'
     compile fileTree(
-        dir: 'libs',
-        include: [
-            slaveLibPrefix + '-' + '*' + '.jar',
-            slaveLibPrefix + '-' + 'ASM' + '-' + '*' + '.jar',
-            slaveLibPrefix + '-' + 'JSON' + '-' + '*' + '.jar',
-
-            '801-Library' + '-' + '*' + '-'  + '.jar'
-        ]
+            dir: 'libs',
+            include: [
+                    '*.jar'
+            ],
+            exclude: [
+                    '*-src.jar'
+            ]
     )
 }
 

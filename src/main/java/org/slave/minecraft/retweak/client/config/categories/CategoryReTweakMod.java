@@ -36,7 +36,7 @@ public final class CategoryReTweakMod extends AbstractCategory {
         elements.add(new BasicConfigElement<Boolean>(
                 new Property(
                         ReTweakStrings.RETWEAK_CONFIG_ELEMENT_ENABLE,
-                        Boolean.TRUE.toString(),
+                        Boolean.valueOf(reTweakModContainer.isEnabled()).toString(),
                         Type.BOOLEAN,
                         new String[] {
                                 Boolean.TRUE.toString(),
@@ -47,7 +47,7 @@ public final class CategoryReTweakMod extends AbstractCategory {
 
             @Override
             public void set(Boolean value) {
-                //TODO
+                reTweakModContainer.setEnabled(value);
             }
 
         });
