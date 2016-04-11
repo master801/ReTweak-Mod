@@ -18,12 +18,18 @@ import java.net.URLClassLoader;
  */
 public final class ReTweakClassLoader extends URLClassLoader {
 
+    /**
+     * {@link org.slave.minecraft.retweak.asm.ReTweakSetup}
+     */
     private static ReTweakClassLoader instance = null;
 
     private LaunchClassLoader parent = null;
 
     public ReTweakClassLoader(LaunchClassLoader parent) {
-        super(new URL[0], parent);
+        super(
+                new URL[0],
+                parent
+        );
         this.parent = parent;
     }
 

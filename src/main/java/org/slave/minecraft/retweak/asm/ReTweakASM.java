@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import org.slave.minecraft.retweak.asm.transformers.LoadControllerTransformer;
 import org.slave.minecraft.retweak.asm.transformers.LoaderTransformer;
 
 import java.util.Map;
@@ -21,7 +22,8 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {
-                LoaderTransformer.class.getCanonicalName()
+                LoaderTransformer.class.getCanonicalName(),
+                LoadControllerTransformer.class.getCanonicalName()
         };
     }
 
