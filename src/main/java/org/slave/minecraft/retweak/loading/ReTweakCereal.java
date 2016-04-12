@@ -23,6 +23,10 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * <p>
+ *     JSON config file
+ * </p>
+ *
  * Created by Master801 on 3/21/2016 at 12:39 PM.
  *
  * @author Master801

@@ -3,7 +3,6 @@ package org.slave.minecraft.retweak.loading;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.resources.EnumMap;
 import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
-import org.slave.minecraft.retweak.loading.discovery.ReTweakModDiscoverer;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
@@ -30,20 +29,37 @@ public final class ReTweakLoader {
             "( |\t)|(\r|\n)|\""
     );
 
+    private final EnumMap<SupportedGameVersion, ArrayList<ReTweakModCandidate>> modCandidates;
     private final EnumMap<SupportedGameVersion, ArrayList<ReTweakModContainer>> modContainers;
 
     private ReTweakLoader() {
-        //noinspection unchecked
-        WrappingDataT2<SupportedGameVersion, ArrayList<ReTweakModContainer>>[] wrappingDataT2 = new WrappingDataT2[SupportedGameVersion.values().length];
+        final SupportedGameVersion[] values = SupportedGameVersion.values();
 
-        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
-            wrappingDataT2[supportedGameVersion.ordinal()] = new WrappingDataT2<>(
+        //noinspection unchecked
+        WrappingDataT2<SupportedGameVersion, ArrayList<ReTweakModCandidate>>[] modCandidatesWrappingData = new WrappingDataT2[values.length];
+        for(SupportedGameVersion supportedGameVersion : values) {
+            modCandidatesWrappingData[supportedGameVersion.ordinal()] = new WrappingDataT2<>(
+                    supportedGameVersion,
+                    new ArrayList<ReTweakModCandidate>()
+            );
+        }
+        modCandidates = new EnumMap<>(
+                SupportedGameVersion.class,
+                modCandidatesWrappingData
+        );
+
+        //noinspection unchecked
+        WrappingDataT2<SupportedGameVersion, ArrayList<ReTweakModContainer>>[] modContainersWrappingData = new WrappingDataT2[values.length];
+        for(SupportedGameVersion supportedGameVersion : values) {
+            modContainersWrappingData[supportedGameVersion.ordinal()] = new WrappingDataT2<>(
                     supportedGameVersion,
                     new ArrayList<ReTweakModContainer>()
             );
         }
-
-        modContainers = new EnumMap<>(SupportedGameVersion.class, wrappingDataT2);
+        modContainers = new EnumMap<>(
+                SupportedGameVersion.class,
+                modContainersWrappingData
+        );
     }
 
     /**
@@ -78,6 +94,8 @@ public final class ReTweakLoader {
                         reTweakModDiscoverer.findModsInDir(supportedGameVersionDir);
                         reTweakModDiscoverer.identify();
 
+                        modCandidates.get(supportedGameVersion).addAll(reTweakModDiscoverer.getReTweakModCandidates());
+
                         for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getReTweakModCandidates()) {
                             for(ReTweakModContainer reTweakModContainer : reTweakModCandidate.getModContainers()) {
                                 if (ReTweakLoader.PATTERN_MOD_ID.matcher(reTweakModContainer.getModid()).matches()) {
@@ -101,6 +119,11 @@ public final class ReTweakLoader {
             }
         }
         writeConfig();
+    }
+
+    List<ReTweakModCandidate> getModCandidates(SupportedGameVersion supportedGameVersion) {
+        if (supportedGameVersion == null) return Collections.emptyList();
+        return modCandidates.get(supportedGameVersion);
     }
 
     public List<ReTweakModContainer> getModContainers(SupportedGameVersion supportedGameVersion) {

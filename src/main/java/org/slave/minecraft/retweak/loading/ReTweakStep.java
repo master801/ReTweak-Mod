@@ -4,6 +4,9 @@ import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.io.IOException;
+import java.util.HashSet;
+
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
  *
@@ -12,6 +15,7 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
 public final class ReTweakStep {
 
     private ReTweakStep() {
+        throw new IllegalStateException();
     }
 
     /**
@@ -26,6 +30,71 @@ public final class ReTweakStep {
                     ReTweakStep.class.getName()
             );
             return;
+        }
+        switch(currentState) {
+            case CONSTRUCTING:
+                ReTweakStep.constructing(loadController);
+                break;
+            case PREINITIALIZATION:
+                //TODO Send pre-init message to all re-tweak mods
+                break;
+            case INITIALIZATION:
+                //TODO Send init message to all re-tweak mods
+                break;
+            case POSTINITIALIZATION:
+                //TODO Send post-init message to all re-tweak mods
+                break;
+            case SERVER_ABOUT_TO_START:
+            case SERVER_STARTING:
+            case SERVER_STARTED:
+            case SERVER_STOPPING:
+            case SERVER_STOPPED:
+                //Unsupported -- NOOP
+                break;
+            case LOADING:
+            case AVAILABLE:
+                //NOOP
+                break;
+            case NOINIT:
+            case ERRORED:
+                //NOOP
+                break;
+        }
+    }
+
+    private static void constructing(LoadController loadController) {
+        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
+            for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getModCandidates(supportedGameVersion)) {
+                try {
+                    reTweakModCandidate.close();//Might as well close the zip file...
+
+                    ReTweakClassLoader.getInstance().loadFile(reTweakModCandidate.getModFile());
+                    ReTweakClassLoader.getInstance().getRealParent().clearNegativeEntries(new HashSet<>(reTweakModCandidate.getClasses()));
+
+                    for(String modClassPath : reTweakModCandidate.getModClassese()) {
+                        try {
+                            Class<?> modClass = ReTweakClassLoader.getInstance().loadClass(modClassPath);
+
+                            //TODO
+
+                            ReTweakResources.RETWEAK_LOGGER.info(
+                                    modClass.getCanonicalName()
+                            );
+                        } catch(ClassNotFoundException e) {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "Derp?",
+                                    e
+                            );
+                        }
+                    }
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            "Failed to load file {}, caught an exception! Exception: {}",
+                            reTweakModCandidate.getModFile().getPath(),
+                            e
+                    );
+                }
+            }
         }
     }
 

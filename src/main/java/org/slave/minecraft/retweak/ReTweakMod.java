@@ -7,12 +7,10 @@ import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import org.slave.minecraft.library.api.network.proxy.Proxy;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.loading.ReTweakCereal;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -36,19 +34,15 @@ public final class ReTweakMod {
     @Instance(ReTweakStrings.RETWEAK_MOD)
     public static ReTweakMod instance;
 
-    @SidedProxy(
-            clientSide = ReTweakStrings.RETWEAK_PROXY_CLIENT,
-            serverSide = ReTweakStrings.RETWEAK_PROXY_SERVER,
-            modId = ReTweakStrings.RETWEAK_MOD
-    )
-    public static Proxy proxy;
-
     @Metadata(ReTweakStrings.RETWEAK_MOD)
     public static ModMetadata modMetadata;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        ModHelper.injectMetadata(ReTweakMod.modMetadata, ReTweakResources.RETWEAK_METADATA);
+        ModHelper.injectMetadata(
+                ReTweakMod.modMetadata,
+                ReTweakResources.RETWEAK_METADATA
+        );
     }
 
     @EventHandler

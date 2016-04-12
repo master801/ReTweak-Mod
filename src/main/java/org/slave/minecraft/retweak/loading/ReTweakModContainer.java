@@ -43,7 +43,7 @@ public final class ReTweakModContainer {
         return enabled;
     }
 
-    public ReTweakGrape toGrape() {
+    ReTweakGrape toGrape() {
         return new ReTweakGrape(
                 getModid(),
                 isEnabled()

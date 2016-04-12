@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -145,6 +146,43 @@ public final class ReTweakModCandidate {
             }
         }
         return reTweakModContainers;
+    }
+
+    File getModFile() {
+        return modFile;
+    }
+
+    List<String> getClasses() {
+        List<String> classesAsString = new ArrayList<>();
+        for(ZipEntry zipEntry : classes) classesAsString.add(zipEntry.getName());
+        return classesAsString;
+    }
+
+    List<String> getModClassese() {
+        ArrayList<String> modClasses = new ArrayList<>();
+        Enumeration<Entry<Type, ArrayList<String>>> enumeration = this.modClasses.enumeration();
+        while(enumeration.hasMoreElements()) {
+            List<String> classes =  enumeration.nextElement().getValue();
+            for(int i = 0; i < classes.size(); ++i) {
+                String _class = classes.get(i);
+                final int index = _class.indexOf('.');
+                if (index != -1) {
+                    _class = _class.substring(
+                            0,
+                            index
+                    );
+                }
+                _class = _class.replace(
+                        '/',
+                        '.'
+                );
+                classes.set(
+                        i,
+                        _class
+                );
+            }
+        }
+        return modClasses;
     }
 
     /**

@@ -1,16 +1,15 @@
-package org.slave.minecraft.retweak.loading.discovery;
+package org.slave.minecraft.retweak.loading;
 
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.FileListHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.ReflectionHelper;
-import org.slave.minecraft.retweak.loading.ReTweakModCandidate;
-import org.slave.minecraft.retweak.loading.SupportedGameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /**
@@ -68,7 +67,7 @@ public final class ReTweakModDiscoverer {
         for(ReTweakModCandidate reTweakModContainer : reTweakModCandidates) reTweakModContainer.search();
     }
 
-    public ArrayList<ReTweakModCandidate> getReTweakModCandidates() {
+    List<ReTweakModCandidate> getReTweakModCandidates() {
         return reTweakModCandidates;
     }
 

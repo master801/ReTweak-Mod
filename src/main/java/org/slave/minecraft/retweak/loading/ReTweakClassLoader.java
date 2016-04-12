@@ -23,7 +23,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
      */
     private static ReTweakClassLoader instance = null;
 
-    private LaunchClassLoader parent = null;
+    private final LaunchClassLoader parent;
 
     public ReTweakClassLoader(LaunchClassLoader parent) {
         super(
@@ -33,8 +33,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
         this.parent = parent;
     }
 
-    public void loadMod(File mod) throws MalformedURLException {
-        parent.addURL(mod.toURI().toURL());
+    public void loadFile(File file) throws MalformedURLException {
+        if (file == null) throw new NullPointerException();
+//        parent.addURL(file.toURI().toURL());//TODO Should I add this to the parent?
+        addURL(file.toURI().toURL());
+    }
+
+    public LaunchClassLoader getRealParent() {
+        return parent;
     }
 
     public static ReTweakClassLoader getInstance() {
