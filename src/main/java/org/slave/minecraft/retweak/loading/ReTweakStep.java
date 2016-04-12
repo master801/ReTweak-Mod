@@ -5,7 +5,6 @@ import cpw.mods.fml.common.LoaderState;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.IOException;
-import java.util.HashSet;
 
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
@@ -65,20 +64,20 @@ public final class ReTweakStep {
     private static void constructing(LoadController loadController) {
         for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getModCandidates(supportedGameVersion)) {
+                //TODO This method may be a little dirty...?
+
                 try {
                     reTweakModCandidate.close();//Might as well close the zip file...
 
                     ReTweakClassLoader.getInstance().loadFile(reTweakModCandidate.getModFile());
-                    ReTweakClassLoader.getInstance().getRealParent().clearNegativeEntries(new HashSet<>(reTweakModCandidate.getClasses()));
 
-                    for(String modClassPath : reTweakModCandidate.getModClassese()) {
+                    for(String modClassPath : reTweakModCandidate.getModClasses()) {
+                        Class<?> modClass = null;
                         try {
-                            Class<?> modClass = ReTweakClassLoader.getInstance().loadClass(modClassPath);
-
-                            //TODO
-
-                            ReTweakResources.RETWEAK_LOGGER.info(
-                                    modClass.getCanonicalName()
+                            modClass = Class.forName(
+                                    modClassPath,
+                                    true,
+                                    ReTweakClassLoader.getInstance()
                             );
                         } catch(ClassNotFoundException e) {
                             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -86,6 +85,17 @@ public final class ReTweakStep {
                                     e
                             );
                         }
+
+                        if (modClass == null) {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "\"{}\" is null",
+                                    modClassPath
+                            );
+                            return;
+                        }
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                modClass.getCanonicalName()
+                        );
                     }
                 } catch(IOException e) {
                     ReTweakResources.RETWEAK_LOGGER.warn(

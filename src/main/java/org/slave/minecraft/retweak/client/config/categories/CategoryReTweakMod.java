@@ -33,14 +33,14 @@ public final class CategoryReTweakMod extends AbstractCategory {
     @Override
     protected List<IConfigElement> getConfigElements() {
         List<IConfigElement> elements = new ArrayList<>();
-        elements.add(new BasicConfigElement<Boolean>(
-                new Property(
-                        ReTweakStrings.RETWEAK_CONFIG_ELEMENT_ENABLE,
-                        Boolean.valueOf(reTweakModContainer.isEnabled()).toString(),
-                        Type.BOOLEAN,
-                        BasicConfigElement.VALID_BOOLEAN_VALUES
-                )
-        ) {
+
+        Property property = new Property(
+                ReTweakStrings.RETWEAK_CONFIG_ELEMENT_ENABLE,
+                Boolean.valueOf(reTweakModContainer.isEnabled()).toString(),
+                Type.BOOLEAN,
+                BasicConfigElement.VALID_BOOLEAN_VALUES
+        );
+        elements.add(new BasicConfigElement<Boolean>(property) {
 
             @Override
             public void set(Boolean value) {

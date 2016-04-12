@@ -158,7 +158,7 @@ public final class ReTweakModCandidate {
         return classesAsString;
     }
 
-    List<String> getModClassese() {
+    List<String> getModClasses() {
         ArrayList<String> modClasses = new ArrayList<>();
         Enumeration<Entry<Type, ArrayList<String>>> enumeration = this.modClasses.enumeration();
         while(enumeration.hasMoreElements()) {
@@ -180,6 +180,7 @@ public final class ReTweakModCandidate {
                         i,
                         _class
                 );
+                modClasses.addAll(classes);
             }
         }
         return modClasses;
