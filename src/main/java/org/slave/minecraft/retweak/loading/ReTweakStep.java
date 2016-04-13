@@ -75,15 +75,12 @@ public final class ReTweakStep {
                         Class<?> modClass = null;
                         try {
                             modClass = Class.forName(
-                                    modClassPath,
+                                    modClassPath.concat("#-#").concat(supportedGameVersion.toString()),
                                     true,
                                     ReTweakClassLoader.getInstance()
                             );
                         } catch(ClassNotFoundException e) {
-                            ReTweakResources.RETWEAK_LOGGER.warn(
-                                    "Derp?",
-                                    e
-                            );
+                            //Ignore
                         }
 
                         if (modClass == null) {

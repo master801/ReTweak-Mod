@@ -4,9 +4,9 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.asm.transformers.BasicTransformer;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.IOHelper;
-import org.slave.minecraft.retweak.loading.tweaker.loaders.ReTweakTweakLoaderIndexer;
-import org.slave.minecraft.retweak.loading.tweaker.loaders.TweakLoader;
-import org.slave.minecraft.retweak.loading.tweaker.tweaks.Tweak;
+import org.slave.minecraft.retweak.loading.tweaker.ReTweakTweakLoaderIndexer;
+import org.slave.minecraft.retweak.loading.tweaker.TweakLoader;
+import org.slave.minecraft.retweak.loading.tweaker.Tweak;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
@@ -56,6 +56,24 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
+        String[] split = name.split(
+                "#-#",
+                2
+        );
+        if (split.length == 2) {
+            return findClass(
+                    split[0],
+                    SupportedGameVersion.valueOf(split[1])
+            );
+        }
+
+        return findClass(
+                name,
+                null
+        );
+    }
+
+    protected Class<?> findClass(final String name, final SupportedGameVersion supportedGameVersion) throws ClassNotFoundException {
         byte[] classBytes;
         String newName = name;
         if (name.indexOf('.') != -1 && !name.toLowerCase().endsWith(".class")) {
@@ -67,7 +85,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
             return loadClassFromBytes(//Null for third parameter -- not needed for default implementation
                     name,
                     classBytes,
-                    null
+                    supportedGameVersion
             );
         }
         Class<?> returnClass = null;

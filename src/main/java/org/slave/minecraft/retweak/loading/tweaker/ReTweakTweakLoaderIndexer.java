@@ -1,6 +1,7 @@
-package org.slave.minecraft.retweak.loading.tweaker.loaders;
+package org.slave.minecraft.retweak.loading.tweaker;
 
 import org.slave.minecraft.retweak.loading.SupportedGameVersion;
+import org.slave.minecraft.retweak.loading.tweaker.v_1_4_7.V_1_4_7_TweakLoader;
 
 import java.util.HashMap;
 

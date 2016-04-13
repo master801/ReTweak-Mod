@@ -1,3 +1,5 @@
+import scala.tools.nsc.io.Jar
+
 buildscript {
     repositories {
         mavenCentral()
@@ -44,7 +46,6 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['sl4j-version']
     compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
-    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: project.properties['json-simple-version']
 
     compile fileTree(
             dir: 'libs',

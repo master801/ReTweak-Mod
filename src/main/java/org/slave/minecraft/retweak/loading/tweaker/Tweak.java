@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.loading.tweaker.tweaks;
+package org.slave.minecraft.retweak.loading.tweaker;
 
 import net.minecraft.launchwrapper.IClassTransformer;
 
