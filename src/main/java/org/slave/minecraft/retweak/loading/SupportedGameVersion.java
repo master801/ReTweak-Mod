@@ -11,7 +11,9 @@ public enum SupportedGameVersion {
 
     V_1_4_6("1.4.6"),
 
-    V_1_4_7("1.4.7");
+    V_1_4_7("1.4.7"),
+
+    V_1_5_2("1.5.2");
 
     private final String version;
 

@@ -59,6 +59,14 @@ public final class ReTweakModCandidate {
                                     Mod.class.getCanonicalName()
                             )
                     ),
+
+                    new WrappingDataT2<>(
+                            SupportedGameVersion.V_1_5_2,
+                            new WrappingDataT2<>(
+                                    Type.ANNOTATION,
+                                    Mod.class.getCanonicalName()
+                            )
+                    )
             }
     );
 
