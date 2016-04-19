@@ -33,6 +33,7 @@ public final class CategoryReTweakMods extends AbstractCategory {
 
             for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getModContainers(supportedGameVersion)) {
                 modContainerElements.add(new CategoryReTweakMod(
+                        supportedGameVersion,
                         reTweakModContainer
                 ));
             }

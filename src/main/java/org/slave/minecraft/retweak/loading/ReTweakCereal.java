@@ -34,8 +34,14 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public final class ReTweakCereal {
 
-    public static final File RETWEAK_CONFIG_DIRECTORY = new File("config", ReTweakResources.RETWEAK_DIRECTORY.getName());
-    public static final File RETWEAK_CONFIG_FILE = new File(ReTweakCereal.RETWEAK_CONFIG_DIRECTORY, "mods.json");
+    public static final File RETWEAK_CONFIG_DIRECTORY = new File(
+            "config",
+            ReTweakResources.RETWEAK_DIRECTORY.getName()
+    );
+    public static final File RETWEAK_CONFIG_FILE = new File(
+            ReTweakCereal.RETWEAK_CONFIG_DIRECTORY,
+            "mods.json"
+    );
 
     public static final ReTweakCereal INSTANCE = new ReTweakCereal();
 
@@ -45,10 +51,22 @@ public final class ReTweakCereal {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
 
-        gsonBuilder.registerTypeAdapter(ReTweakGrapeVine.class, new ReTweakGrapeVineSerializer());
-        gsonBuilder.registerTypeAdapter(ReTweakGrapeVine.class, new ReTweakGrapeVineDeserializer());
-        gsonBuilder.registerTypeAdapter(ReTweakGrape.class, new ReTweakGrapeSerializer());
-        gsonBuilder.registerTypeAdapter(ReTweakGrape.class, new ReTweakGrapeDeserializer());
+        gsonBuilder.registerTypeAdapter(
+                ReTweakGrapeVine.class,
+                new ReTweakGrapeVineSerializer()
+        );
+        gsonBuilder.registerTypeAdapter(
+                ReTweakGrapeVine.class,
+                new ReTweakGrapeVineDeserializer()
+        );
+        gsonBuilder.registerTypeAdapter(
+                ReTweakGrape.class,
+                new ReTweakGrapeSerializer()
+        );
+        gsonBuilder.registerTypeAdapter(
+                ReTweakGrape.class,
+                new ReTweakGrapeDeserializer()
+        );
 
         gson = gsonBuilder.create();
     }
@@ -103,8 +121,13 @@ public final class ReTweakCereal {
 
         if (broken) {
             int i = 0;
-            String newName = ReTweakCereal.RETWEAK_CONFIG_FILE.getPath() + ".broken" + i;
-            while(!ReTweakCereal.RETWEAK_CONFIG_FILE.renameTo(new File(newName))) i++;
+            String newName;
+            while(!ReTweakCereal.RETWEAK_CONFIG_FILE.renameTo(new File(
+                    ReTweakCereal.RETWEAK_CONFIG_FILE.getParentFile(),
+                    newName = (ReTweakCereal.RETWEAK_CONFIG_FILE.getName() + "." + i + "broken")
+            ))) {
+                i++;
+            }
 
             ReTweakResources.RETWEAK_LOGGER.info(
                     "ReTweak's config file was marked as broken, renamed to \"{}\". Please either fix or delete the config file.",
@@ -158,6 +181,7 @@ public final class ReTweakCereal {
                         save = true;
                     }
                 }
+                break;
             }
         }
         fileReader.close();

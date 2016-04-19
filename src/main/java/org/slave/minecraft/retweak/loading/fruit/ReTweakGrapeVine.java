@@ -25,22 +25,22 @@ public final class ReTweakGrapeVine implements Serializable {
     private static final long serialVersionUID = -5453174058209040688L;
 
     private String version;
-    private List<ReTweakGrape> mods;
+    private List<ReTweakGrape> grapes;
 
     public ReTweakGrapeVine() {
     }
 
     public ReTweakGrapeVine(final String version) {
         this.version = version;
-        mods = new ArrayList<>();
+        grapes = new ArrayList<>();
     }
 
     public String getVersion() {
         return version;
     }
 
-    public Iterable<ReTweakGrape> getMods() {
-        return mods;
+    public Iterable<ReTweakGrape> getGrapes() {
+        return grapes;
     }
 
     public static final class ReTweakGrapeVineSerializer implements JsonSerializer<ReTweakGrapeVine> {
@@ -50,8 +50,8 @@ public final class ReTweakGrapeVine implements Serializable {
             JsonObject jsonElement = new JsonObject();
 
             JsonArray mods = new JsonArray();
-            if (src.getMods() != null) {
-                for(ReTweakGrape grape : src.getMods()) {
+            if (src.getGrapes() != null) {
+                for(ReTweakGrape grape : src.getGrapes()) {
                     mods.add(context.serialize(
                             grape,
                             ReTweakGrape.class
@@ -82,13 +82,13 @@ public final class ReTweakGrapeVine implements Serializable {
 
             ReTweakGrapeVine grapeVine = new ReTweakGrapeVine();
             grapeVine.version = version.getAsString();
-            grapeVine.mods = new ArrayList<>();
+            grapeVine.grapes = new ArrayList<>();
             for(JsonElement jsonElement : mods) {
                 ReTweakGrape grape = context.deserialize(
                         jsonElement.getAsJsonObject(),
                         ReTweakGrapeVine.class
                 );
-                grapeVine.mods.add(grape);
+                grapeVine.grapes.add(grape);
             }
             return grapeVine;
         }

@@ -6,10 +6,14 @@ import net.minecraftforge.common.config.Property.Type;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.library.client.gui.config.AbstractCategory;
 import org.slave.minecraft.library.client.gui.config.elements.BasicConfigElement;
+import org.slave.minecraft.retweak.loading.ReTweakCereal;
 import org.slave.minecraft.retweak.loading.ReTweakModContainer;
+import org.slave.minecraft.retweak.loading.SupportedGameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakStrings;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -19,14 +23,16 @@ import java.util.List;
  */
 public final class CategoryReTweakMod extends AbstractCategory {
 
+    private final SupportedGameVersion supportedGameVersion;
     private final ReTweakModContainer reTweakModContainer;
 
-    public CategoryReTweakMod(ReTweakModContainer reTweakModContainer) {
+    public CategoryReTweakMod(final SupportedGameVersion supportedGameVersion, final ReTweakModContainer reTweakModContainer) {
         super(
                 StringHelper.isNullOrEmpty(reTweakModContainer.getName()) ? "UNKNOWN_MOD_NAME" : reTweakModContainer.getName(),
                 true,
                 true
         );
+        this.supportedGameVersion = supportedGameVersion;
         this.reTweakModContainer = reTweakModContainer;
     }
 
@@ -44,7 +50,15 @@ public final class CategoryReTweakMod extends AbstractCategory {
 
             @Override
             public void set(Boolean value) {
-                reTweakModContainer.setEnabled(value);
+//                reTweakModContainer.setEnabled(value);//FIXME Config should not be allowed to directly set the container to be enabled
+                try {
+                    ReTweakCereal.INSTANCE.modify(
+                            supportedGameVersion,
+                            Collections.singletonList(reTweakModContainer)
+                    );
+                } catch(IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         });
