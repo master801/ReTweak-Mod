@@ -64,7 +64,7 @@ public final class ReTweakStep {
     private static void constructing(LoadController loadController) {
         for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getModCandidates(supportedGameVersion)) {
-                //TODO This method may be a little dirty...?
+                //TODO REFACTOR
 
                 try {
                     reTweakModCandidate.close();//Might as well close the zip file...

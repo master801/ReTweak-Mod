@@ -1,9 +1,9 @@
 package org.slave.minecraft.retweak.loading.tweaker.v_1_4_7;
 
 import org.slave.minecraft.retweak.loading.SupportedGameVersion;
-import org.slave.minecraft.retweak.loading.tweaker.DeobfuscationTweaker;
-import org.slave.minecraft.retweak.loading.tweaker.TweakLoader;
 import org.slave.minecraft.retweak.loading.tweaker.Tweak;
+import org.slave.minecraft.retweak.loading.tweaker.TweakLoader;
+import org.slave.minecraft.retweak.loading.tweaker.base.DeobfuscationTweak;
 
 import java.util.ArrayList;
 
@@ -18,7 +18,7 @@ public final class V_1_4_7_TweakLoader implements TweakLoader {
 
     public V_1_4_7_TweakLoader() {
         tweaks = new ArrayList<>();
-        tweaks.add(new DeobfuscationTweaker(SupportedGameVersion.V_1_4_7));
+        tweaks.add(new DeobfuscationTweak(getGameVersion()));
     }
 
     @Override

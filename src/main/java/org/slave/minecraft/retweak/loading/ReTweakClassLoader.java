@@ -27,8 +27,14 @@ import java.net.URLClassLoader;
  */
 public final class ReTweakClassLoader extends URLClassLoader {
 
-    private static final Boolean DEBUG_WRITE_ORIGINAL = Boolean.valueOf(System.getProperty("org.slave.retweak.class_loader.debug.write_original", Boolean.FALSE.toString()));
-    private static final Boolean DEBUG_WRITE_MODIFIED = Boolean.valueOf(System.getProperty("org.slave.retweak.class_loader.debug.write_modified", Boolean.FALSE.toString()));
+    private static final Boolean DEBUG_WRITE_ORIGINAL = Boolean.valueOf(System.getProperty(
+            "org.slave.retweak.class_loader.debug.write_original",
+            Boolean.FALSE.toString()
+    ));
+    private static final Boolean DEBUG_WRITE_MODIFIED = Boolean.valueOf(System.getProperty(
+            "org.slave.retweak.class_loader.debug.write_modified",
+            Boolean.FALSE.toString()
+    ));
 
     /**
      * {@link org.slave.minecraft.retweak.asm.ReTweakSetup}

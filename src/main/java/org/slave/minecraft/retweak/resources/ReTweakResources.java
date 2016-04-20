@@ -16,7 +16,14 @@ public final class ReTweakResources {
     public static final Metadata RETWEAK_METADATA = ReTweakMetadata.INSTANCE;
 
     public static final File RETWEAK_DIRECTORY = new File("retweak");
-    public static final File RETWEAK_MODS_DIRECTORY = new File(ReTweakResources.RETWEAK_DIRECTORY, "mods");
+    public static final File RETWEAK_MODS_DIRECTORY = new File(
+            ReTweakResources.RETWEAK_DIRECTORY,
+            "mods"
+    );
+    public static final File RETWEAK_PLAY_DIRECTORY = new File(
+            ReTweakResources.RETWEAK_DIRECTORY,
+            "play"
+    );
 
     public static final Logger RETWEAK_LOGGER = LoggerFactory.getLogger("ReTweak-Mod");
 
