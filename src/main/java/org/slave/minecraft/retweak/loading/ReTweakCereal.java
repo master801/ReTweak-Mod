@@ -97,6 +97,8 @@ public final class ReTweakCereal {
                 break;
             }
 
+            //TODO
+            /*
             List<ReTweakModContainer> reTweakModContainers = ReTweakLoader.INSTANCE.getModContainers(supportedGameVersion);
 
             for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
@@ -114,6 +116,7 @@ public final class ReTweakCereal {
                     }
                 }
             }
+                */
         }
         fileReader.close();
 

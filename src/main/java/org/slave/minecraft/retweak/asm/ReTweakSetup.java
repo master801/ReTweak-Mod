@@ -28,7 +28,9 @@ public final class ReTweakSetup implements IFMLCallHook {
                     new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"))
             );
         } catch(NoSuchFieldException | IllegalAccessException e) {
-            ReTweakResources.RETWEAK_LOGGER.error("Failed to create class loader for ReTweak! ReTweak will not be able to load mods!");
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    "Failed to create class loader for ReTweak! ReTweak will not be able to load mods!"
+            );
         }
     }
 

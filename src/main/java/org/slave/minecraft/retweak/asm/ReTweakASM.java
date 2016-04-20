@@ -4,6 +4,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import org.slave.minecraft.retweak.asm.transformers.GsonTransformer;
 import org.slave.minecraft.retweak.asm.transformers.LoadControllerTransformer;
 import org.slave.minecraft.retweak.asm.transformers.LoaderTransformer;
 
@@ -16,14 +17,18 @@ import java.util.Map;
  */
 @Name("ReTweak-Mod-ASM")
 @MCVersion("1.7.10")
-@TransformerExclusions({ "org.slave.minecraft.retweak.asm.*" })
+@TransformerExclusions({
+        "org.slave.lib.",
+        "org.slave.minecraft.retweak.asm."
+})
 public final class ReTweakASM implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {
                 LoaderTransformer.class.getCanonicalName(),
-                LoadControllerTransformer.class.getCanonicalName()
+                LoadControllerTransformer.class.getCanonicalName(),
+                GsonTransformer.class.getCanonicalName()
         };
     }
 

@@ -94,21 +94,9 @@ public final class ReTweakLoader {
                         reTweakModDiscoverer.findModsInDir(supportedGameVersionDir);
                         reTweakModDiscoverer.identify();
 
-                        modCandidates.get(supportedGameVersion).addAll(reTweakModDiscoverer.getReTweakModCandidates());
+                        reTweakModDiscoverer.getReTweakModCandidates();
 
-                        for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getReTweakModCandidates()) {
-                            for(ReTweakModContainer reTweakModContainer : reTweakModCandidate.getModContainers()) {
-                                if (ReTweakLoader.PATTERN_MOD_ID.matcher(reTweakModContainer.getModid()).matches()) {
-                                    ReTweakResources.RETWEAK_LOGGER.warn(
-                                            "ReTweak will not load mod \"{}\" because its mod id matches pattern \"{}\".",
-                                            reTweakModContainer.getModid(),
-                                            ReTweakLoader.PATTERN_MOD_ID.toString()
-                                    );
-                                    continue;
-                                }
-                                modContainers.get(supportedGameVersion).add(reTweakModContainer);
-                            }
-                        }
+                        //TODO
                     } catch(IOException | IllegalAccessException | NoSuchFieldException e) {
                         ReTweakResources.RETWEAK_LOGGER.warn(
                                 "Failed to load ReTweak mods due to catching an exception!",
@@ -126,7 +114,7 @@ public final class ReTweakLoader {
         return modCandidates.get(supportedGameVersion);
     }
 
-    public List<ReTweakModContainer> getModContainers(SupportedGameVersion supportedGameVersion) {
+    public Iterable<ReTweakModContainer> getModContainers(SupportedGameVersion supportedGameVersion) {
         if (supportedGameVersion == null) return Collections.emptyList();
         return modContainers.get(supportedGameVersion);
     }

@@ -9,7 +9,7 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Iterator;
 import java.util.regex.Pattern;
 
 /**
@@ -34,7 +34,9 @@ public final class ReTweakModDiscoverer {
 
     public void findModsInDir(File dir) throws NoSuchFieldException, IllegalAccessException {
         if (dir == null || !dir.exists() || !dir.isDirectory()) {
-            ReTweakResources.RETWEAK_LOGGER.error("Invalid ReTweak mods directory!");
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    "Invalid ReTweak mods directory!"
+            );
             return;
         }
         File[] modList = dir.listFiles();
@@ -52,22 +54,42 @@ public final class ReTweakModDiscoverer {
         modList = FileListHelper.sortFileList(modList);
 
         for(File mod : modList) {
-            if (mod.isFile()) {
-                if (ReTweakModDiscoverer.fmlZipJar.matcher(mod.getName()).matches()) {
-                    ReTweakResources.RETWEAK_LOGGER.info("Found a candidate mod!");//TODO Should be a debug message with more info
-                    reTweakModCandidates.add(new ReTweakModCandidate(supportedGameVersion, mod));
-                }
-            } else {
-                ReTweakResources.RETWEAK_LOGGER.warn("Mod \"{}\" is not a file or is not a mod! ReTweak does not support this!", mod.getName());
+            if (ReTweakModDiscoverer.fmlZipJar.matcher(mod.getName()).matches()) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Found candidate mod \"{}\"!",
+                        mod.getPath()
+                );
+                reTweakModCandidates.add(new ReTweakModCandidate(
+                        supportedGameVersion,
+                        mod
+                ));
             }
         }
     }
 
     public void identify() throws IOException {
-        for(ReTweakModCandidate reTweakModContainer : reTweakModCandidates) reTweakModContainer.search();
+        Iterator<ReTweakModCandidate> reTweakModCandidateIterator = reTweakModCandidates.iterator();
+        while(reTweakModCandidateIterator.hasNext()) {
+            ReTweakModCandidate reTweakModCandidate = reTweakModCandidateIterator.next();
+            boolean check;
+            try {
+                check = reTweakModCandidate.check();
+            } catch(IOException e) {
+                check = false;
+            }
+            if (!check) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "File \"{}\" is not a mod.",
+                        reTweakModCandidate.getFile()
+                );
+                reTweakModCandidateIterator.remove();
+                continue;
+            }
+            //TODO
+        }
     }
 
-    List<ReTweakModCandidate> getReTweakModCandidates() {
+    Iterable<ReTweakModCandidate> getReTweakModCandidates() {
         return reTweakModCandidates;
     }
 

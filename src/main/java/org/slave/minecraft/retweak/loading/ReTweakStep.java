@@ -4,8 +4,6 @@ import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
-import java.io.IOException;
-
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
  *
@@ -64,43 +62,7 @@ public final class ReTweakStep {
     private static void constructing(LoadController loadController) {
         for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getModCandidates(supportedGameVersion)) {
-                //TODO REFACTOR
-
-                try {
-                    reTweakModCandidate.close();//Might as well close the zip file...
-
-                    ReTweakClassLoader.getInstance().loadFile(reTweakModCandidate.getModFile());
-
-                    for(String modClassPath : reTweakModCandidate.getModClasses()) {
-                        Class<?> modClass = null;
-                        try {
-                            modClass = Class.forName(
-                                    modClassPath.concat("#-#").concat(supportedGameVersion.toString()),
-                                    true,
-                                    ReTweakClassLoader.getInstance()
-                            );
-                        } catch(ClassNotFoundException e) {
-                            //Ignore
-                        }
-
-                        if (modClass == null) {
-                            ReTweakResources.RETWEAK_LOGGER.warn(
-                                    "\"{}\" is null",
-                                    modClassPath
-                            );
-                            return;
-                        }
-                        ReTweakResources.RETWEAK_LOGGER.info(
-                                modClass.getCanonicalName()
-                        );
-                    }
-                } catch(IOException e) {
-                    ReTweakResources.RETWEAK_LOGGER.warn(
-                            "Failed to load file {}, caught an exception! Exception: {}",
-                            reTweakModCandidate.getModFile().getPath(),
-                            e
-                    );
-                }
+                //TODO
             }
         }
     }
