@@ -148,10 +148,7 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
                 AbstractInsnNode abstractInsnNode = newJsonWriter.instructions.get(i);
                 if (abstractInsnNode instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
-                    if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL &&
-                            methodInsnNode.owner.equals("com/google/gson/stream/JsonWriter") &&
-                            methodInsnNode.name.equals(GsonTransformer.METHOD_INDENT_SETTER_NAME) &&
-                            methodInsnNode.desc.equals("(Ljava/lang/String;)V")) {
+                    if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL && methodInsnNode.owner.equals("com/google/gson/stream/JsonWriter") && methodInsnNode.name.equals(GsonTransformer.METHOD_INDENT_SETTER_NAME) && methodInsnNode.desc.equals("(Ljava/lang/String;)V")) {
                         InsnList injectionList = new InsnList();
                         injectionList.add(new VarInsnNode(
                                 Opcodes.ALOAD,

@@ -106,6 +106,7 @@ public final class ReTweakLoader {
                 }
             }
         }
+
         writeConfig();
     }
 
@@ -122,21 +123,7 @@ public final class ReTweakLoader {
     private void writeConfig() {
         for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
             List<ReTweakModContainer> reTweakModContainers = modContainers.get(supportedGameVersion);
-            try {
-                ReTweakCereal.INSTANCE.modify(
-                        supportedGameVersion,
-                        reTweakModContainers
-                );
-            } catch(IOException e) {
-                ReTweakResources.RETWEAK_LOGGER.warn(
-                        "Caught an IO Exception while modifying the config file! Renaming to \"{}.broken\"...",
-                        ReTweakCereal.RETWEAK_CONFIG_FILE.getPath()
-                );
-                if (ReTweakCereal.RETWEAK_CONFIG_FILE.exists()) {
-                    //noinspection ResultOfMethodCallIgnored
-                    ReTweakCereal.RETWEAK_CONFIG_FILE.renameTo(new File(ReTweakCereal.RETWEAK_CONFIG_FILE.getPath() + ".broken"));
-                }
-            }
+            //TODO
         }
     }
 
