@@ -153,6 +153,7 @@ public final class ReTweakCereal {
 
         boolean save = false, containsVersion = false;
         FileReader fileReader = new FileReader(ReTweakCereal.RETWEAK_CONFIG_FILE);
+
         JsonArray jsonArray = gson.fromJson(
                 fileReader,
                 JsonArray.class
