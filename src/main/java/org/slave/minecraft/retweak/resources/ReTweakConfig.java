@@ -1,10 +1,8 @@
 package org.slave.minecraft.retweak.resources;
 
-import com.google.common.base.Joiner;
 import org.slave.lib.api.CommentProperties;
 import org.slave.lib.helpers.ConfigHelper;
 import org.slave.lib.helpers.FileHelper;
-import org.slave.minecraft.retweak.loading.CompilationMode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -28,14 +26,7 @@ public final class ReTweakConfig {
 
     private final CommentProperties config = ConfigHelper.createCommentProperties();
 
-    private CompilationMode compilationMode;
-
     private ReTweakConfig() {
-        config.put(
-                ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
-                CompilationMode.JIT.name(),
-                Joiner.on(", ").join(CompilationMode.values())
-        );
     }
 
     public void update(final boolean load) throws IOException {
@@ -46,9 +37,6 @@ public final class ReTweakConfig {
         }
 
         //TODO
-        compilationMode = CompilationMode.valueOf(
-                (String)config.get(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE)
-        );
 
         if (!load || !ReTweakConfig.CONFIG_FILE.exists()) {
             if (!ReTweakConfig.CONFIG_FILE.getParentFile().exists()) FileHelper.createDirectory(ReTweakConfig.CONFIG_FILE.getParentFile());
@@ -60,10 +48,6 @@ public final class ReTweakConfig {
             fileOutputStream.flush();
             fileOutputStream.close();
         }
-    }
-
-    public CompilationMode getCompilationMode() {
-        return compilationMode;
     }
 
 }

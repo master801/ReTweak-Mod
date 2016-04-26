@@ -26,12 +26,6 @@ public final class ReTweakStrings {
     public static final String RETWEAK_CONFIG_PREFIX = "retweak.gui.config.";
     public static final String RETWEAK_CONFIG_CATEGORY_PREFIX = ReTweakStrings.RETWEAK_CONFIG_PREFIX + "category.";
     public static final String RETWEAK_CONFIG_ELEMENT = ReTweakStrings.RETWEAK_CONFIG_PREFIX + "element.";
-    //Elements
-    public static final String RETWEAK_CONFIG_ELEMENT_ENABLE = ReTweakStrings.RETWEAK_CONFIG_ELEMENT + "enable";
-    public static final String RETWEAK_CONFIG_ELEMENT_COMPILATION_MODE = ReTweakStrings.RETWEAK_CONFIG_ELEMENT + "compilation_mode";
-    //Categories
-    public static final String RETWEAK_GUI_CONFIG_CATEGORY_MODS = ReTweakStrings.RETWEAK_CONFIG_CATEGORY_PREFIX + "mods";
-    public static final String RETWEAK_GUI_CONFIG_CATEGORY_LOADING = ReTweakStrings.RETWEAK_CONFIG_CATEGORY_PREFIX + "loading";
 
     //Config
     //-----------------------------------

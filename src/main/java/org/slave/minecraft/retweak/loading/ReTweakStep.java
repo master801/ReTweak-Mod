@@ -60,11 +60,7 @@ public final class ReTweakStep {
     }
 
     private static void constructing(LoadController loadController) {
-        for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
-            for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getModCandidates(supportedGameVersion)) {
-                //TODO
-            }
-        }
+        //TODO
     }
 
 }
