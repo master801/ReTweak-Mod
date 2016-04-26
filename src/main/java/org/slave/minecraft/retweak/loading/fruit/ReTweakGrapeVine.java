@@ -9,6 +9,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.slave.minecraft.retweak.loading.SupportedGameVersion;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
@@ -28,6 +29,10 @@ public final class ReTweakGrapeVine implements Serializable {
     private List<ReTweakGrape> grapes;
 
     public ReTweakGrapeVine() {
+    }
+
+    public ReTweakGrapeVine(SupportedGameVersion supportedGameVersion) {
+        this(supportedGameVersion.getVersion());
     }
 
     public ReTweakGrapeVine(final String version) {

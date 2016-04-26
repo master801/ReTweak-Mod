@@ -16,6 +16,11 @@ public final class ReTweakTweakLoaderIndexer {
 
     private final HashMap<SupportedGameVersion, TweakLoader> tweakLoaders = new HashMap<>();
 
+    /**
+     * {@link org.slave.minecraft.retweak.loading.CompilationMode}
+     */
+    //TODO
+
     private ReTweakTweakLoaderIndexer() {
         tweakLoaders.put(
                 SupportedGameVersion.V_1_4_7,

@@ -4,6 +4,7 @@ import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.gui.GuiScreen;
 import org.slave.lib.helpers.IterableHelper;
+import org.slave.minecraft.retweak.client.config.categories.CategoryReTweakLoading;
 import org.slave.minecraft.retweak.client.config.categories.CategoryReTweakMods;
 import org.slave.minecraft.retweak.resources.ReTweakStrings;
 
@@ -19,6 +20,7 @@ public final class GuiScreenConfigReTweak extends GuiConfig {
         super(
                 parentScreen,
                 IterableHelper.easyArrayList(new IConfigElement[] {
+                        new CategoryReTweakLoading(),
                         new CategoryReTweakMods()
                 }),
                 ReTweakStrings.RETWEAK_MOD,

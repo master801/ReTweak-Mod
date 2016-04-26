@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.loading;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.resources.EnumMap;
 import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
+import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
@@ -107,7 +108,7 @@ public final class ReTweakLoader {
             }
         }
 
-        writeConfig();
+        config();
     }
 
     List<ReTweakModCandidate> getModCandidates(SupportedGameVersion supportedGameVersion) {
@@ -120,7 +121,14 @@ public final class ReTweakLoader {
         return modContainers.get(supportedGameVersion);
     }
 
-    private void writeConfig() {
+    private void config() {
+        try {
+            ReTweakConfig.INSTANCE.update(true);
+
+            ReTweakMilk.INSTANCE.update(true);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
         for(SupportedGameVersion supportedGameVersion : SupportedGameVersion.values()) {
             List<ReTweakModContainer> reTweakModContainers = modContainers.get(supportedGameVersion);
             //TODO
