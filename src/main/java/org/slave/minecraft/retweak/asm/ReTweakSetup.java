@@ -1,6 +1,11 @@
 package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLCallHook;
+import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
+import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Map;
 
@@ -13,10 +18,26 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public void injectData(Map<String, Object> data) {
+        try {
+            ReflectionHelper.setFieldValue(
+                    ReflectionHelper.getField(
+                            ReTweakClassLoader.class,
+                            "instance"
+                    ),
+                    null,
+                    new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"))
+            );
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    "Failed to create ReTweak classloader instance! ReTweak mods will not be able to load properly!",
+                    e
+            );
+        }
     }
 
     @Override
     public Void call() throws Exception {
+        if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
         return null;
     }
 

@@ -179,12 +179,12 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
 
     @Override
     protected boolean writeClassFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
     @Override
     protected boolean writeASMFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
     @Override

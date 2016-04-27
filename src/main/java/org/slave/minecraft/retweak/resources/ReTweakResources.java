@@ -1,6 +1,5 @@
 package org.slave.minecraft.retweak.resources;
 
-import org.slave.minecraft.library.api.Metadata;
 import org.slave.minecraft.library.resources.LibraryResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +12,6 @@ import java.io.File;
  * @author Master801
  */
 public final class ReTweakResources {
-
-    public static final Metadata RETWEAK_METADATA = ReTweakMetadata.INSTANCE;
 
     public static final File RETWEAK_DIRECTORY = new File(
             "retweak"
@@ -33,6 +30,11 @@ public final class ReTweakResources {
     );
 
     public static final Logger RETWEAK_LOGGER = LoggerFactory.getLogger("ReTweak-Mod");
+
+    public static final Boolean DEBUG = Boolean.valueOf(System.getProperty(
+            "org.slave.minecraft.retweak.debug",
+            Boolean.FALSE.toString()
+    ));
 
     private ReTweakResources() {
         throw new IllegalStateException();

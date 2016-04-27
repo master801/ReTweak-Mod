@@ -31,6 +31,8 @@ public final class LoadControllerTransformer extends BasicTransformer implements
 
         for(MethodNode methodNode : classNode.methods) {
             if (methodNode.name.equals("transition") && methodNode.desc.equals("(Lcpw/mods/fml/common/LoaderState;Z)V")) transition = methodNode;
+
+            if (transition != null) break;
         }
 
         if (transition != null) {
@@ -73,7 +75,7 @@ public final class LoadControllerTransformer extends BasicTransformer implements
 
                 instructionsToInject.add(new MethodInsnNode(
                         Opcodes.INVOKESTATIC,
-                        "org/slave/minecraft/retweak/loading/ReTweakStep",
+                        "org/slave/minecraft/retweak/loading/ReTweakStateHandler",
                         "step",
                         "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
                         false
@@ -84,8 +86,9 @@ public final class LoadControllerTransformer extends BasicTransformer implements
                         instructionsToInject
                 );
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -95,12 +98,12 @@ public final class LoadControllerTransformer extends BasicTransformer implements
 
     @Override
     protected boolean writeClassFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
     @Override
     protected boolean writeASMFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
 }

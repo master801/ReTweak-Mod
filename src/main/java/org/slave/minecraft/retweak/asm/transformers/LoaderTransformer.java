@@ -30,6 +30,8 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
 
         for(MethodNode methodNode : classNode.methods) {
             if (methodNode.name.equals("loadMods") && methodNode.desc.equals("()V")) loadModsMethodNode = methodNode;
+
+            if (loadModsMethodNode != null) break;
         }
 
         if (loadModsMethodNode != null) {
@@ -67,8 +69,9 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
                     }
                 }
             }
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -78,12 +81,12 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
 
     @Override
     protected boolean writeClassFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
     @Override
     protected boolean writeASMFile() {
-        return true;
+        return ReTweakResources.DEBUG;
     }
 
 }

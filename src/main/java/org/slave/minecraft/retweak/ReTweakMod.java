@@ -13,6 +13,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
+import org.slave.minecraft.retweak.resources.ReTweakMetadata;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.minecraft.retweak.resources.ReTweakStrings;
 
@@ -41,7 +42,7 @@ public final class ReTweakMod {
     public void preInit(FMLPreInitializationEvent event) {
         ModHelper.injectMetadata(
                 ReTweakMod.modMetadata,
-                ReTweakResources.RETWEAK_METADATA
+                ReTweakMetadata.INSTANCE
         );
     }
 

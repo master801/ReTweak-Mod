@@ -46,7 +46,9 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getDescription() {
-        return Joiner.on(System.lineSeparator()).join(new String[] {
+        return Joiner.on('\n').join(new String[] {
+                "Loads (most) Forge mods from (some) previous versions of Minecraft.",
+                "Uses trickery and may cause crashes, use at your own risk."
         });
     }
 
@@ -57,12 +59,18 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getModID() {
-        return ChatHelper.formatString(ModHelper.getReflectiveModID(ReTweakMod.class), EnumChatFormatting.DARK_AQUA);
+        return ChatHelper.formatString(
+                ModHelper.getReflectiveModID(ReTweakMod.class),
+                EnumChatFormatting.DARK_AQUA
+        );
     }
 
     @Override
     public String getModName() {
-        return ChatHelper.formatString(ModHelper.getReflectiveModName(ReTweakMod.class), EnumChatFormatting.DARK_RED);
+        return ChatHelper.formatString(
+                ModHelper.getReflectiveModName(ReTweakMod.class),
+                EnumChatFormatting.DARK_RED
+        );
     }
 
     @Override
@@ -87,7 +95,10 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getModVersion() {
-        return ChatHelper.formatString(ModHelper.getReflectiveModVersion(ReTweakMod.class), EnumChatFormatting.LIGHT_PURPLE);
+        return ChatHelper.formatString(
+                ModHelper.getReflectiveModVersion(ReTweakMod.class),
+                EnumChatFormatting.LIGHT_PURPLE
+        );
     }
 
 }
