@@ -5,6 +5,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Map;
  * @author Master801
  */
 public final class ReTweakSetup implements IFMLCallHook {
+
+    private static boolean deobfuscatedEnvironment = false;
 
     @Override
     public void injectData(Map<String, Object> data) {
@@ -33,12 +36,18 @@ public final class ReTweakSetup implements IFMLCallHook {
                     e
             );
         }
+        ReTweakSetup.deobfuscatedEnvironment = !(boolean)data.get("runtimeDeobfuscationEnabled");
     }
 
     @Override
     public Void call() throws Exception {
         if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
+        ReTweakConfig.INSTANCE.update(true);
         return null;
+    }
+
+    public static boolean isDeobfuscatedEnvironment() {
+        return ReTweakSetup.deobfuscatedEnvironment;
     }
 
 }

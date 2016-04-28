@@ -1,8 +1,10 @@
 package org.slave.minecraft.retweak.resources;
 
+import com.google.common.base.Joiner;
 import org.slave.lib.api.CommentProperties;
 import org.slave.lib.helpers.ConfigHelper;
 import org.slave.lib.helpers.FileHelper;
+import org.slave.minecraft.retweak.loading.capsule.CompilationMode;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,7 +28,14 @@ public final class ReTweakConfig {
 
     private final CommentProperties config = ConfigHelper.createCommentProperties();
 
+    private CompilationMode compilationMode = null;
+
     private ReTweakConfig() {
+        config.put(
+                ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
+                CompilationMode.JIT.name(),
+                "Valid values: " + "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
+        );
     }
 
     public void update(final boolean load) throws IOException {
@@ -37,6 +46,11 @@ public final class ReTweakConfig {
         }
 
         //TODO
+        if (config.hasKey(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE)) {
+            compilationMode = CompilationMode.valueOf((String)config.get(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE));
+        } else {
+            compilationMode = CompilationMode.JIT;
+        }
 
         if (!load || !ReTweakConfig.CONFIG_FILE.exists()) {
             if (!ReTweakConfig.CONFIG_FILE.getParentFile().exists()) FileHelper.createDirectory(ReTweakConfig.CONFIG_FILE.getParentFile());
@@ -48,6 +62,10 @@ public final class ReTweakConfig {
             fileOutputStream.flush();
             fileOutputStream.close();
         }
+    }
+
+    public CompilationMode getCompilationMode() {
+        return compilationMode;
     }
 
 }
