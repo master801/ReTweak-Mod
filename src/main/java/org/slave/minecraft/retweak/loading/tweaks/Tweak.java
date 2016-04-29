@@ -13,4 +13,6 @@ public interface Tweak {
 
     void tweak(ClassNode classNode);
 
+    int getSortIndex();
+
 }

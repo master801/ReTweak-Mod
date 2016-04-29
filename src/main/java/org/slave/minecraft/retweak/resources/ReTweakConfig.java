@@ -34,7 +34,7 @@ public final class ReTweakConfig {
         config.put(
                 ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
                 CompilationMode.JIT.name(),
-                "Valid values: " + "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
+                "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
         );
     }
 

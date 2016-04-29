@@ -37,7 +37,13 @@ public final class JITTweak implements Tweak {
         }
     }
 
+    @Override
+    public int getSortIndex() {
+        return 1;
+    }
+
     private void remap(Object node) {
+        if (Boolean.valueOf(System.getProperty("org.slave.minecraft.retweak.tweak.jit", Boolean.TRUE.toString()))) return;//TODO DEBUG VALUE, DO NOT USE IN RELEASE
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(

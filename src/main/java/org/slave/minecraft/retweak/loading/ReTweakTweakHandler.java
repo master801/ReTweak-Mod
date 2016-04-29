@@ -1,14 +1,17 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.minecraft.retweak.loading.capsule.CompilationMode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.SRGTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.JITTweak;
+import org.slave.minecraft.retweak.resources.ReTweakConfig;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,6 +30,30 @@ public final class ReTweakTweakHandler {
         for(GameVersion gameVersion : GameVersion.values()) {
             List<Tweak> tweaks = new ArrayList<>();
             tweaks.add(new SRGTweak(gameVersion));
+            switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
+                case JIT:
+                    tweaks.add(new JITTweak(gameVersion));
+                    break;
+                case INTERPRETER:
+                    tweaks.add(new InterpreterTweak(gameVersion));
+                    break;
+            }
+
+            Collections.sort(
+                    tweaks,
+                    new Comparator<Tweak>() {
+
+                        @Override
+                        public int compare(final Tweak o1, final Tweak o2) {
+                            if (o1.getSortIndex() < 0 || o2.getSortIndex() < 0) throw new IllegalStateException("Cannot have sort index less than zero!");
+                            if (o1.getSortIndex() == o2.getSortIndex()) throw new IllegalStateException("Sort index of Tweak cannot be the same!");
+                            if (o1.getSortIndex() < o2.getSortIndex()) return -1;
+                            if (o1.getSortIndex() > o2.getSortIndex()) return 1;
+                            return 0;
+                        }
+
+                    }
+            );
             this.tweaks.put(
                     gameVersion,
                     tweaks
@@ -34,17 +61,23 @@ public final class ReTweakTweakHandler {
         }
     }
 
-    public void tweak(ClassNode classNode, GameVersion gameVersion, CompilationMode compilationMode) {
-        switch(compilationMode) {
-            case JIT:
-                tweaks.get(gameVersion).add(new JITTweak(gameVersion));
-                break;
-            case INTERPRETER:
-                tweaks.get(gameVersion).add(new InterpreterTweak(gameVersion));
-                break;
+    public void tweak(ClassNode classNode, GameVersion gameVersion) {
+        List<Tweak> tweakList = tweaks.get(gameVersion);
+        for(Tweak tweak : tweakList) {
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.info(
+                        "Start Tweak \"{}\"",
+                        tweak.getName()
+                );
+            }
+            tweak.tweak(classNode);
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.info(
+                        "End Tweak\n\n",
+                        tweak.getName()
+                );
+            }
         }
-
-        for(Tweak tweak : tweaks.get(gameVersion)) tweak.tweak(classNode);
     }
 
 }

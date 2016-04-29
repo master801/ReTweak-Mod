@@ -27,4 +27,9 @@ public final class InterpreterTweak implements Tweak {
         if (gameVersion == null) return;
     }
 
+    @Override
+    public int getSortIndex() {
+        return 1;
+    }
+
 }

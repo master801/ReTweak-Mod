@@ -4,6 +4,7 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 /**
  * Created by Master on 4/27/2016 at 3:31 PM.
@@ -25,10 +26,12 @@ public abstract class Mapping {
      */
     public void remap(final Object node) {
         if (!(node instanceof MethodNode) && !(node instanceof MethodInsnNode) && !(node instanceof FieldNode) && !(node instanceof FieldInsnNode)) return;
+        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
         if (node instanceof MethodNode) method((MethodNode)node);
         if (node instanceof MethodInsnNode) methodInsn((MethodInsnNode)node);
         if (node instanceof FieldNode) field((FieldNode)node);
         if (node instanceof FieldInsnNode) fieldInsn((FieldInsnNode)node);
+        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");
     }
 
 }

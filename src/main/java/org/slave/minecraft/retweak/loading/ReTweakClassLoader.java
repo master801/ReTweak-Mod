@@ -90,8 +90,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
             ReTweakTweakHandler.INSTANCE.tweak(
                     classNode,
-                    reTweakModCandidate.getGameVersion(),
-                    ReTweakConfig.INSTANCE.getCompilationMode()
+                    reTweakModCandidate.getGameVersion()
             );
 
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
