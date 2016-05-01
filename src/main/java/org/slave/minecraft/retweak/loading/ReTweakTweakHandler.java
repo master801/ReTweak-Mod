@@ -4,8 +4,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.SRGTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.JITTweak;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -32,10 +30,11 @@ public final class ReTweakTweakHandler {
             tweaks.add(new SRGTweak(gameVersion));
             switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
                 case JIT:
-                    tweaks.add(new JITTweak(gameVersion));
+                    //TODO
+//                    tweaks.add(new JITTweak(gameVersion));
                     break;
                 case INTERPRETER:
-                    tweaks.add(new InterpreterTweak(gameVersion));
+//                    tweaks.add(new InterpreterTweak(gameVersion));
                     break;
             }
 

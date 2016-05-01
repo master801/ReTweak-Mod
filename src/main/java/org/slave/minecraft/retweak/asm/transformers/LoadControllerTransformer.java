@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -40,6 +41,7 @@ public final class LoadControllerTransformer extends BasicTransformer implements
             for(int i = 0; i < transition.instructions.size(); ++i) {
                 AbstractInsnNode abstractInsnNode = transition.instructions.get(i);
 
+                /*
                 if (abstractInsnNode instanceof FieldInsnNode) {
                     FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                     if (fieldInsnNode.getOpcode() == Opcodes.PUTFIELD &&
@@ -47,6 +49,15 @@ public final class LoadControllerTransformer extends BasicTransformer implements
                             fieldInsnNode.name.equals("state") &&
                             fieldInsnNode.desc.equals("Lcpw/mods/fml/common/LoaderState;")) {
                         injectionNode = abstractInsnNode;
+                        break;
+                    }
+                }
+                */
+                if (abstractInsnNode instanceof InsnNode) {
+                    InsnNode insnNode = (InsnNode)abstractInsnNode;
+                    if (insnNode.getOpcode() == Opcodes.RETURN) {
+                        injectionNode = transition.instructions.get(i - 3);
+                        break;
                     }
                 }
             }

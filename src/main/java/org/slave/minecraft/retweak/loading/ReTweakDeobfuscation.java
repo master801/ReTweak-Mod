@@ -1,7 +1,9 @@
 package org.slave.minecraft.retweak.loading;
 
 import LZMA.LzmaInputStream;
+import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.train.Train;
 import org.slave.tool.remapper.SRG;
 
 import java.io.File;
@@ -19,7 +21,7 @@ public final class ReTweakDeobfuscation {
 
     public static final ReTweakDeobfuscation INSTANCE = new ReTweakDeobfuscation();
 
-    private final HashMap<GameVersion, SRG> srgs = new HashMap<>();
+    private final HashMap<GameVersion, WrappingDataT2<SRG, Train>> srgs = new HashMap<>();
 
     private ReTweakDeobfuscation() {
     }
@@ -32,9 +34,13 @@ public final class ReTweakDeobfuscation {
             );
             if (dataFile.exists()) {
                 FileInputStream fileInputStream = new FileInputStream(dataFile);
+                SRG srg = loadSRG(fileInputStream);
                 srgs.put(
                         gameVersion,
-                        loadSRG(fileInputStream)
+                        new WrappingDataT2<>(
+                                srg,
+                                Train.fromSRG(srg)
+                        )
                 );
                 fileInputStream.close();
             }
@@ -42,7 +48,11 @@ public final class ReTweakDeobfuscation {
     }
 
     public SRG getSRG(GameVersion gameVersion) {
-        return srgs.get(gameVersion);
+        return srgs.get(gameVersion).getObject1();
+    }
+
+    public Train getTrain(GameVersion gameVersion) {
+        return srgs.get(gameVersion).getObject2();
     }
 
     private SRG loadSRG(InputStream inputStream) throws IOException {

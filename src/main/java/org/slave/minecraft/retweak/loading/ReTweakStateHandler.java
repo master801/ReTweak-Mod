@@ -24,7 +24,7 @@ public final class ReTweakStateHandler {
     public static void step(LoadController loadController, LoaderState currentState, LoaderState wantedState) {
         if (loadController == null || currentState == null || wantedState == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
-                    "An error occurred while stepping [all three variables for {} are null]! The ASM hacks may have failed?",
+                    "An error occurred while stepping (variables for {} are null)! The ASM hacks may have failed?",
                     ReTweakStateHandler.class.getName()
             );
             return;
