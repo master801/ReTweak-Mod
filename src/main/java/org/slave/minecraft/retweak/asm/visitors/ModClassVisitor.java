@@ -7,6 +7,7 @@ import org.slave.lib.resources.Bulk;
 import org.slave.lib.resources.EnumMap;
 import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Map.Entry;
 
@@ -25,14 +26,14 @@ public final class ModClassVisitor extends ClassVisitor {
                             GameVersion.V_1_4_7,
                             new Bulk<>(
                                     Type.ANNOTATION,
-                                    "Lcpw/mods/fml/common/Mod;"
+                                    "L" + "cpw/mods/fml/common/Mod" + ";"
                             )
                     ),
                     new WrappingDataT2(
                             GameVersion.V_1_5_2,
                             new Bulk<>(
                                     Type.ANNOTATION,
-                                    "Lcpw/mods/fml/common/Mod;"
+                                    "L" + "cpw/mods/fml/common/Mod" + ";"
                             )
                     )
             }
@@ -43,7 +44,7 @@ public final class ModClassVisitor extends ClassVisitor {
     private final GameVersion gameVersion;
     private final Type type;
 
-    public ModClassVisitor(final ClassVisitor cv, GameVersion gameVersion) {
+    public ModClassVisitor(ClassVisitor cv, GameVersion gameVersion) {
         super(
                 ASMHelper.ASM_VERSION,
                 cv
@@ -61,9 +62,18 @@ public final class ModClassVisitor extends ClassVisitor {
         if (type == Type.EXTENDS) {
             if (superName.equals(ModClassVisitor.TYPES.get(gameVersion).getValue())) {
                 isMod = true;
+                ReTweakResources.RETWEAK_LOGGER.info("!!!!! EXTENDS !!!!!\nNot yet implemented!!!!!!");
             }
         }
-        super.visit(version, access, name, signature, superName, interfaces);
+
+        super.visit(
+                version,
+                access,
+                name,
+                signature,
+                superName,
+                interfaces
+        );
     }
 
     @Override
@@ -73,11 +83,21 @@ public final class ModClassVisitor extends ClassVisitor {
                 isMod = true;
             }
         }
-        return super.visitAnnotation(desc, visible);
+        return super.visitAnnotation(
+                desc,
+                visible
+        );
     }
 
     public boolean isMod() {
         return isMod;
+    }
+
+    public static String getDesc(GameVersion gameVersion) {
+        if (gameVersion == null) return null;
+        Entry<Type, String> entry = TYPES.get(gameVersion);
+        if (entry == null) return null;
+        return entry.getValue();
     }
 
     private enum Type {

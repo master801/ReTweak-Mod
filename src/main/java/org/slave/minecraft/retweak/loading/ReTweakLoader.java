@@ -132,9 +132,10 @@ public final class ReTweakLoader {
                     );
                 }
             }
-
-            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
-                if (!reTweakModCandidate.getModClasses().isEmpty()) ReTweakClassLoader.getInstance().addFile(reTweakModCandidate.getFile());
+            try {
+                ReTweakModConfig.INSTANCE.update(true);
+            } catch(IOException e) {
+                e.printStackTrace();
             }
         }
         //</editor-fold>

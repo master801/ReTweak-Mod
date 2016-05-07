@@ -5,6 +5,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.loading.ReTweakModConfig;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 

@@ -12,6 +12,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import org.slave.minecraft.library.helpers.ModHelper;
+import org.slave.minecraft.retweak.loading.ReTweakModConfig;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakMetadata;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -60,6 +61,7 @@ public final class ReTweakMod {
         if (event.modID.equals(ReTweakStrings.RETWEAK_MOD) && event.configID.equals(ReTweakStrings.RETWEAK_GUI_CONFIG_ID)) {
             //TODO
             try {
+                ReTweakModConfig.INSTANCE.update(false);
                 ReTweakConfig.INSTANCE.update(false);
             } catch(IOException e) {
                 ReTweakResources.RETWEAK_LOGGER.warn(

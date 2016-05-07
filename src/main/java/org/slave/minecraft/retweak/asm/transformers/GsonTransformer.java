@@ -19,6 +19,8 @@ import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Created by Master801 on 4/20/2016 at 2:53 PM.
  *
@@ -27,8 +29,8 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
 public final class GsonTransformer extends BasicTransformer implements IClassTransformer {
 
     private static final String FIELD_INDENT_NAME = "indent";
-    private static final String METHOD_INDENT_SETTER_NAME = "setIndent";
-    private static final String METHOD_INDENT_GETTER_NAME = "getIndent";
+    private static final String METHOD_INDENT_SETTER_NAME = "setIndent", METHOD_INDENT_SETTER_DESC = "(Ljava/lang/String;)V";
+    private static final String METHOD_INDENT_GETTER_NAME = "getIndent", METHOD_INDENT_GETTER_DESC = "()Ljava/lang/String;";
 
     public GsonTransformer() {
         super(ReTweakResources.RETWEAK_LOGGER);
@@ -63,7 +65,7 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
             methodVisitor = classNode.visitMethod(
                     Opcodes.ACC_PUBLIC,
                     GsonTransformer.METHOD_INDENT_GETTER_NAME,
-                    "()Ljava/lang/String;",
+                    GsonTransformer.METHOD_INDENT_GETTER_DESC,
                     null,
                     null
             );
@@ -89,7 +91,7 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
             methodVisitor = classNode.visitMethod(
                     Opcodes.ACC_PUBLIC,
                     GsonTransformer.METHOD_INDENT_SETTER_NAME,
-                    "(Ljava/lang/String;)V",
+                    GsonTransformer.METHOD_INDENT_SETTER_DESC,
                     null,
                     null
             );
@@ -202,7 +204,7 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
                     ),
                     gson
             );
-        } catch(Exception e) {
+        } catch(IllegalAccessException | NoSuchFieldException e) {
             //Ignore
         }
         return null;
@@ -211,15 +213,20 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
     public static void setIndent(Gson gson, String indent) {
         if (gson == null || StringHelper.isNullOrEmpty(indent)) return;
         try {
-            ReflectionHelper.setFieldValue(
-                    ReflectionHelper.getField(
+            ReflectionHelper.invokeMethod(
+                    ReflectionHelper.getMethod(
                             Gson.class,
-                            GsonTransformer.FIELD_INDENT_NAME
+                            GsonTransformer.METHOD_INDENT_SETTER_NAME,
+                            ReflectionHelper.createNewClassParameter(
+                                    String.class
+                            )
                     ),
                     gson,
-                    indent
+                    ReflectionHelper.createNewObjectParameter(
+                            indent
+                    )
             );
-        } catch(Exception e) {
+        } catch(IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             //Ignore
         }
     }

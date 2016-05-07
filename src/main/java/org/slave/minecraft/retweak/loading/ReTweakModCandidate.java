@@ -1,7 +1,10 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.helpers.IOHelper;
+import org.slave.lib.resources.ASMAnnotation;
 import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 
@@ -33,6 +36,9 @@ public final class ReTweakModCandidate {
     private final ArrayList<String> classes = new ArrayList<>(), packages = new ArrayList<>();
     private final ArrayList<String> modClasses = new ArrayList<>();
 
+    private String[] modids;
+    private boolean enabled = true;
+
     ReTweakModCandidate(GameVersion gameVersion, File file) {
         this.gameVersion = gameVersion;
         this.file = file;
@@ -58,7 +64,7 @@ public final class ReTweakModCandidate {
     private void findModClasses(final byte[] classBytes) {
         ClassReader classReader = new ClassReader(classBytes);
         ModClassVisitor modVisitor = new ModClassVisitor(
-                null,//We're only reading that it is a mod, no need for a functioning class visitor
+                null,//No need for actual class visitor
                 gameVersion
         );
         classReader.accept(
@@ -70,7 +76,7 @@ public final class ReTweakModCandidate {
     }
 
     public boolean isValid() throws IOException {
-        if (!modClasses.isEmpty()) return false;//Has previously invoked method???
+        if (!modClasses.isEmpty()) return false;//Has previously invoked method?
         ZipFile zipFile = new ZipFile(file);
         for(String _class : classes) {
             InputStream inputStream = zipFile.getInputStream(zipFile.getEntry(_class));
@@ -79,6 +85,45 @@ public final class ReTweakModCandidate {
         }
         zipFile.close();
         return !modClasses.isEmpty();
+    }
+
+    public String[] getModIds() {
+        if (modids == null && !modClasses.isEmpty()) {
+            try {
+                ZipFile zipFile = new ZipFile(file);
+                for(String modClass : modClasses) {
+                    ZipEntry modZipEntry = zipFile.getEntry(modClass);
+                    ClassReader classReader = new ClassReader(zipFile.getInputStream(modZipEntry));
+                    ClassNode classNode = new ClassNode();
+                    classReader.accept(
+                            classNode,
+                            0
+                    );
+                    if (classNode.visibleAnnotations != null) {
+                        List<String> modidList = new ArrayList<>();
+                        for(AnnotationNode annotationNode : classNode.visibleAnnotations) {
+                            if (annotationNode.desc.equals(ModClassVisitor.getDesc(getGameVersion()))) {//TODO Check if annotation or extends
+                                modidList.add((String)new ASMAnnotation(annotationNode).get().get("modid"));
+                            }
+                        }
+                        modids = modidList.toArray(new String[modidList.size()]);
+                    }
+                    //TODO Get modids from class node
+                }
+                zipFile.close();
+            } catch(IOException e) {
+                //Ignore
+            }
+        }
+        return modids;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     GameVersion getGameVersion() {

@@ -5,6 +5,8 @@ import cpw.mods.fml.common.LoaderState;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.io.IOException;
+
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
  *
@@ -61,10 +63,21 @@ public final class ReTweakStateHandler {
     }
 
     private static void constructing(LoadController loadController) {
+        try {
+            ReTweakModConfig.INSTANCE.update(true);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
         for(GameVersion gameVersion : GameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getReTweakModDiscoverer().getModCandidates(gameVersion)) {
+                if (!reTweakModCandidate.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not loading..."
+                    );
+                    continue;
+                }
                 ReTweakClassLoader.getInstance().addFile(reTweakModCandidate.getFile());
-
                 for(String modClassName : reTweakModCandidate.getModClasses()) {
                     modClassName = modClassName.replace(
                             '/',

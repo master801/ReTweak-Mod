@@ -23,7 +23,10 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String[] getAuthorList() {
         return new String[] {
-                ChatHelper.formatString("Master801", EnumChatFormatting.AQUA)
+                ChatHelper.formatString(
+                        "Master801",
+                        EnumChatFormatting.AQUA
+                )
         };
     }
 
@@ -40,7 +43,10 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String getCredits() {
         return Joiner.on(System.lineSeparator()).join(new String[] {
-                ChatHelper.formatString("FyberOptic - Intermediary", EnumChatFormatting.DARK_GREEN)
+                ChatHelper.formatString(
+                        "FyberOptic - Intermediary",
+                        EnumChatFormatting.DARK_GREEN
+                )
         });
     }
 
@@ -48,7 +54,10 @@ public final class ReTweakMetadata implements Metadata {
     public String getDescription() {
         return Joiner.on('\n').join(new String[] {
                 "Loads (most) Forge mods from (some) previous versions of Minecraft.",
-                "Uses trickery and may cause crashes, use at your own risk."
+                ChatHelper.formatString(
+                        "Uses trickery and may cause crashes, use at your own risk.",
+                        EnumChatFormatting.DARK_RED
+                )
         });
     }
 
