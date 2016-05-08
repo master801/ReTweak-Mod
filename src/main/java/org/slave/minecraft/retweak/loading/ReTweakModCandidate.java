@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.helpers.IOHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
+import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor.Type;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 
 import java.io.File;
@@ -38,6 +39,7 @@ public final class ReTweakModCandidate {
 
     private String[] modids;
     private boolean enabled = true;
+    private Type type;
 
     ReTweakModCandidate(GameVersion gameVersion, File file) {
         this.gameVersion = gameVersion;
@@ -71,6 +73,7 @@ public final class ReTweakModCandidate {
                 modVisitor,
                 0
         );
+        type = modVisitor.getType();
 
         if (modVisitor.isMod()) modClasses.add(classReader.getClassName() + ".class");
     }
@@ -99,16 +102,25 @@ public final class ReTweakModCandidate {
                             classNode,
                             0
                     );
-                    if (classNode.visibleAnnotations != null) {
-                        List<String> modidList = new ArrayList<>();
-                        for(AnnotationNode annotationNode : classNode.visibleAnnotations) {
-                            if (annotationNode.desc.equals(ModClassVisitor.getDesc(getGameVersion()))) {//TODO Check if annotation or extends
-                                modidList.add((String)new ASMAnnotation(annotationNode).get().get("modid"));
+                    switch(type) {
+                        case EXTENDS:
+                            //Yes, modids were literally the name of the class...
+                            modids = new String[] {
+                                    classNode.name
+                            };
+                            break;
+                        case ANNOTATION:
+                            if (classNode.visibleAnnotations != null) {
+                                List<String> modidList = new ArrayList<>();
+                                for(AnnotationNode annotationNode : classNode.visibleAnnotations) {
+                                    if (annotationNode.desc.equals(ModClassVisitor.getDesc(getGameVersion()))) {//TODO Check if annotation or extends
+                                        modidList.add((String)new ASMAnnotation(annotationNode).get().get("modid"));
+                                    }
+                                }
+                                modids = modidList.toArray(new String[modidList.size()]);
                             }
-                        }
-                        modids = modidList.toArray(new String[modidList.size()]);
+                            break;
                     }
-                    //TODO Get modids from class node
                 }
                 zipFile.close();
             } catch(IOException e) {
@@ -132,10 +144,6 @@ public final class ReTweakModCandidate {
 
     File getFile() {
         return file;
-    }
-
-    String getPath() {
-        return file.getPath();
     }
 
     List<String> getModClasses() {

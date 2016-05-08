@@ -68,4 +68,9 @@ public final class ReTweakConfig {
         return compilationMode;
     }
 
+    public void setCompilationMode(CompilationMode compilationMode) {
+        if (compilationMode == null) return;
+        this.compilationMode = compilationMode;
+    }
+
 }

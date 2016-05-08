@@ -3,13 +3,17 @@ package org.slave.minecraft.retweak.loading;
 import com.github.pwittchen.kirai.library.Kirai;
 import com.google.common.base.Joiner;
 import org.slave.lib.helpers.FileHelper;
+import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * <p>
@@ -26,7 +30,16 @@ public final class ReTweakLoader {
 
     private final ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer();
 
+    private final EnumMap<GameVersion, List<ReTweakModContainer>> mods;
+
     private ReTweakLoader() {
+        mods = new EnumMap<>(GameVersion.class);
+        for(GameVersion gameVersion : GameVersion.values()) {
+            mods.put(
+                    gameVersion,
+                    new ArrayList<ReTweakModContainer>()
+            );
+        }
     }
 
     /**
@@ -132,6 +145,16 @@ public final class ReTweakLoader {
                     );
                 }
             }
+            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
+                for(String modid : reTweakModCandidate.getModIds()) {
+                    mods.get(gameVersion).add(new ReTweakModContainer(
+                            modid,
+                            null,
+                            null,
+                            reTweakModCandidate
+                    ));
+                }
+            }
             try {
                 ReTweakModConfig.INSTANCE.update(true);
             } catch(IOException e) {
@@ -139,6 +162,24 @@ public final class ReTweakLoader {
             }
         }
         //</editor-fold>
+
+        //<editor-fold desc="Sort">
+        //TODO
+        //</editor-fold>
+    }
+
+    public ReTweakModContainer getReTweakModContainer(final GameVersion gameVersion, final String modid) {
+        if (gameVersion == null || StringHelper.isNullOrEmpty(modid)) return null;
+        for(ReTweakModContainer reTweakModContainer : mods.get(gameVersion)) {
+            if (reTweakModContainer.getModid().equals(modid)) return reTweakModContainer;
+        }
+        return null;
+    }
+
+    public ReTweakModContainer[] getReTweakModContainers(final GameVersion gameVersion) {
+        if (gameVersion == null) return null;
+        List<ReTweakModContainer> list = mods.get(gameVersion);
+        return list.toArray(new ReTweakModContainer[list.size()]);
     }
 
     ReTweakModDiscoverer getReTweakModDiscoverer() {

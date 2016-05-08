@@ -11,8 +11,44 @@ public interface Tweak {
 
     String getName();
 
-    void tweak(ClassNode classNode);
+    void tweak(ClassNode classNode) throws TweakException;
 
     int getSortIndex();
+
+    class TweakException extends Exception {
+
+        private static final long serialVersionUID = 1990489569439481334L;
+
+        public TweakException() {
+            super();
+        }
+
+        public TweakException(final String message) {
+            super(message);
+        }
+
+        public TweakException(final Throwable cause) {
+            super(cause);
+        }
+
+    }
+
+    class StopTweakException extends TweakException {
+
+        private static final long serialVersionUID = 5779122186044917493L;
+
+        public StopTweakException() {
+            super();
+        }
+
+        public StopTweakException(final String message) {
+            super(message);
+        }
+
+        public StopTweakException(final Throwable cause) {
+            super(cause);
+        }
+
+    }
 
 }

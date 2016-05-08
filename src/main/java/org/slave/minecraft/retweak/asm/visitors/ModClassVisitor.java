@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 public final class ModClassVisitor extends ClassVisitor {
 
     @SuppressWarnings("unchecked")
-    private static final EnumMap<GameVersion, Entry<Type, String>> TYPES = new EnumMap<>(
+    public static final EnumMap<GameVersion, Entry<Type, String>> TYPES = new EnumMap<>(
             GameVersion.class,
             new WrappingDataT2[] {
                     new WrappingDataT2(
@@ -93,6 +93,10 @@ public final class ModClassVisitor extends ClassVisitor {
         return isMod;
     }
 
+    public Type getType() {
+        return type;
+    }
+
     public static String getDesc(GameVersion gameVersion) {
         if (gameVersion == null) return null;
         Entry<Type, String> entry = TYPES.get(gameVersion);
@@ -100,7 +104,7 @@ public final class ModClassVisitor extends ClassVisitor {
         return entry.getValue();
     }
 
-    private enum Type {
+    public enum Type {
 
         EXTENDS,
 

@@ -2,12 +2,12 @@ package org.slave.minecraft.retweak.loading;
 
 import LZMA.LzmaInputStream;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 /**
@@ -31,26 +31,33 @@ public final class ReTweakDeobfuscation {
                     "deobfuscation_data-" + gameVersion.getVersion() + ".lzma"
             );
             if (dataFile.exists()) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Play file \"{}\" was found, JIT compiler will now work.",
+                        dataFile.getPath()
+                );
                 FileInputStream fileInputStream = new FileInputStream(dataFile);
-                SRG srg = loadSRG(fileInputStream);
+                SRG srg;
+
+                LzmaInputStream lzmaInputStream = new LzmaInputStream(fileInputStream);
+                srg = SRG.load(lzmaInputStream);
+                lzmaInputStream.close();
+
                 srgs.put(
                         gameVersion,
                         srg
                 );
                 fileInputStream.close();
+            } else {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Play file \"{}\" was not found... JIT compiler will not work...",
+                        dataFile.getPath()
+                );
             }
         }
     }
 
     public SRG getSRG(GameVersion gameVersion) {
         return srgs.get(gameVersion);
-    }
-
-    private SRG loadSRG(InputStream inputStream) throws IOException {
-        LzmaInputStream lzmaInputStream = new LzmaInputStream(inputStream);
-        SRG srg = SRG.load(lzmaInputStream);
-        lzmaInputStream.close();
-        return srg;
     }
 
 }

@@ -10,6 +10,7 @@ import org.slave.lib.helpers.IOHelper;
 import org.slave.minecraft.retweak.asm.ReTweakSetup;
 import org.slave.minecraft.retweak.loading.capsule.CompilationMode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -89,10 +90,24 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     0
             );
 
-            ReTweakTweakHandler.INSTANCE.tweak(
-                    classNode,
-                    reTweakModCandidate.getGameVersion()
-            );
+            try {
+                ReTweakTweakHandler.INSTANCE.tweak(
+                        classNode,
+                        reTweakModCandidate.getGameVersion()
+                );
+            } catch(TweakException e) {
+                ReTweakResources.RETWEAK_LOGGER.error(
+                        Kirai.from(
+                                "Disabled ReTweak mod candidate \"{file_path}\" because an exception was caught while tweaking!"
+                        ).put(
+                                "file_path",
+                                reTweakModCandidate.getFile().getPath()
+                        ).format().toString(),
+                        e
+                );
+                reTweakModCandidate.setEnabled(false);
+                ReTweakModConfig.INSTANCE.update(false);
+            }
 
             ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
             classNode.accept(classWriter);

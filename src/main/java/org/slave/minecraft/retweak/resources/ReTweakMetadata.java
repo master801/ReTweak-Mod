@@ -52,7 +52,7 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getDescription() {
-        return Joiner.on('\n').join(new String[] {
+        return Joiner.on("\n\n").join(new String[] {
                 "Loads (most) Forge mods from (some) previous versions of Minecraft.",
                 ChatHelper.formatString(
                         "Uses trickery and may cause crashes, use at your own risk.",

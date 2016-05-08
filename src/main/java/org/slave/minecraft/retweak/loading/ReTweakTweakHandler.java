@@ -4,6 +4,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.SRGTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
+import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -60,7 +61,7 @@ public final class ReTweakTweakHandler {
         }
     }
 
-    public void tweak(ClassNode classNode, GameVersion gameVersion) {
+    public void tweak(ClassNode classNode, GameVersion gameVersion) throws TweakException {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
             if (ReTweakResources.DEBUG) {
