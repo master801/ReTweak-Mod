@@ -147,6 +147,7 @@ public final class ReTweakLoader {
             }
             for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
                 for(String modid : reTweakModCandidate.getModIds()) {
+                    //TODO Make this method different: name and version using this method is not detected.
                     mods.get(gameVersion).add(new ReTweakModContainer(
                             modid,
                             null,

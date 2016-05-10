@@ -1,20 +1,16 @@
 package org.slave.minecraft.retweak.loading;
 
-import java.io.Serializable;
-
 /**
  * Created by Master on 5/7/2016 at 6:36 PM.
  *
  * @author Master
  */
-public final class ReTweakModContainer implements Serializable {
-
-    private static final long serialVersionUID = -8130835653362533286L;
+public final class ReTweakModContainer {
 
     private final String modid;
     private String name;
     private String version;
-    private transient final ReTweakModCandidate reTweakModCandidate;
+    private final ReTweakModCandidate reTweakModCandidate;
     private boolean enabled = true;
 
     public ReTweakModContainer(final String modid, final String name, final String version, final ReTweakModCandidate reTweakModCandidate) {
@@ -46,9 +42,6 @@ public final class ReTweakModContainer implements Serializable {
 
     ReTweakModCandidate getReTweakModCandidate() {
         return reTweakModCandidate;
-    }
-
-    public void state() {
     }
 
 }

@@ -42,7 +42,8 @@ public final class SRGTweak implements Tweak {
         methods(classNode);//0 - Methods
         fields(classNode);//1 - Fields
         superName(classNode);//2 - Super-name
-        name(classNode);//3 - Name
+        interfaces(classNode);//3 - Interfaces
+        name(classNode);//4 - Name
     }
 
     @Override
@@ -89,10 +90,37 @@ public final class SRGTweak implements Tweak {
             classNode.superName = superNameEntry[1];
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
-                        "Remapped super-class from \"{}\" to \"{}\".",
+                        "Remapped super-class from \"{}\" to \"{}\"",
                         superNameEntry[0],
                         superNameEntry[1]
                 );
+            }
+        }
+    }
+
+    private void interfaces(ClassNode classNode) throws TweakException {
+        if (classNode.interfaces == null) return;
+        for(int i = 0; i < classNode.interfaces.size(); ++i) {
+            final String _interface = classNode.interfaces.get(i);
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.info(
+                        "TWEAK INTERFACE: {}",
+                        _interface
+                );
+            }
+            String[] entry = srg.getClassEntry(_interface);
+            if (entry != null) {
+                classNode.interfaces.set(
+                        i,
+                        entry[1]
+                );
+                if (ReTweakResources.DEBUG) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Remapped interface from \"{}\" to \"{}\"",
+                            entry[0],
+                            entry[1]
+                    );
+                }
             }
         }
     }
