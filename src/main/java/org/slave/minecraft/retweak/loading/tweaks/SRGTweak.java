@@ -299,7 +299,7 @@ public final class SRGTweak implements Tweak {
             methodInsnNode.desc = entry[5];
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.debug(
-                        "Remapped method insn node \"{}\", from \"{} {} {}\" to \"{} {} {}\".",
+                        "Remapped method insn node \"{}\", from \"{}/{}{}\" to \"{}/{}{}\".",
                         Kirai.from(
                                 "Class: \"{class}\", Method: \"{method}\", Index: {index}"
                         ).put(
@@ -530,6 +530,7 @@ public final class SRGTweak implements Tweak {
             for(int i = 0; i < frameNode.local.size(); ++i) {
                 final Object local = frameNode.local.get(i);
                 if (local instanceof String) {
+
                     String[] entry = srg.getClassEntry(
                             (String)local
                     );
@@ -554,8 +555,8 @@ public final class SRGTweak implements Tweak {
                                             "index",
                                             index
                                     ).format().toString(),
-                                    entry[0],
-                                    entry[1]
+                                    local,
+                                    frameNode.local.get(i)
                             );
                         }
                     }
@@ -655,8 +656,14 @@ public final class SRGTweak implements Tweak {
             ));
 
             if (entry != null) {
-                if (argumentType.getSort() == Type.ARRAY) throw new IllegalStateException("Arrays not yet supported!");
-                newArgumentTypes[i] = Type.getType("L" + entry[1] + ";");
+                String x = "";
+                if (argumentType.getSort() == Type.ARRAY) {
+                    x = argumentType.getDescriptor().substring(
+                            0,
+                            argumentType.getDescriptor().lastIndexOf('/') + 1
+                    );
+                }
+                newArgumentTypes[i] = Type.getType(x + "L" + entry[1] + ";");
             } else {
                 newArgumentTypes[i] = argumentType;
             }
@@ -668,8 +675,14 @@ public final class SRGTweak implements Tweak {
         ));
 
         if (entry != null) {
-            if (returnType.getSort() == Type.ARRAY) throw new IllegalStateException("Arrays are not yet supported!");
-            newReturnType = Type.getReturnType("L" + entry[1] + ";");
+            String x = "";
+            if (returnType.getSort() == Type.ARRAY) {
+                x = returnType.getDescriptor().substring(
+                        0,
+                        returnType.getDescriptor().lastIndexOf('[') + 1
+                );
+            }
+            newReturnType = Type.getReturnType(x + "L" + entry[1] + ";");
         } else {
             newReturnType = returnType;
         }

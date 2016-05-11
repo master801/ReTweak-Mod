@@ -81,7 +81,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
             if (reTweakModCandidate == null) throw new IOException();//Jump out of try-catch block statement
 
-            InputStream inputStream = super.getResourceAsStream(name.replace('.', '/') + ".class");
+            InputStream inputStream = super.getResourceAsStream(name.replace(
+                    '.',
+                    '/'
+            ) + ".class");
             ClassReader classReader = new ClassReader(IOHelper.toByteArray(inputStream));
             ClassNode classNode = new ClassNode();
 
@@ -109,18 +112,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 ReTweakModConfig.INSTANCE.update(false);
             }
 
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES + ClassWriter.COMPUTE_MAXS);
+            ClassWriter classWriter = new ClassWriter(0);
             classNode.accept(classWriter);
             inputStream.close();
 
             byte[] classData = classWriter.toByteArray();
-            returnClass = super.defineClass(
-                    name,
-                    classData,
-                    0,
-                    classData.length
-            );
-
             if (ReTweakClassLoader.OUTPUT_CLASS) {
                 try {
                     File file = new File(
@@ -143,6 +139,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     //Ignore
                 }
             }
+            returnClass = super.defineClass(
+                    name,
+                    classData,
+                    0,
+                    classData.length
+            );
         } catch(IOException ee) {
             //Ignore
         }

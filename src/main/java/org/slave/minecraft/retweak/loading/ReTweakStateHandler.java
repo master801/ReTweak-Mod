@@ -222,7 +222,7 @@ public final class ReTweakStateHandler {
                                         );
                                         return;
                                     }
-                                } catch(NoClassDefFoundError | ClassNotFoundException e) {
+                                } catch(ClassNotFoundException e) {
                                     reTweakModContainer.setEnabled(false);
                                     ReTweakResources.RETWEAK_LOGGER.error(
                                             "Mod \"{}\" has been disabled due to the proxy class \"{}\" being unable to be found.",
@@ -233,7 +233,7 @@ public final class ReTweakStateHandler {
                                 }
                             }
                         }
-                    } catch(NoClassDefFoundError | ClassNotFoundException e) {
+                    } catch(ClassNotFoundException e) {
                         ReTweakResources.RETWEAK_LOGGER.error(
                                 "Failed to load a mod class!",
                                 e

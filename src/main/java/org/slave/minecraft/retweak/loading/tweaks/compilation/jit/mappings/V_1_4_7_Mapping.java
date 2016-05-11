@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings;
 
 import cpw.mods.fml.common.Mod.EventHandler;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -18,13 +19,15 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
 final class V_1_4_7_Mapping extends Mapping {
 
     @Override
-    protected void _class(final ClassNode classNode) {
+    protected boolean _class(final ClassNode classNode) {
         ReTweakResources.RETWEAK_LOGGER.info("MAPPING CLASS: {} {}", classNode.name, classNode.superName);
+
+        return false;
     }
 
     @Override
-    protected void method(final MethodNode methodNode) {
-        ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD: {} {}", methodNode.name, methodNode.desc);
+    protected boolean method(final MethodNode methodNode) {
+        ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD: {}/{}", methodNode.name, methodNode.desc);
 
         if (methodNode.visibleAnnotations != null) {
             for(AnnotationNode annotationNode : methodNode.visibleAnnotations) {
@@ -42,21 +45,32 @@ final class V_1_4_7_Mapping extends Mapping {
                 }
             }
         }
+
+        return false;
     }
 
     @Override
-    protected void field(final FieldNode fieldNode) {
+    protected boolean field(final FieldNode fieldNode) {
         ReTweakResources.RETWEAK_LOGGER.info("MAPPING FIELD: {} {}", fieldNode.name, fieldNode.desc);
+
+        return false;
     }
 
     @Override
-    protected void fieldInsn(final FieldInsnNode fieldInsnNode) {
-        ReTweakResources.RETWEAK_LOGGER.info("MAPPING FIELD INSN: {} {} {}", fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
+    protected boolean fieldInsn(final FieldInsnNode fieldInsnNode) {
+        ReTweakResources.RETWEAK_LOGGER.info("MAPPING FIELD INSN: {}/{} {}", fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
+        if (fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC && fieldInsnNode.owner.equals("net/minecraft/client/renderer/ChestItemRenderHelper") && fieldInsnNode.name.equals("field_78545_a") && fieldInsnNode.desc.equals("Lnet/minecraft/client/renderer/ChestItemRenderHelper;")) return true;
+
+        return false;
     }
 
     @Override
-    protected void methodInsn(final MethodInsnNode methodInsnNode) {
-        ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD INSN: {} {} {}", methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
+    protected boolean methodInsn(final MethodInsnNode methodInsnNode) {
+        ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD INSN: {}/{}/{}", methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
+
+//        ClientRegistry.registerTileEntity(null,null,null);
+
+        return false;
     }
 
 }
