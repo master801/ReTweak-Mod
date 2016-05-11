@@ -16,6 +16,7 @@ import java.util.Map.Entry;
  *
  * @author Master
  */
+@Deprecated
 public final class ModClassVisitor extends ClassVisitor {
 
     @SuppressWarnings("unchecked")

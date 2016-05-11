@@ -168,16 +168,22 @@ public final class SRGTweak implements Tweak {
         }
 
         Type type = Type.getType(fieldNode.desc);
-        if (type.getSort() == Type.ARRAY) {
-            throw new IllegalStateException("Arrays are not yet supported!");
-        }
         String[] entry = srg.getClassEntry(Type.getType(fieldNode.desc).getClassName().replace(
                 '.',
                 '/'
         ));
         Type newType;
         if (entry != null) {
-            newType = Type.getType("L" + entry[1] + ";");
+            String x = "";
+
+            if (type.getSort() == Type.ARRAY) {
+                x = type.getDescriptor().substring(
+                        0,
+                        type.getDescriptor().lastIndexOf('[') + 1
+                );
+            }
+
+            newType = Type.getType(x + "L" + entry[1] + ";");
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped field desc from \"{}\" to \"{}\"",
@@ -372,7 +378,14 @@ public final class SRGTweak implements Tweak {
             }
             entry = srg.getClassEntry(cs);
             if (entry != null) {
-                newArgumentTypes[a] = Type.getType((argumentType.getSort() == Type.ARRAY ? "[" : "") + "L" + entry[1] + ";");
+                String x = "";
+                if (argumentType.getSort() == Type.ARRAY) {
+                    x = argumentType.getDescriptor().substring(
+                            0,
+                            argumentType.getDescriptor().lastIndexOf('[') + 1
+                    );
+                }
+                newArgumentTypes[a] = Type.getType(x + "L" + entry[1] + ";");
             } else {
                 newArgumentTypes[a] = argumentType;
             }
@@ -487,15 +500,24 @@ public final class SRGTweak implements Tweak {
         Type descType = Type.getType(fieldInsnNode.desc);
         Type newDescType;
 
-        if (descType.getSort() == Type.ARRAY) throw new IllegalStateException("Arrays are not yet supported!");
-
-        String[] descEntry = srg.getClassEntry(descType.getClassName().replace(
+        String[] descEntry = srg.getClassEntry(descType.getClassName().substring(
+                descType.getSort() == Type.ARRAY ? descType.getDescriptor().lastIndexOf('[') : 0
+        ).replace(
                 '.',
                 '/'
         ));
 
         if (descEntry != null) {
-            newDescType = Type.getType("L" + descEntry[1] + ";");
+            String x = "";
+
+            if (descType.getSort() == Type.ARRAY) {
+                x = descType.getDescriptor().substring(
+                        0,
+                        descType.getDescriptor().lastIndexOf('[') + 1
+                );
+            }
+
+            newDescType = Type.getType(x + "L" + descEntry[1] + ";");
         } else {
             newDescType = descType;
         }
@@ -584,7 +606,14 @@ public final class SRGTweak implements Tweak {
         }
         String[] descEntry = srg.getClassEntry(cs);
         if (descEntry != null) {
-            newDescType = Type.getType((descType.getSort() == Type.ARRAY ? "[" : "") + "L" + descEntry[1] + ";");
+            String x = "";
+            if (descType.getSort() == Type.ARRAY) {
+                x = descType.getDescriptor().substring(
+                        0,
+                        descType.getDescriptor().lastIndexOf('[') + 1
+                );
+            }
+            newDescType = Type.getType(x + "L" + descEntry[1] + ";");
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped local variable \"{}\", desc from \"{}\" to \"{}\"",

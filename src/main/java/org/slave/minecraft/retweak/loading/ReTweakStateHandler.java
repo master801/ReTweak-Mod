@@ -4,8 +4,21 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.SidedProxy;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLStateEvent;
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.lib.helpers.StringHelper;
+import org.slave.lib.resources.ASMTable.TableClass;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
@@ -36,13 +49,9 @@ public final class ReTweakStateHandler {
                 ReTweakStateHandler.constructing(loadController);
                 break;
             case PREINITIALIZATION:
-                ReTweakModController.preInitialization();
-                break;
             case INITIALIZATION:
-                ReTweakModController.initialization();
-                break;
             case POSTINITIALIZATION:
-                ReTweakModController.postInitialization();
+                //NOOP
                 break;
             case SERVER_ABOUT_TO_START:
             case SERVER_STARTING:
@@ -60,6 +69,29 @@ public final class ReTweakStateHandler {
                 //NOOP
                 break;
         }
+    }
+
+    /**
+     * {@link org.slave.minecraft.retweak.asm.transformers.LoadControllerTransformer}
+     *
+     * Sends a state event to mods
+     *
+     * @param loadController Load controller instance
+     * @param fmlStateEvent State event to send to mods
+     */
+    public static void sendStateEvent(LoadController loadController, FMLStateEvent fmlStateEvent) {
+        if (fmlStateEvent.getClass() == FMLPreInitializationEvent.class) {
+            ReTweakModController.preInitialization((FMLPreInitializationEvent)fmlStateEvent);
+        } else if (fmlStateEvent.getClass() == FMLInitializationEvent.class) {
+            ReTweakModController.initialization((FMLInitializationEvent)fmlStateEvent);
+        } else if (fmlStateEvent.getClass() == FMLPostInitializationEvent.class) {
+            ReTweakModController.postInitialization((FMLPostInitializationEvent)fmlStateEvent);
+        }
+
+        ReTweakResources.RETWEAK_LOGGER.debug(
+                "Sent state event {}",
+                fmlStateEvent
+        );
     }
 
     private static void constructing(LoadController loadController) {
@@ -87,22 +119,121 @@ public final class ReTweakStateHandler {
                     continue;
                 }
                 ReTweakClassLoader.getInstance().addFile(reTweakModContainer.getReTweakModCandidate().getFile());
-                for(String modClassName : reTweakModContainer.getReTweakModCandidate().getModClasses()) {
-                    modClassName = modClassName.replace(
-                            '/',
-                            '.'
-                    ).substring(
-                            0,
-                            modClassName.indexOf(".class")
-                    );
-
+                for(TableClass tableClass : reTweakModContainer.getReTweakModCandidate().getModClasses()) {
                     try {
-                        Class.forName(
-                                modClassName,
+                        Class<?> modClass = Class.forName(
+                                tableClass.getName().replace(
+                                        '/',
+                                        '.'
+                                ),
                                 true,
                                 ReTweakClassLoader.getInstance()
                         );
-                    } catch(ClassNotFoundException e) {
+
+                        for(Field field : modClass.getDeclaredFields()) {
+                            field.setAccessible(true);
+                            if (field.isAnnotationPresent(Instance.class)) {
+                                if (!Modifier.isStatic(field.getModifiers())) {
+                                    reTweakModContainer.setEnabled(false);
+                                    ReTweakResources.RETWEAK_LOGGER.error(
+                                            "Mod \"{}\" has been disabled due to the \"{}\" field not being static.",
+                                            Instance.class.getCanonicalName(),
+                                            reTweakModContainer.getModClass()
+                                    );
+                                    return;
+                                }
+                                Instance instance = field.getAnnotation(Instance.class);
+                                if (!instance.value().equals(reTweakModContainer.getModid())) {
+                                    throw new UnsupportedOperationException("Instance annotation value must be the mod's modid! Injecting other mods' instances is not yet supported!");
+                                }
+                                Object classInstance;
+                                try {
+                                    classInstance = ReflectionHelper.createFromConstructor(
+                                            ReflectionHelper.getConstructor(
+                                                    modClass,
+                                                    null
+                                            ),
+                                            null
+                                    );
+                                } catch(InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+                                    reTweakModContainer.setEnabled(false);
+                                    ReTweakResources.RETWEAK_LOGGER.warn(
+                                            "Mod \"{}\" has been disabled due to incorrectly creating a new instance of class \"{}\"",
+                                            reTweakModContainer.getModid(),
+                                            reTweakModContainer.getModClass()
+                                    );
+                                    return;
+                                }
+                                try {
+                                    ReflectionHelper.setFieldValue(
+                                            field,
+                                            null,
+                                            classInstance
+                                    );
+                                } catch(IllegalAccessException e) {
+                                    reTweakModContainer.setEnabled(false);
+                                    ReTweakResources.RETWEAK_LOGGER.warn(
+                                            "Mod \"{}\" has been disabled due to being unable to set the instance of the class, to the field with the \"{}\" annotation.",
+                                            reTweakModContainer.getModid(),
+                                            Instance.class.getCanonicalName()
+                                    );
+                                    return;
+                                }
+                                reTweakModContainer.setInstance(classInstance);
+                            } else if (field.isAnnotationPresent(SidedProxy.class)) {
+                                SidedProxy sidedProxy = field.getAnnotation(SidedProxy.class);
+                                if (!Modifier.isStatic(field.getModifiers())) {
+                                    reTweakModContainer.setEnabled(false);
+                                    ReTweakResources.RETWEAK_LOGGER.error(
+                                            "Mod \"{}\" has been disabled due to the \"{}\" field not being static.",
+                                            SidedProxy.class.getCanonicalName(),
+                                            reTweakModContainer.getModClass()
+                                    );
+                                    return;
+                                }
+                                if (!StringHelper.isNullOrEmpty(sidedProxy.modId())) throw new UnsupportedOperationException("Modids for SidedProxies are not yet supported!");
+                                String proxyClassName = FMLCommonHandler.instance().getSide().isClient() ? sidedProxy.clientSide() : sidedProxy.serverSide();
+                                try {
+                                    Class<?> proxyClass = Class.forName(
+                                            proxyClassName,
+                                            true,
+                                            ReTweakClassLoader.getInstance()
+                                    );
+
+                                    try {
+                                        Object proxyInstance = ReflectionHelper.createFromConstructor(
+                                                ReflectionHelper.getConstructor(
+                                                        proxyClass,
+                                                        null
+                                                ),
+                                                null
+                                        );
+                                        ReflectionHelper.setFieldValue(
+                                                field,
+                                                null,
+                                                proxyInstance
+                                        );
+                                    } catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                                        reTweakModContainer.setEnabled(false);
+                                        ReTweakResources.RETWEAK_LOGGER.warn(
+                                                "Mod \"{}\" has been disabled due to being unable to set the proxy instance to the \"{}\" field",
+                                                reTweakModContainer.getModid(),
+                                                SidedProxy.class.getCanonicalName()
+                                        );
+                                        return;
+                                    }
+                                } catch(NoClassDefFoundError | ClassNotFoundException e) {
+                                    reTweakModContainer.setEnabled(false);
+                                    ReTweakResources.RETWEAK_LOGGER.error(
+                                            "Mod \"{}\" has been disabled due to the proxy class \"{}\" being unable to be found.",
+                                            reTweakModContainer.getModClass(),
+                                            proxyClassName
+                                    );
+                                    return;
+                                }
+                            }
+                        }
+                    } catch(NoClassDefFoundError | ClassNotFoundException e) {
                         ReTweakResources.RETWEAK_LOGGER.error(
                                 "Failed to load a mod class!",
                                 e

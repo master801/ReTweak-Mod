@@ -3,8 +3,8 @@ package org.slave.minecraft.retweak.loading.tweaks.compilation;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.mappings.Mapping;
-import org.slave.minecraft.retweak.loading.mappings.Mappings;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mapping;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mappings;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -35,6 +35,7 @@ public final class JITTweak implements Tweak {
         if (classNode.fields != null) {
             for(int i = 0; i < classNode.fields.size(); ++i) remap(classNode.fields.get(i));
         }
+        remap(classNode);
     }
 
     @Override
@@ -43,7 +44,6 @@ public final class JITTweak implements Tweak {
     }
 
     private void remap(Object node) {
-        if (Boolean.valueOf(System.getProperty("org.slave.minecraft.retweak.tweak.jit", Boolean.TRUE.toString()))) return;//TODO DEBUG VALUE, DO NOT USE IN RELEASE
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -53,6 +53,8 @@ public final class JITTweak implements Tweak {
             return;
         }
         mapping.remap(node);
+
+        //Remap method instructions
         if (node instanceof MethodNode) {
             MethodNode methodNode = (MethodNode)node;
             for(int i = 0; i < methodNode.instructions.size(); ++i) mapping.remap(methodNode.instructions.get(i));

@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.loading.mappings;
+package org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings;
 
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 

@@ -1,10 +1,13 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
+import org.slave.lib.exceptions.IncorrectSortException;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.SRGTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.JITTweak;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -31,11 +34,10 @@ public final class ReTweakTweakHandler {
             tweaks.add(new SRGTweak(gameVersion));
             switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
                 case JIT:
-                    //TODO
-//                    tweaks.add(new JITTweak(gameVersion));
+                    tweaks.add(new JITTweak(gameVersion));
                     break;
                 case INTERPRETER:
-//                    tweaks.add(new InterpreterTweak(gameVersion));
+                    tweaks.add(new InterpreterTweak(gameVersion));
                     break;
             }
 
@@ -45,8 +47,8 @@ public final class ReTweakTweakHandler {
 
                         @Override
                         public int compare(final Tweak o1, final Tweak o2) {
-                            if (o1.getSortIndex() < 0 || o2.getSortIndex() < 0) throw new IllegalStateException("Cannot have sort index less than zero!");
-                            if (o1.getSortIndex() == o2.getSortIndex()) throw new IllegalStateException("Sort index of Tweak cannot be the same!");
+                            if (o1.getSortIndex() < 0 || o2.getSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
+                            if (o1.getSortIndex() == o2.getSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
                             if (o1.getSortIndex() < o2.getSortIndex()) return -1;
                             if (o1.getSortIndex() > o2.getSortIndex()) return 1;
                             return 0;

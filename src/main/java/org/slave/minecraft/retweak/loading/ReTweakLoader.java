@@ -4,6 +4,10 @@ import com.github.pwittchen.kirai.library.Kirai;
 import com.google.common.base.Joiner;
 import org.slave.lib.helpers.FileHelper;
 import org.slave.lib.helpers.StringHelper;
+import org.slave.lib.resources.ASMAnnotation;
+import org.slave.lib.resources.ASMTable.TableClass;
+import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
+import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor.Type;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -14,6 +18,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -94,16 +99,7 @@ public final class ReTweakLoader {
 
         //<editor-fold desc="Find">
         for(GameVersion gameVersion : GameVersion.values()) {
-            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
-                try {
-                    reTweakModCandidate.find();
-                } catch(IOException e) {
-                    ReTweakResources.RETWEAK_LOGGER.warn(
-                            "Caught an I/O exception while finding classes for a mod candidate!",
-                            e
-                    );
-                }
-            }
+            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) reTweakModCandidate.find();
         }
         //</editor-fold>
 
@@ -146,21 +142,57 @@ public final class ReTweakLoader {
                 }
             }
             for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
-                for(String modid : reTweakModCandidate.getModIds()) {
-                    //TODO Make this method different: name and version using this method is not detected.
+                String modClass = null;
+                String modid = null;
+                String name = null;
+                String version = null;
+
+                Entry<Type, String> entry = ModClassVisitor.TYPES.get(reTweakModCandidate.getGameVersion());
+                for(TableClass tableClass : reTweakModCandidate.getModClasses()) {
+                    switch(entry.getKey()) {
+                        case EXTENDS:
+                            modClass = tableClass.getName();
+                            modid = tableClass.getName();
+                            name = null;//TODO
+                            version = null;//TODO
+                            break;
+                        case ANNOTATION:
+                            for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
+                                if (asmAnnotation.getDesc().equals(entry.getValue())) {
+                                    modClass = tableClass.getName();
+                                    modid = (String)asmAnnotation.get().get("modid");
+                                    name = (String)asmAnnotation.get().get("name");
+                                    version = (String)asmAnnotation.get().get("version");
+                                    break;
+                                }
+                            }
+                            break;
+                    }
+                }
+
+                if (modClass != null && modid != null) {
                     mods.get(gameVersion).add(new ReTweakModContainer(
+                            modClass.replace(
+                                    '/',
+                                    '.'
+                            ),
                             modid,
-                            null,
-                            null,
+                            name,
+                            version,
                             reTweakModCandidate
                     ));
                 }
             }
+
+            //TODO
+
+            /*
             try {
                 ReTweakModConfig.INSTANCE.update(true);
             } catch(IOException e) {
                 e.printStackTrace();
             }
+            */
         }
         //</editor-fold>
 

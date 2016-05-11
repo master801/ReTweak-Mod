@@ -1,22 +1,18 @@
 package org.slave.minecraft.retweak.loading;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.helpers.IOHelper;
+import org.slave.lib.helpers.IterableHelper;
 import org.slave.lib.resources.ASMAnnotation;
+import org.slave.lib.resources.ASMTable;
+import org.slave.lib.resources.ASMTable.TableClass;
 import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
 import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor.Type;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
+import java.util.Map.Entry;
 import java.util.zip.ZipFile;
 
 /**
@@ -26,105 +22,83 @@ import java.util.zip.ZipFile;
  */
 public final class ReTweakModCandidate {
 
-    private static final Pattern CLASS_PATTERN = Pattern.compile(
-            "(.+)(\\.class$)",
-            Pattern.MULTILINE
-    );
-
     private final GameVersion gameVersion;
     private final File file;
 
-    private final ArrayList<String> classes = new ArrayList<>(), packages = new ArrayList<>();
-    private final ArrayList<String> modClasses = new ArrayList<>();
+    private ASMTable asmTable;
+
+    private final ArrayList<String> classes = new ArrayList<>();
+    private final ArrayList<TableClass> modClasses = new ArrayList<>();
 
     private String[] modids;
     private boolean enabled = true;
-    private Type type;
 
-    ReTweakModCandidate(GameVersion gameVersion, File file) {
+    ReTweakModCandidate(final GameVersion gameVersion, final File file) {
         this.gameVersion = gameVersion;
         this.file = file;
+        try {
+            ZipFile zipFile = new ZipFile(file);
+            asmTable = new ASMTable();
+            asmTable.load(zipFile);
+            zipFile.close();
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
+        if (asmTable == null) throw new NullPointerException("Read ASM Table incorrectly?");
     }
 
-    public void find() throws IOException {
-        ZipFile zipFile = new ZipFile(file);
-        Enumeration<? extends ZipEntry> zipEntryEnumeration = zipFile.entries();
-        while(zipEntryEnumeration.hasMoreElements()) {
-            ZipEntry zipEntry = zipEntryEnumeration.nextElement();
-            if (zipEntry.isDirectory()) {
-                packages.add(zipEntry.getName());
-            }
-            if (ReTweakModCandidate.CLASS_PATTERN.matcher(zipEntry.getName()).matches()) {
-                InputStream zipEntryInputStream = zipFile.getInputStream(zipEntry);
-                classes.add(zipEntry.getName());
-                zipEntryInputStream.close();
+    public void find() {
+        for(TableClass tableClass : asmTable.getClasses()) classes.add(tableClass.getName());
+    }
+
+    private void findModClasses() {
+        for(TableClass tableClass : asmTable.getClasses()) {
+            Entry<Type, String> entry = ModClassVisitor.TYPES.get(gameVersion);
+            switch(entry.getKey()) {
+                case EXTENDS:
+                    if (tableClass.getSuperName().equals(entry.getValue())) modClasses.add(tableClass);
+                    break;
+                case ANNOTATION:
+                    if (tableClass.getAnnotations() != null) {
+                        for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
+                            if (asmAnnotation.getDesc().equals(entry.getValue())) {
+                                modClasses.add(tableClass);
+                                break;
+                            }
+                        }
+                    }
+                    break;
             }
         }
-        zipFile.close();
-    }
-
-    private void findModClasses(final byte[] classBytes) {
-        ClassReader classReader = new ClassReader(classBytes);
-        ModClassVisitor modVisitor = new ModClassVisitor(
-                null,//No need for actual class visitor
-                gameVersion
-        );
-        classReader.accept(
-                modVisitor,
-                0
-        );
-        type = modVisitor.getType();
-
-        if (modVisitor.isMod()) modClasses.add(classReader.getClassName() + ".class");
     }
 
     public boolean isValid() throws IOException {
         if (!modClasses.isEmpty()) return false;//Has previously invoked method?
-        ZipFile zipFile = new ZipFile(file);
-        for(String _class : classes) {
-            InputStream inputStream = zipFile.getInputStream(zipFile.getEntry(_class));
-            findModClasses(IOHelper.toByteArray(inputStream));
-            inputStream.close();
-        }
-        zipFile.close();
+        findModClasses();
         return !modClasses.isEmpty();
     }
 
     public String[] getModIds() {
         if (modids == null && !modClasses.isEmpty()) {
-            try {
-                ZipFile zipFile = new ZipFile(file);
-                for(String modClass : modClasses) {
-                    ZipEntry modZipEntry = zipFile.getEntry(modClass);
-                    ClassReader classReader = new ClassReader(zipFile.getInputStream(modZipEntry));
-                    ClassNode classNode = new ClassNode();
-                    classReader.accept(
-                            classNode,
-                            0
-                    );
-                    switch(type) {
-                        case EXTENDS:
-                            //Yes, modids were literally the name of the class...
-                            modids = new String[] {
-                                    classNode.name
-                            };
-                            break;
-                        case ANNOTATION:
-                            if (classNode.visibleAnnotations != null) {
-                                List<String> modidList = new ArrayList<>();
-                                for(AnnotationNode annotationNode : classNode.visibleAnnotations) {
-                                    if (annotationNode.desc.equals(ModClassVisitor.getDesc(getGameVersion()))) {//TODO Check if annotation or extends
-                                        modidList.add((String)new ASMAnnotation(annotationNode).get().get("modid"));
-                                    }
-                                }
-                                modids = modidList.toArray(new String[modidList.size()]);
+            ArrayList<String> modids = new ArrayList<>();
+            for(TableClass tableClass : asmTable.getClasses()) {
+                Entry<Type, String> entry = ModClassVisitor.TYPES.get(gameVersion);
+                switch(entry.getKey()) {
+                    case EXTENDS:
+                        if (tableClass.getSuperName().equals(entry.getValue())) {
+                            modids.add(tableClass.getName());//Modids were literally the name of the class...?
+                        }
+                        break;
+                    case ANNOTATION:
+                        if (tableClass.getAnnotations() != null) {
+                            for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
+                                if (asmAnnotation.getDesc().equals(entry.getValue())) modids.add((String)asmAnnotation.get().get("modid"));
                             }
-                            break;
-                    }
+                        }
+                        break;
                 }
-                zipFile.close();
-            } catch(IOException e) {
-                //Ignore
+                if (!IterableHelper.isNullOrEmpty(modids)) this.modids = modids.toArray(new String[modids.size()]);
             }
         }
         return modids;
@@ -146,8 +120,12 @@ public final class ReTweakModCandidate {
         return file;
     }
 
-    List<String> getModClasses() {
+    List<TableClass> getModClasses() {
         return modClasses;
+    }
+
+    ASMTable getASMTable() {
+        return asmTable;
     }
 
 }

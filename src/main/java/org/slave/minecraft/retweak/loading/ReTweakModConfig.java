@@ -92,11 +92,15 @@ public final class ReTweakModConfig {
             for(JsonElement element : mods) {
                 JsonObject object = element.getAsJsonObject();
                 for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getReTweakModDiscoverer().getModCandidates(gameVersion)) {
+                    /*
                     for(String modid : reTweakModCandidate.getModClasses()) {
                         if (modid.equals(object.get(ReTweakModConfig.JSON_TAG_OBJECT_MODID).getAsString())) {
                             reTweakModCandidate.setEnabled(object.get(ReTweakModConfig.JSON_TAG_OBJECT_ENABLED).getAsBoolean());
                         }
                     }
+                    */
+
+                    //TODO
                 }
             }
         }
