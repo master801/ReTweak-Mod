@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweaks.compilation;
 
 import org.objectweb.asm.tree.ClassNode;
+import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 
@@ -23,8 +24,9 @@ public final class InterpreterTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ClassNode classNode) {
+    public void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) {
         if (gameVersion == null) return;
+        //TODO?
     }
 
     @Override

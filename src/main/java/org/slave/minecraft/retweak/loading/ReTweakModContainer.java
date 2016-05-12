@@ -1,9 +1,13 @@
 package org.slave.minecraft.retweak.loading;
 
+import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLStateEvent;
+import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -67,16 +71,16 @@ public final class ReTweakModContainer {
         return modClass;
     }
 
-    public void callState(FMLStateEvent fmlStateEvent) {
+    public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) {
         ReTweakResources.RETWEAK_LOGGER.debug(
                 "Calling state \"{}\" for mod \"{}\"",
-                fmlStateEvent.getClass().getSimpleName(),
+                fmlStateEventClass.getSimpleName(),
                 getModid()
         );
         if (!isEnabled()) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    "Attemped to call state class \"{}\" when disabled?! This should not happen!",
-                    fmlStateEvent.getClass().getCanonicalName()
+                    "Attempted to call state class \"{}\" when disabled?! This should not happen!",
+                    fmlStateEventClass.getCanonicalName()
             );
             return;
         }
@@ -89,11 +93,11 @@ public final class ReTweakModContainer {
 
             for(Method method : _modClass.getDeclaredMethods()) {
                 final Class<?>[] parameterTypes = method.getParameterTypes();
-                if (parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEvent.getClass() && method.isAnnotationPresent(EventHandler.class)) {
+                if (parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass && method.isAnnotationPresent(EventHandler.class)) {
                     try {
                         method.invoke(
                                 instance,
-                                fmlStateEvent
+                                createStateEvent(fmlStateEventClass)
                         );
                     } catch(IllegalAccessException | InvocationTargetException e) {
                         ReTweakResources.RETWEAK_LOGGER.error(
@@ -111,6 +115,56 @@ public final class ReTweakModContainer {
                     e
             );
         }
+    }
+
+    private FMLStateEvent createStateEvent(Class<? extends FMLStateEvent> fmlStateEventClass) {
+        try {
+            FMLStateEvent fmlStateEvent = ReflectionHelper.createFromConstructor(
+                    ReflectionHelper.getConstructor(
+                            fmlStateEventClass,
+                            ReflectionHelper.createNewClassParameter(
+                                    Object[].class
+                            )
+                    ),
+                    fmlStateEventClass == FMLPreInitializationEvent.class ? ReflectionHelper.createNewObjectParameter(
+                            null,//ASMDataTable
+                            ReTweakResources.RETWEAK_CONFIG_DIRECTORY
+                    ) : null
+            );
+            if (fmlStateEventClass == FMLPreInitializationEvent.class) {
+                ReflectionHelper.setFieldValue(
+                        ReflectionHelper.getField(
+                                FMLPreInitializationEvent.class,
+                                "sourceFile"
+                        ),
+                        fmlStateEvent,
+                        getReTweakModCandidate().getFile()
+                );
+                ReflectionHelper.setFieldValue(
+                        ReflectionHelper.getField(
+                                FMLPreInitializationEvent.class,
+                                "suggestedConfigFile"
+                        ),
+                        fmlStateEvent,
+                        new File(
+                                ReTweakResources.RETWEAK_CONFIG_DIRECTORY,
+                                getModid() + ".cfg"
+                        )
+                );
+            }
+            return fmlStateEvent;
+        } catch(Exception e) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    Kirai.from(
+                            "Failed to create new instance of state event \"{state_event}\"!"
+                    ).put(
+                            "state_event",
+                            fmlStateEventClass.getCanonicalName()
+                    ).format().toString(),
+                    e
+            );
+        }
+        return null;
     }
 
 }

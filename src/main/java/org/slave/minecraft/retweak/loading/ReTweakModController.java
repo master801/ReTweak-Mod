@@ -17,7 +17,7 @@ public final class ReTweakModController {
         throw new IllegalStateException();
     }
 
-    static void preInitialization(FMLPreInitializationEvent fmlPreInitializationEvent) {
+    static void preInitialization() {
         Object _INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
@@ -34,7 +34,7 @@ public final class ReTweakModController {
                     );
                     continue;
                 }
-                reTweakModContainer.callState(fmlPreInitializationEvent);
+                reTweakModContainer.callState(FMLPreInitializationEvent.class);
             }
 
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -44,7 +44,7 @@ public final class ReTweakModController {
         }
     }
 
-    static void initialization(FMLInitializationEvent fmlInitializationEvent) {
+    static void initialization() {
         Object _INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
@@ -61,7 +61,7 @@ public final class ReTweakModController {
                     );
                     continue;
                 }
-                reTweakModContainer.callState(fmlInitializationEvent);
+                reTweakModContainer.callState(FMLInitializationEvent.class);
             }
 
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -71,7 +71,7 @@ public final class ReTweakModController {
         }
     }
 
-    static void postInitialization(FMLPostInitializationEvent fmlPostInitializationEvent) {
+    static void postInitialization() {
         Object _INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
@@ -88,7 +88,7 @@ public final class ReTweakModController {
                     );
                     continue;
                 }
-                reTweakModContainer.callState(fmlPostInitializationEvent);
+                reTweakModContainer.callState(FMLPostInitializationEvent.class);
             }
 
             ReTweakResources.RETWEAK_LOGGER.debug(

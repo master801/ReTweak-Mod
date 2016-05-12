@@ -29,13 +29,11 @@ public final class LoadControllerTransformer extends BasicTransformer implements
     @Override
     protected boolean transformClass(final ClassNode classNode) throws Exception {
         MethodNode transition = null;
-        MethodNode distributeStateMessage = null;
 
         for(MethodNode methodNode : classNode.methods) {
             if (methodNode.name.equals("transition") && methodNode.desc.equals("(Lcpw/mods/fml/common/LoaderState;Z)V")) transition = methodNode;
-            if (methodNode.name.equals("distributeStateMessage") && methodNode.desc.equals("(Lcpw/mods/fml/common/LoaderState;[Ljava/lang/Object;)V")) distributeStateMessage = methodNode;
 
-            if (transition != null && distributeStateMessage != null) break;
+            if (transition != null) break;
         }
 
         if (transition != null) {
@@ -87,57 +85,7 @@ public final class LoadControllerTransformer extends BasicTransformer implements
                 );
             }
         }
-        if (distributeStateMessage != null) {
-            AbstractInsnNode injectionNode = null;
-            for(int i = 0; i < distributeStateMessage.instructions.size(); ++i) {
-                AbstractInsnNode abstractInsnNode = distributeStateMessage.instructions.get(i);
-
-                if (abstractInsnNode instanceof MethodInsnNode) {
-                    MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
-                    if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL && methodInsnNode.owner.equals("com/google/common/eventbus/EventBus") && methodInsnNode.name.equals("post") && methodInsnNode.desc.equals("(Ljava/lang/Object;)V")) {
-                        injectionNode = abstractInsnNode;
-                        break;
-                    }
-                }
-            }
-
-            if (injectionNode != null) {
-                InsnList instructionsToInject = new InsnList();
-                instructionsToInject.add(new LabelNode(new Label()));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        0
-                ));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        1
-                ));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        2
-                ));
-                instructionsToInject.add(new MethodInsnNode(
-                        Opcodes.INVOKEVIRTUAL,
-                        "cpw/mods/fml/common/LoaderState",
-                        "getEvent",
-                        "([Ljava/lang/Object;)Lcpw/mods/fml/common/event/FMLStateEvent;",
-                        false
-                ));
-                instructionsToInject.add(new MethodInsnNode(
-                        Opcodes.INVOKESTATIC,
-                        "org/slave/minecraft/retweak/loading/ReTweakStateHandler",
-                        "sendStateEvent",
-                        "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/event/FMLStateEvent;)V",
-                        false
-                ));
-
-                distributeStateMessage.instructions.insert(
-                        injectionNode,
-                        instructionsToInject
-                );
-            }
-        }
-        return transition != null && distributeStateMessage != null;
+        return transition != null;
     }
 
     @Override

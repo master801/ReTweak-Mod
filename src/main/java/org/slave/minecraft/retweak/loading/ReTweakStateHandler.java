@@ -6,10 +6,6 @@ import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLStateEvent;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.lib.resources.ASMTable.TableClass;
@@ -33,6 +29,7 @@ public final class ReTweakStateHandler {
 
     /**
      * {@link org.slave.minecraft.retweak.asm.transformers.LoadControllerTransformer}
+     * {@link cpw.mods.fml.common.LoadController#transition(cpw.mods.fml.common.LoaderState, boolean)}
      *
      * @param currentState Such a fragile existence...
      */
@@ -49,9 +46,13 @@ public final class ReTweakStateHandler {
                 ReTweakStateHandler.constructing(loadController);
                 break;
             case PREINITIALIZATION:
+                ReTweakModController.preInitialization();
+                break;
             case INITIALIZATION:
+                ReTweakModController.initialization();
+                break;
             case POSTINITIALIZATION:
-                //NOOP
+                ReTweakModController.postInitialization();
                 break;
             case SERVER_ABOUT_TO_START:
             case SERVER_STARTING:
@@ -69,29 +70,6 @@ public final class ReTweakStateHandler {
                 //NOOP
                 break;
         }
-    }
-
-    /**
-     * {@link org.slave.minecraft.retweak.asm.transformers.LoadControllerTransformer}
-     *
-     * Sends a state event to mods
-     *
-     * @param loadController Load controller instance
-     * @param fmlStateEvent State event to send to mods
-     */
-    public static void sendStateEvent(LoadController loadController, FMLStateEvent fmlStateEvent) {
-        if (fmlStateEvent.getClass() == FMLPreInitializationEvent.class) {
-            ReTweakModController.preInitialization((FMLPreInitializationEvent)fmlStateEvent);
-        } else if (fmlStateEvent.getClass() == FMLInitializationEvent.class) {
-            ReTweakModController.initialization((FMLInitializationEvent)fmlStateEvent);
-        } else if (fmlStateEvent.getClass() == FMLPostInitializationEvent.class) {
-            ReTweakModController.postInitialization((FMLPostInitializationEvent)fmlStateEvent);
-        }
-
-        ReTweakResources.RETWEAK_LOGGER.debug(
-                "Sent state event {}",
-                fmlStateEvent
-        );
     }
 
     private static void constructing(LoadController loadController) {

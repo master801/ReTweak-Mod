@@ -27,7 +27,7 @@ public final class ReTweakModConfig {
     public static final ReTweakModConfig INSTANCE = new ReTweakModConfig();
 
     private static final File MOD_CONFIG_FILE = new File(
-            ReTweakResources.RETWEAK_CONFIG_DIRECTORY,
+            ReTweakResources.RETWEAK_MAIN_CONFIG_DIRECTORY,
             "mods.json"
     );
     private static final String JSON_TAG_OBJECT_VERSION = "version";

@@ -21,7 +21,7 @@ public final class ReTweakConfig {
     public static final ReTweakConfig INSTANCE = new ReTweakConfig();
 
     private static final File CONFIG_FILE = new File(
-            ReTweakResources.RETWEAK_CONFIG_DIRECTORY,
+            ReTweakResources.RETWEAK_MAIN_CONFIG_DIRECTORY,
             "ReTweak.cfg"
     );
     private static final String COMMENT = ReTweakStrings.RETWEAK_MOD;

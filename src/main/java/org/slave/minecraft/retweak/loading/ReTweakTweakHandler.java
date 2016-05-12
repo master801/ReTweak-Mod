@@ -63,7 +63,7 @@ public final class ReTweakTweakHandler {
         }
     }
 
-    public void tweak(ClassNode classNode, GameVersion gameVersion) throws TweakException {
+    public void tweak(ClassNode classNode, GameVersion gameVersion, ReTweakModContainer reTweakModContainer) throws TweakException {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
             if (ReTweakResources.DEBUG) {
@@ -72,7 +72,10 @@ public final class ReTweakTweakHandler {
                         tweak.getName()
                 );
             }
-            tweak.tweak(classNode);
+            tweak.tweak(
+                    reTweakModContainer,
+                    classNode
+            );
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "End Tweak\n\n",

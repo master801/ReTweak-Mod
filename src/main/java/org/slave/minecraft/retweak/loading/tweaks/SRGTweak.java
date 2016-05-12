@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
@@ -37,7 +38,7 @@ public final class SRGTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ClassNode classNode) throws TweakException {
+    public void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) throws TweakException {
         if (srg == null) return;
         methods(classNode);//0 - Methods
         fields(classNode);//1 - Fields

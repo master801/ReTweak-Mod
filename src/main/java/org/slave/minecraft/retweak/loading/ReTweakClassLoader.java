@@ -77,6 +77,15 @@ public final class ReTweakClassLoader extends URLClassLoader {
         Class<?> returnClass = null;
 
         try {
+            returnClass = super.loadClass(name);
+        } catch(ClassNotFoundException e) {
+            //Ignore
+        }
+
+        if (returnClass != null) return returnClass;
+
+        //Create class
+        try {
             ReTweakModCandidate reTweakModCandidate = getCandidate(name);
 
             if (reTweakModCandidate == null) throw new IOException();//Jump out of try-catch block statement
@@ -96,7 +105,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
             try {
                 ReTweakTweakHandler.INSTANCE.tweak(
                         classNode,
-                        reTweakModCandidate.getGameVersion()
+                        reTweakModCandidate.getGameVersion(),
+                        null//TODO MUST NOT BE NULL!
                 );
             } catch(TweakException e) {
                 ReTweakResources.RETWEAK_LOGGER.error(
@@ -148,8 +158,6 @@ public final class ReTweakClassLoader extends URLClassLoader {
         } catch(IOException ee) {
             //Ignore
         }
-
-        if (returnClass == null) returnClass = super.loadClass(name);
         return returnClass;
     }
 

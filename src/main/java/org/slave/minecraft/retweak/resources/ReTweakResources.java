@@ -25,6 +25,10 @@ public final class ReTweakResources {
             "play"
     );
     public static final File RETWEAK_CONFIG_DIRECTORY = new File(
+            ReTweakResources.RETWEAK_DIRECTORY,
+            "config"
+    );
+    public static final File RETWEAK_MAIN_CONFIG_DIRECTORY = new File(
             LibraryResources.CONFIG_DIRECTORY,
             "retweak"
     );
