@@ -1,11 +1,11 @@
 package org.slave.minecraft.retweak.asm;
 
+import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
-import org.slave.minecraft.retweak.loading.ReTweakModConfig;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -43,6 +43,34 @@ public final class ReTweakSetup implements IFMLCallHook {
     @Override
     public Void call() throws Exception {
         if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
+        try {
+            Object instance = ReflectionHelper.invokeMethod(
+                    ReflectionHelper.getMethod(
+                            ReTweakClassLoader.class,
+                            "getInstance",
+                            null
+                    ),
+                    null,
+                    null
+            );
+
+            ReflectionHelper.invokeMethod(
+                    ReflectionHelper.getMethod(
+                            ReTweakClassLoader.class,
+                            "loadSRGs",
+                            null
+                    ),
+                    instance,
+                    null
+            );
+        } catch(Exception e) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    Kirai.from(
+                            "Failed to load SRGs!"
+                    ).format().toString(),
+                    e
+            );
+        }
         ReTweakConfig.INSTANCE.update(true);
         return null;
     }

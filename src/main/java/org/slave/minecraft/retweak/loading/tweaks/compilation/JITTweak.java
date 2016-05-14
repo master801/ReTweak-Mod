@@ -38,10 +38,7 @@ public final class JITTweak implements Tweak {
             Iterator<MethodNode> methodNodeIterator = classNode.methods.iterator();
             while(methodNodeIterator.hasNext()) {
                 MethodNode methodNode = methodNodeIterator.next();
-                if (remap(
-                        reTweakModContainer,
-                        methodNode
-                )) {
+                if (remap(reTweakModContainer, methodNode)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing method \"{}{}\" from class \"{}\"",
@@ -58,10 +55,7 @@ public final class JITTweak implements Tweak {
             Iterator<FieldNode> fieldNodeIterator = classNode.fields.iterator();
             while(fieldNodeIterator.hasNext()) {
                 FieldNode fieldNode = fieldNodeIterator.next();
-                if (remap(
-                        reTweakModContainer,
-                        fieldNode
-                )) {
+                if (remap(reTweakModContainer, fieldNode)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing field \"{} {}\" from class \"{}\"",
@@ -74,15 +68,12 @@ public final class JITTweak implements Tweak {
                 }
             }
         }
-        remap(
-                reTweakModContainer,
-                classNode
-        );
+        remap(reTweakModContainer, classNode);
     }
 
     @Override
-    public int getSortIndex() {
-        return 1;
+    public int getWantedSortIndex() {
+        return 0;
     }
 
     private boolean remap(final ReTweakModContainer reTweakModContainer, final Object node) {
@@ -94,10 +85,7 @@ public final class JITTweak implements Tweak {
             );
             return false;
         }
-        if (mapping.remap(
-                reTweakModContainer,
-                node
-        )) return true;
+        if (mapping.remap(reTweakModContainer, node)) return true;
 
         //Remap method instructions
         if (node instanceof MethodNode) {
@@ -107,10 +95,7 @@ public final class JITTweak implements Tweak {
             int index = 0;
             while(abstractInsnNodeIterator.hasNext()) {
                 AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
-                if (mapping.remap(
-                        reTweakModContainer,
-                        abstractInsnNode
-                )) {
+                if (mapping.remap(reTweakModContainer, abstractInsnNode)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\"",

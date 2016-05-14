@@ -14,7 +14,7 @@ public interface Tweak {
 
     void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) throws TweakException;
 
-    int getSortIndex();
+    int getWantedSortIndex();
 
     class TweakException extends Exception {
 

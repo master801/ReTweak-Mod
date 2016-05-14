@@ -22,6 +22,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.EnumMap;
 import java.util.jar.JarFile;
 
 /**
@@ -46,6 +47,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private static ReTweakClassLoader instance;
 
     private final LaunchClassLoader parent;
+    private EnumMap<GameVersion, ReTweakSRG> srgs;
 
     public ReTweakClassLoader(final LaunchClassLoader parent) {
         super(
@@ -57,7 +59,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("LOAD: {}", name);//TODO DEBUG
+        if (srgs == null) {
+            throw new NullPointerException(Kirai.from(
+                    "Method \"loadSRGs\" was not invoked!"
+            ).format().toString());
+        }
+        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("LOAD: {}", name);
         if (name.startsWith("net.minecraft.")) {
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER) {
                 throw new IllegalStateException(
@@ -76,24 +83,23 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
         Class<?> returnClass = null;
 
-        try {
-            returnClass = super.loadClass(name);
-        } catch(ClassNotFoundException e) {
-            //Ignore
-        }
-
-        if (returnClass != null) return returnClass;
-
         //Create class
         try {
-            ReTweakModCandidate reTweakModCandidate = getCandidate(name);
+            ReTweakModCandidate reTweakModCandidate = findCandidate(name);
 
-            if (reTweakModCandidate == null) throw new IOException();//Jump out of try-catch block statement
+            if (reTweakModCandidate == null) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "THIS IS NOT AN ERROR:\nCould not find mod candidate for class {}",
+                        name
+                );
+                throw new IOException();//Jump out of try-catch block statement
+            }
 
-            InputStream inputStream = super.getResourceAsStream(name.replace(
+            final String resourceName = name.replace(
                     '.',
                     '/'
-            ) + ".class");
+            ) + ".class";
+            InputStream inputStream = super.getResourceAsStream(resourceName);
             ClassReader classReader = new ClassReader(IOHelper.toByteArray(inputStream));
             ClassNode classNode = new ClassNode();
 
@@ -101,6 +107,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     classNode,
                     0
             );
+
+            if (srgs != null) {
+                srgs.get(reTweakModCandidate.getGameVersion()).srg(classNode);
+            } else {
+                ReTweakResources.RETWEAK_LOGGER.error(
+                        "Failed to load SRGs?"
+                );
+            }
 
             try {
                 ReTweakTweakHandler.INSTANCE.tweak(
@@ -158,12 +172,21 @@ public final class ReTweakClassLoader extends URLClassLoader {
         } catch(IOException ee) {
             //Ignore
         }
+
+        if (returnClass == null) {
+            try {
+                returnClass = super.loadClass(name);
+            } catch(ClassNotFoundException e) {
+                //Ignore
+            }
+        }
+
         return returnClass;
     }
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("FIND: {}", name);//TODO DEBUG
+        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("FIND: {}", name);
         return super.findClass(name);
     }
 
@@ -171,11 +194,40 @@ public final class ReTweakClassLoader extends URLClassLoader {
         try {
             super.addURL(file.toURI().toURL());
         } catch(MalformedURLException e) {
-            //Ignore
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    Kirai.from(
+                            "Failed to add file \"{file_path}\" to the class loader!"
+                    ).put(
+                            "file_path",
+                            file.getPath()
+                    ).format().toString(),
+                    e
+            );
         }
     }
 
-    private ReTweakModCandidate getCandidate(String name) throws IOException {
+    /**
+     * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#call()}
+     */
+    private void loadSRGs() {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        if (srgs != null && !srgs.isEmpty()) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    "Should not have loaded SRGs! This is an unknown error!"
+            );
+            return;
+        }
+        srgs = new EnumMap<>(GameVersion.class);
+        for(GameVersion gameVersion : GameVersion.values()) {
+            srgs.put(
+                    gameVersion,
+                    new ReTweakSRG(gameVersion)
+            );
+        }
+    }
+
+    private ReTweakModCandidate findCandidate(String name) throws IOException {
         URL url = super.findResource(name.replace('.', '/') + ".class");
         if (url == null) return null;
         JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
@@ -184,6 +236,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getReTweakModDiscoverer().getModCandidates(gameVersion)) {
                 int index;
                 index = jarFile.getName().lastIndexOf('\\');
+
+                //Get index of slash instead of back-slash (for unix systems)
                 if (index == -1) index = jarFile.getName().lastIndexOf('/');
                 if (index != -1) index++;
 

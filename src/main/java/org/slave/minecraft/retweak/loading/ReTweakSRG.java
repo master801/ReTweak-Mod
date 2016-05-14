@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.loading.tweaks;
+package org.slave.minecraft.retweak.loading;
 
 import com.github.pwittchen.kirai.library.Kirai;
 import org.objectweb.asm.Type;
@@ -11,8 +11,6 @@ import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
-import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
-import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
@@ -22,24 +20,24 @@ import org.slave.tool.remapper.SRG;
  *
  * @author Master
  */
-public final class SRGTweak implements Tweak {
+final class ReTweakSRG {
 
     private final GameVersion gameVersion;
     private final SRG srg;
 
-    public SRGTweak(GameVersion gameVersion) {
+    ReTweakSRG(GameVersion gameVersion) {
         this.gameVersion = gameVersion;
         srg = ReTweakDeobfuscation.INSTANCE.getSRG(gameVersion);
     }
 
-    @Override
-    public String getName() {
-        return "SRG";
-    }
-
-    @Override
-    public void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) throws TweakException {
-        if (srg == null) return;
+    public void srg(final ClassNode classNode) {
+        if (srg == null) {
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Found no SRG for version {}",
+                    gameVersion.getVersion()
+            );
+            return;
+        }
         methods(classNode);//0 - Methods
         fields(classNode);//1 - Fields
         superName(classNode);//2 - Super-name
@@ -47,15 +45,10 @@ public final class SRGTweak implements Tweak {
         name(classNode);//4 - Name
     }
 
-    @Override
-    public int getSortIndex() {
-        return 0;
-    }
-
-    private void name(ClassNode classNode) throws TweakException {
+    private void name(ClassNode classNode) {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
-                    "TWEAK NAME: {}",
+                    "[SRG] NAME: {}",
                     classNode.name
             );
         }
@@ -63,9 +56,7 @@ public final class SRGTweak implements Tweak {
         String[] nameEntry = srg.getClassEntry(classNode.name);
         if (nameEntry != null) {
             if (!ReTweakResources.DEBUG) {//Throw exception unless in DEBUG mode
-                throw new StopTweakException(Kirai.from(
-                        "Found Minecraft related class file? ReTweak-Mod cannot load base-classes from Minecraft!"
-                ).format().toString());
+                throw new IllegalStateException("Found Minecraft related class file? ReTweak-Mod cannot load base-classes from Minecraft!");
             }
             classNode.name = nameEntry[1];
             if (ReTweakResources.DEBUG) {
@@ -78,10 +69,10 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void superName(ClassNode classNode) throws TweakException {
+    private void superName(ClassNode classNode) {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
-                    "TWEAK SUPER-NAME: {}",
+                    "[SRG] SUPER-NAME: {}",
                     classNode.superName
             );
         }
@@ -99,13 +90,13 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void interfaces(ClassNode classNode) throws TweakException {
+    private void interfaces(ClassNode classNode) {
         if (classNode.interfaces == null) return;
         for(int i = 0; i < classNode.interfaces.size(); ++i) {
             final String _interface = classNode.interfaces.get(i);
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
-                        "TWEAK INTERFACE: {}",
+                        "[SRG] INTERFACE: {}",
                         _interface
                 );
             }
@@ -126,12 +117,12 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void fields(ClassNode classNode) throws TweakException {
+    private void fields(ClassNode classNode) {
         if (classNode.fields == null) return;
         for(FieldNode fieldNode : classNode.fields) {
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
-                        "TWEAK FIELD: \"{}\" \"{}\"",
+                        "[SRG] FIELD: \"{}\" \"{}\"",
                         fieldNode.name,
                         fieldNode.desc
                 );
@@ -144,7 +135,7 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void field(ClassNode classNode, FieldNode fieldNode) throws TweakException {
+    private void field(ClassNode classNode, FieldNode fieldNode) {
         final String originalName = fieldNode.name, originalDesc = fieldNode.desc;
         String[] nameEntry = srg.getFieldEntry(
                 classNode.name,
@@ -198,12 +189,12 @@ public final class SRGTweak implements Tweak {
         fieldNode.desc = newType.getDescriptor();
     }
 
-    private void methods(ClassNode classNode) throws TweakException {
+    private void methods(ClassNode classNode) {
         if (classNode.methods == null) return;
         for(MethodNode methodNode : classNode.methods) {
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
-                        "TWEAK METHOD: \"{}{}\"",
+                        "[SRG] METHOD: \"{}{}\"",
                         methodNode.name,
                         methodNode.desc
                 );
@@ -215,7 +206,7 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void method(ClassNode classNode, MethodNode methodNode) throws TweakException {
+    private void method(ClassNode classNode, MethodNode methodNode) {
         String[] entry = srg.getMethodEntry(
                 classNode.name,
                 methodNode.name,
@@ -286,7 +277,7 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void methodInsnNode(final String className, final int index, final String method, final MethodInsnNode methodInsnNode) throws TweakException {
+    private void methodInsnNode(final String className, final int index, final String method, final MethodInsnNode methodInsnNode) {
         final String originalOwner = methodInsnNode.owner, originalName = methodInsnNode.name, originalDesc = methodInsnNode.desc;
 
         String[] entry = srg.getMethodEntry(
@@ -435,7 +426,7 @@ public final class SRGTweak implements Tweak {
         );
     }
 
-    private void fieldInsnNode(final String className, final int index, final String method, final FieldInsnNode fieldInsnNode) throws TweakException {
+    private void fieldInsnNode(final String className, final int index, final String method, final FieldInsnNode fieldInsnNode) {
         String[] entry = srg.getFieldEntry(
                 fieldInsnNode.owner,
                 fieldInsnNode.name
@@ -526,7 +517,7 @@ public final class SRGTweak implements Tweak {
         fieldInsnNode.desc = newDescType.getDescriptor();
     }
 
-    private void frameNode(final String className, final int index, final String method, final FrameNode frameNode) throws TweakException {
+    private void frameNode(final String className, final int index, final String method, final FrameNode frameNode) {
         if (frameNode.local != null) {
             for(int i = 0; i < frameNode.local.size(); ++i) {
                 final Object local = frameNode.local.get(i);
@@ -566,7 +557,7 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void typeInsnNode(final String className, final int index, final String method, final TypeInsnNode typeInsnNode) throws TweakException {
+    private void typeInsnNode(final String className, final int index, final String method, final TypeInsnNode typeInsnNode) {
         String[] entry = srg.getClassEntry(typeInsnNode.desc);
         if (entry != null) {
             typeInsnNode.desc = entry[1];
@@ -592,7 +583,7 @@ public final class SRGTweak implements Tweak {
         }
     }
 
-    private void localVariable(final String className, final int index, final String method, final LocalVariableNode localVariableNode) throws TweakException {
+    private void localVariable(final String className, final int index, final String method, final LocalVariableNode localVariableNode) {
         Type descType = Type.getType(localVariableNode.desc);
         Type newDescType;
 
@@ -642,7 +633,7 @@ public final class SRGTweak implements Tweak {
         localVariableNode.desc = newDescType.getDescriptor();
     }
 
-    private String getRemappedMethodDesc(String desc) throws TweakException {
+    private String getRemappedMethodDesc(String desc) {
         final Type[] argumentTypes = Type.getArgumentTypes(desc);
         final Type returnType = Type.getReturnType(desc);
 

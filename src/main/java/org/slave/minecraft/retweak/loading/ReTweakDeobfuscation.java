@@ -32,14 +32,23 @@ public final class ReTweakDeobfuscation {
             );
             if (dataFile.exists()) {
                 ReTweakResources.RETWEAK_LOGGER.debug(
-                        "Play file \"{}\" was found, JIT compiler will now work.",
+                        "SRG file \"{}\" was found, JIT compiler will now work.",
                         dataFile.getPath()
                 );
                 FileInputStream fileInputStream = new FileInputStream(dataFile);
                 SRG srg;
 
                 LzmaInputStream lzmaInputStream = new LzmaInputStream(fileInputStream);
-                srg = SRG.load(lzmaInputStream);
+                try {
+                    srg = SRG.load(lzmaInputStream);
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            "Failed to load SRG file \"{}\"",
+                            dataFile.getPath()
+                    );
+                    lzmaInputStream.close();
+                    return;
+                }
                 lzmaInputStream.close();
 
                 srgs.put(
@@ -49,7 +58,7 @@ public final class ReTweakDeobfuscation {
                 fileInputStream.close();
             } else {
                 ReTweakResources.RETWEAK_LOGGER.debug(
-                        "Play file \"{}\" was not found... JIT compiler will not work...",
+                        "SRG file \"{}\" was not found... JIT compiler will not work...",
                         dataFile.getPath()
                 );
             }

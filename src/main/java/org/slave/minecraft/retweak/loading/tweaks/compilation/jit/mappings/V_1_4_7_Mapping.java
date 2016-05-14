@@ -90,90 +90,65 @@ final class V_1_4_7_Mapping extends Mapping {
 
         //<editor-fold desc="Unsupported method invokes">
         if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL) {
-            if (methodInsnNode.owner.equals("cpw/mods/fml/common/event/FMLPreInitializationEvent")) {
-                if (methodInsnNode.name.equals("applyModContainer") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ModContainer;)V")) {
-                    throw new UnsupportedOperationException(
-                            Kirai.from(
-                                    "Mod cannot invoke method {class} {name}/{desc}!"
-                            ).put(
-                                    "class",
-                                    methodInsnNode.owner
-                            ).put(
-                                    "name",
-                                    methodInsnNode.name
-                            ).put(
-                                    "desc",
-                                    methodInsnNode.desc
-                            ).format().toString()
-                    );
-                } else if (methodInsnNode.name.equals("getModMetadata") && methodInsnNode.desc.equals("()Lcpw/mods/fml/common/ModMetadata;")) {
-                    throw new UnsupportedOperationException(
-                            Kirai.from(
-                                    "Mod cannot invoke method {class} {name}/{desc}!"
-                            ).put(
-                                    "class",
-                                    methodInsnNode.owner
-                            ).put(
-                                    "name",
-                                    methodInsnNode.name
-                            ).put(
-                                    "desc",
-                                    methodInsnNode.desc
-                            ).format().toString()
-                    );
-                } else if (methodInsnNode.name.equals("getAsmData") && methodInsnNode.desc.equals("()Lcpw/mods/fml/common/discovery/ASMDataTable;")) {
-                    throw new UnsupportedOperationException(
-                            Kirai.from(
-                                    "Mod cannot invoke method {class} {name}/{desc}!"
-                            ).put(
-                                    "class",
-                                    methodInsnNode.owner
-                            ).put(
-                                    "name",
-                                    methodInsnNode.name
-                            ).put(
-                                    "desc",
-                                    methodInsnNode.desc
-                            ).format().toString()
-                    );
-                } else if (methodInsnNode.name.equals("getModLog") && methodInsnNode.desc.equals("()Lorg/apache/logging/log4j/Logger;")) {
-                    throw new UnsupportedOperationException(
-                            Kirai.from(
-                                    "Mod cannot invoke method {class} {name}/{desc}!"
-                            ).put(
-                                    "class",
-                                    methodInsnNode.owner
-                            ).put(
-                                    "name",
-                                    methodInsnNode.name
-                            ).put(
-                                    "desc",
-                                    methodInsnNode.desc
-                            ).format().toString()
-                    );
-                }
-            } else if (methodInsnNode.owner.equals("cpw/mods/fml/common/event/FMLPostInitializationEvent")) {
-                if (methodInsnNode.name.equals("buildSoftDependProxy") && methodInsnNode.desc.equals("(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;")) {
-                    throw new UnsupportedOperationException(
-                            Kirai.from(
-                                    "Mod cannot invoke method {class} {name}/{desc}!"
-                            ).put(
-                                    "class",
-                                    methodInsnNode.owner
-                            ).put(
-                                    "name",
-                                    methodInsnNode.name
-                            ).put(
-                                    "desc",
-                                    methodInsnNode.desc
-                            ).format().toString()
-                    );
-                }
+            String[][] methods = new String[][] {
+                    new String[] {
+                            "cpw/mods/fml/common/event/FMLPreInitializationEvent",
+                            "applyModContainer",
+                            "(Lcpw/mods/fml/common/ModContainer;)V"
+                    },
+                    new String[] {
+                            "cpw/mods/fml/common/event/FMLPreInitializationEvent",
+                            "getModMetadata",
+                            "()Lcpw/mods/fml/common/ModMetadata;"
+                    },
+                    new String[] {
+                            "cpw/mods/fml/common/event/FMLPreInitializationEvent",
+                            "getAsmData",
+                            "()Lcpw/mods/fml/common/discovery/ASMDataTable;"
+                    },
+                    new String[] {
+                            "cpw/mods/fml/common/event/FMLPreInitializationEvent",
+                            "getModLog",
+                            "()Lorg/apache/logging/log4j/Logger;"
+                    },
+                    new String[] {
+                            "cpw/mods/fml/common/event/FMLPostInitializationEvent",
+                            "buildSoftDependProxy",
+                            "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/Object;",
+                    }
+            };
+
+            for(String[] method : methods) {
+                checkMethodInsn(
+                        method[0],
+                        method[1],
+                        method[2],
+                        methodInsnNode
+                );
             }
         }
         //</editor-fold>
 
         return false;
+    }
+
+    private void checkMethodInsn(final String owner, final String name, final String desc, final MethodInsnNode methodInsnNode) throws UnsupportedOperationException {
+        if (methodInsnNode.owner.equals(owner) && methodInsnNode.name.equals(name) && methodInsnNode.desc.equals(desc)) {
+            throw new UnsupportedOperationException(
+                    Kirai.from(
+                            "Mod cannot invoke method \"{class}/{name}{desc}\"!"
+                    ).put(
+                            "class",
+                            methodInsnNode.owner
+                    ).put(
+                            "name",
+                            methodInsnNode.name
+                    ).put(
+                            "desc",
+                            methodInsnNode.desc
+                    ).format().toString()
+            );
+        }
     }
 
 }

@@ -30,8 +30,8 @@ public final class InterpreterTweak implements Tweak {
     }
 
     @Override
-    public int getSortIndex() {
-        return 1;
+    public int getWantedSortIndex() {
+        return 0;
     }
 
 }

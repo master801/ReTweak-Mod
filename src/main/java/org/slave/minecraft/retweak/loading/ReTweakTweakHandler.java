@@ -3,7 +3,6 @@ package org.slave.minecraft.retweak.loading;
 import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.exceptions.IncorrectSortException;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.tweaks.SRGTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
@@ -14,7 +13,7 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 
 /**
@@ -26,12 +25,17 @@ public final class ReTweakTweakHandler {
 
     public static final ReTweakTweakHandler INSTANCE = new ReTweakTweakHandler();
 
-    private final HashMap<GameVersion, List<Tweak>> tweaks = new HashMap<>();
+    private final EnumMap<GameVersion, List<Tweak>> tweaks;
 
     private ReTweakTweakHandler() {
+        tweaks = new EnumMap<>(GameVersion.class);
+        addTweaks();
+        sortTweaks();
+    }
+
+    private void addTweaks() {
         for(GameVersion gameVersion : GameVersion.values()) {
             List<Tweak> tweaks = new ArrayList<>();
-            tweaks.add(new SRGTweak(gameVersion));
             switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
                 case JIT:
                     tweaks.add(new JITTweak(gameVersion));
@@ -40,25 +44,29 @@ public final class ReTweakTweakHandler {
                     tweaks.add(new InterpreterTweak(gameVersion));
                     break;
             }
+            this.tweaks.put(
+                    gameVersion,
+                    tweaks
+            );
+        }
+    }
 
+    private void sortTweaks() {
+        for(List<Tweak> list : tweaks.values()) {
             Collections.sort(
-                    tweaks,
+                    list,
                     new Comparator<Tweak>() {
 
                         @Override
                         public int compare(final Tweak o1, final Tweak o2) {
-                            if (o1.getSortIndex() < 0 || o2.getSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
-                            if (o1.getSortIndex() == o2.getSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
-                            if (o1.getSortIndex() < o2.getSortIndex()) return -1;
-                            if (o1.getSortIndex() > o2.getSortIndex()) return 1;
+                            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
+                            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
+                            if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
+                            if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
                             return 0;
                         }
 
                     }
-            );
-            this.tweaks.put(
-                    gameVersion,
-                    tweaks
             );
         }
     }
