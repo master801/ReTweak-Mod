@@ -18,7 +18,7 @@ public final class ReTweakModController {
     }
 
     static void preInitialization() {
-        Object _INTERNAL_USAGE_ONLY_ = null;
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -45,7 +45,7 @@ public final class ReTweakModController {
     }
 
     static void initialization() {
-        Object _INTERNAL_USAGE_ONLY_ = null;
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -72,7 +72,7 @@ public final class ReTweakModController {
     }
 
     static void postInitialization() {
-        Object _INTERNAL_USAGE_ONLY_ = null;
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(

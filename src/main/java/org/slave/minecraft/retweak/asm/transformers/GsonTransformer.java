@@ -217,14 +217,14 @@ public final class GsonTransformer extends BasicTransformer implements IClassTra
                     ReflectionHelper.getMethod(
                             Gson.class,
                             GsonTransformer.METHOD_INDENT_SETTER_NAME,
-                            ReflectionHelper.createNewClassParameter(
+                            new Class<?>[] {
                                     String.class
-                            )
+                            }
                     ),
                     gson,
-                    ReflectionHelper.createNewObjectParameter(
+                    new Object[] {
                             indent
-                    )
+                    }
             );
         } catch(IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             //Ignore

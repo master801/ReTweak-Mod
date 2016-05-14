@@ -25,10 +25,9 @@ public final class ReTweakTweakHandler {
 
     public static final ReTweakTweakHandler INSTANCE = new ReTweakTweakHandler();
 
-    private final EnumMap<GameVersion, List<Tweak>> tweaks;
+    private final EnumMap<GameVersion, List<Tweak>> tweaks = new EnumMap<>(GameVersion.class);
 
     private ReTweakTweakHandler() {
-        tweaks = new EnumMap<>(GameVersion.class);
         addTweaks();
         sortTweaks();
     }
@@ -55,18 +54,7 @@ public final class ReTweakTweakHandler {
         for(List<Tweak> list : tweaks.values()) {
             Collections.sort(
                     list,
-                    new Comparator<Tweak>() {
-
-                        @Override
-                        public int compare(final Tweak o1, final Tweak o2) {
-                            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
-                            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
-                            if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
-                            if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
-                            return 0;
-                        }
-
-                    }
+                    TweakComparator.INSTANCE
             );
         }
     }
@@ -91,6 +79,25 @@ public final class ReTweakTweakHandler {
                 );
             }
         }
+    }
+
+    private static final class TweakComparator implements Comparator<Tweak> {
+
+        static final Comparator<Tweak> INSTANCE = new TweakComparator();
+
+        private TweakComparator() {
+            Object _INTERNAL_USAGE_ONLY_ = null;
+        }
+
+        @Override
+        public int compare(final Tweak o1, final Tweak o2) {
+            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
+            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
+            if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
+            if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
+            return 0;
+        }
+
     }
 
 }

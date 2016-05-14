@@ -1,6 +1,5 @@
 package org.slave.minecraft.retweak.asm;
 
-import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ReflectionHelper;
@@ -48,26 +47,24 @@ public final class ReTweakSetup implements IFMLCallHook {
                     ReflectionHelper.getMethod(
                             ReTweakClassLoader.class,
                             "getInstance",
-                            null
+                            new Class<?>[0]
                     ),
                     null,
-                    null
+                    new Object[0]
             );
 
             ReflectionHelper.invokeMethod(
                     ReflectionHelper.getMethod(
                             ReTweakClassLoader.class,
                             "loadSRGs",
-                            null
+                            new Class<?>[0]
                     ),
                     instance,
-                    null
+                    new Object[0]
             );
         } catch(Exception e) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    Kirai.from(
-                            "Failed to load SRGs!"
-                    ).format().toString(),
+                    "Failed to load SRGs!",
                     e
             );
         }

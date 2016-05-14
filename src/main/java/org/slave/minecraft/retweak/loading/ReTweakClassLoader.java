@@ -60,9 +60,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
         if (srgs == null) {
-            throw new NullPointerException(Kirai.from(
-                    "Method \"loadSRGs\" was not invoked!"
-            ).format().toString());
+            throw new NullPointerException(
+                    Kirai.from(
+                            "Method \"{name}\" was not invoked!"
+                    ).put(
+                            "name",
+                            "loadSRGs"
+                    ).format().toString()
+            );
         }
         if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("LOAD: {}", name);
         if (name.startsWith("net.minecraft.")) {

@@ -4,6 +4,7 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import org.slave.lib.helpers.ReflectionHelper;
@@ -108,6 +109,28 @@ public final class ReTweakStateHandler {
                                 ReTweakClassLoader.getInstance()
                         );
 
+                        if (modClass.isAnnotationPresent(Mod.class)) {
+                            Object classInstance;
+                            try {
+                                classInstance = ReflectionHelper.createFromConstructor(
+                                        ReflectionHelper.getConstructor(
+                                                modClass,
+                                                new Class<?>[0]
+                                        ),
+                                        new Object[0]
+                                );
+                            } catch(InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+                                reTweakModContainer.setEnabled(false);
+                                ReTweakResources.RETWEAK_LOGGER.warn(
+                                        "Mod \"{}\" has been disabled due to incorrectly creating a new instance of class \"{}\"",
+                                        reTweakModContainer.getModid(),
+                                        reTweakModContainer.getModClass()
+                                );
+                                return;
+                            }
+                            reTweakModContainer.setInstance(classInstance);
+                        }
+
                         for(Field field : modClass.getDeclaredFields()) {
                             field.setAccessible(true);
                             if (field.isAnnotationPresent(Instance.class)) {
@@ -124,29 +147,11 @@ public final class ReTweakStateHandler {
                                 if (!instance.value().equals(reTweakModContainer.getModid())) {
                                     throw new UnsupportedOperationException("Instance annotation value must be the mod's modid! Injecting other mods' instances is not yet supported!");
                                 }
-                                Object classInstance;
-                                try {
-                                    classInstance = ReflectionHelper.createFromConstructor(
-                                            ReflectionHelper.getConstructor(
-                                                    modClass,
-                                                    null
-                                            ),
-                                            null
-                                    );
-                                } catch(InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
-                                    reTweakModContainer.setEnabled(false);
-                                    ReTweakResources.RETWEAK_LOGGER.warn(
-                                            "Mod \"{}\" has been disabled due to incorrectly creating a new instance of class \"{}\"",
-                                            reTweakModContainer.getModid(),
-                                            reTweakModContainer.getModClass()
-                                    );
-                                    return;
-                                }
                                 try {
                                     ReflectionHelper.setFieldValue(
                                             field,
                                             null,
-                                            classInstance
+                                            reTweakModContainer.getInstance()
                                     );
                                 } catch(IllegalAccessException e) {
                                     reTweakModContainer.setEnabled(false);
@@ -157,7 +162,6 @@ public final class ReTweakStateHandler {
                                     );
                                     return;
                                 }
-                                reTweakModContainer.setInstance(classInstance);
                             } else if (field.isAnnotationPresent(SidedProxy.class)) {
                                 SidedProxy sidedProxy = field.getAnnotation(SidedProxy.class);
                                 if (!Modifier.isStatic(field.getModifiers())) {
@@ -182,9 +186,9 @@ public final class ReTweakStateHandler {
                                         Object proxyInstance = ReflectionHelper.createFromConstructor(
                                                 ReflectionHelper.getConstructor(
                                                         proxyClass,
-                                                        null
+                                                        new Class<?>[0]
                                                 ),
-                                                null
+                                                new Object[0]
                                         );
                                         ReflectionHelper.setFieldValue(
                                                 field,

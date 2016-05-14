@@ -64,12 +64,14 @@ public final class ReTweakModDiscoverer {
             );
         }
         if (!dir.isDirectory()) {
-            throw new FileNotFoundException(Kirai.from(
-                    "Not a directory! \"{path}\""
-            ).put(
-                    "path",
-                    dir.getPath()
-            ).format().toString());
+            throw new FileNotFoundException(
+                    Kirai.from(
+                            "Not a directory! \"{path}\""
+                    ).put(
+                            "path",
+                            dir.getPath()
+                    ).format().toString()
+            );
         }
 
         File[] files = dir.listFiles();

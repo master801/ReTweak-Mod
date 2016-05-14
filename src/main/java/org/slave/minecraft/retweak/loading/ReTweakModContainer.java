@@ -72,6 +72,17 @@ public final class ReTweakModContainer {
     }
 
     public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) {
+        if (instance == null) {
+            throw new NullPointerException(
+                    Kirai.from(
+                            "Instance for mod \"{modid}\" is null!"
+                    ).put(
+                            "modid",
+                            getModid()
+                    ).format().toString()
+            );
+        }
+
         ReTweakResources.RETWEAK_LOGGER.debug(
                 "Calling state \"{}\" for mod \"{}\"",
                 fmlStateEventClass.getSimpleName(),
@@ -93,11 +104,14 @@ public final class ReTweakModContainer {
 
             for(Method method : _modClass.getDeclaredMethods()) {
                 final Class<?>[] parameterTypes = method.getParameterTypes();
-                if (parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass && method.isAnnotationPresent(EventHandler.class)) {
+                if ((parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass) && method.isAnnotationPresent(EventHandler.class)) {
                     try {
-                        method.invoke(
+                        ReflectionHelper.invokeMethod(
+                                method,
                                 instance,
-                                createStateEvent(fmlStateEventClass)
+                                new Object[] {
+                                        createStateEvent(fmlStateEventClass)
+                                }
                         );
                     } catch(IllegalAccessException | InvocationTargetException e) {
                         ReTweakResources.RETWEAK_LOGGER.error(
@@ -122,14 +136,11 @@ public final class ReTweakModContainer {
             FMLStateEvent fmlStateEvent = ReflectionHelper.createFromConstructor(
                     ReflectionHelper.getConstructor(
                             fmlStateEventClass,
-                            ReflectionHelper.createNewClassParameter(
+                            new Class<?>[] {
                                     Object[].class
-                            )
+                            }
                     ),
-                    fmlStateEventClass == FMLPreInitializationEvent.class ? ReflectionHelper.createNewObjectParameter(
-                            null,//ASMDataTable
-                            ReTweakResources.RETWEAK_CONFIG_DIRECTORY
-                    ) : null
+                    fmlStateEventClass == FMLPreInitializationEvent.class ? new Object[] { null, ReTweakResources.RETWEAK_CONFIG_DIRECTORY } : new Object[] { new Object[0] }
             );
             if (fmlStateEventClass == FMLPreInitializationEvent.class) {
                 ReflectionHelper.setFieldValue(
