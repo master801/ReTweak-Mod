@@ -137,7 +137,6 @@ public final class ReTweakClassLoader extends URLClassLoader {
                         e
                 );
                 reTweakModCandidate.setEnabled(false);
-                ReTweakModConfig.INSTANCE.update(false);
             }
 
             ClassWriter classWriter = new ClassWriter(0);
