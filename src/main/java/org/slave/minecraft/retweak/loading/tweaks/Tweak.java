@@ -1,7 +1,6 @@
 package org.slave.minecraft.retweak.loading.tweaks;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 
 /**
  * Created by Master on 4/27/2016 at 7:21 AM.
@@ -12,7 +11,7 @@ public interface Tweak {
 
     String getName();
 
-    void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) throws TweakException;
+    void tweak(final ClassNode classNode) throws TweakException;
 
     int getWantedSortIndex();
 

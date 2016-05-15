@@ -2,7 +2,9 @@ package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.exceptions.IncorrectSortException;
+import org.slave.minecraft.retweak.asm.ReTweakSetup;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.tweaks.DeSeargeTweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
@@ -43,6 +45,21 @@ public final class ReTweakTweakHandler {
                     tweaks.add(new InterpreterTweak(gameVersion));
                     break;
             }
+            if (ReTweakSetup.isDeobfuscatedEnvironment()) {
+                ReTweakResources.RETWEAK_LOGGER.info(
+                        "Is deobfuscated environment! Adding DeSearge tweak for game version \"{}\"...",
+                        gameVersion.getVersion()
+                );
+                tweaks.add(new DeSeargeTweak(ReTweakDeobfuscation.INSTANCE.getLatestSRG()));
+            } else {
+                if (ReTweakResources.DEBUG) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Is not deobfuscated environment... not adding DeSearge tweak for game version {}...",
+                            gameVersion.getVersion()
+                    );
+                }
+
+            }
             this.tweaks.put(
                     gameVersion,
                     tweaks
@@ -59,7 +76,7 @@ public final class ReTweakTweakHandler {
         }
     }
 
-    public void tweak(ClassNode classNode, GameVersion gameVersion, ReTweakModContainer reTweakModContainer) throws TweakException {
+    public void tweak(ClassNode classNode, GameVersion gameVersion) throws TweakException {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
             if (ReTweakResources.DEBUG) {
@@ -68,10 +85,7 @@ public final class ReTweakTweakHandler {
                         tweak.getName()
                 );
             }
-            tweak.tweak(
-                    reTweakModContainer,
-                    classNode
-            );
+            tweak.tweak(classNode);
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "End Tweak\n\n",

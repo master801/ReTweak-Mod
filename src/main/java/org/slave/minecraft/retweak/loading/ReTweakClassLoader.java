@@ -124,8 +124,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
             try {
                 ReTweakTweakHandler.INSTANCE.tweak(
                         classNode,
-                        reTweakModCandidate.getGameVersion(),
-                        null//TODO MUST NOT BE NULL!
+                        reTweakModCandidate.getGameVersion()
                 );
             } catch(TweakException e) {
                 ReTweakResources.RETWEAK_LOGGER.error(

@@ -1,8 +1,11 @@
 package org.slave.minecraft.retweak.loading;
 
 import com.github.pwittchen.kirai.library.Kirai;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLStateEvent;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -71,7 +74,7 @@ public final class ReTweakModContainer {
         return modClass;
     }
 
-    public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) {
+    public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (instance == null) {
             throw new NullPointerException(
                     Kirai.from(
@@ -95,52 +98,56 @@ public final class ReTweakModContainer {
             );
             return;
         }
-        try {
-            Class<?> _modClass = Class.forName(
-                    modClass,
-                    true,
-                    ReTweakClassLoader.getInstance()
-            );
+        Class<?> _modClass = Class.forName(
+                modClass,
+                true,
+                ReTweakClassLoader.getInstance()
+        );
 
-            for(Method method : _modClass.getDeclaredMethods()) {
-                final Class<?>[] parameterTypes = method.getParameterTypes();
-                if ((parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass) && method.isAnnotationPresent(EventHandler.class)) {
-                    try {
-                        ReflectionHelper.invokeMethod(
-                                method,
-                                instance,
-                                new Object[] {
-                                        createStateEvent(fmlStateEventClass)
-                                }
-                        );
-                    } catch(IllegalAccessException | InvocationTargetException e) {
-                        ReTweakResources.RETWEAK_LOGGER.error(
-                                "Something happened that should not have happened!",
-                                e
-                        );
-                    }
-                    break;
-                }
+        for(Method method : _modClass.getDeclaredMethods()) {
+            final Class<?>[] parameterTypes = method.getParameterTypes();
+            if ((parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass) && method.isAnnotationPresent(EventHandler.class)) {
+                ReflectionHelper.invokeMethod(
+                        method,
+                        instance,
+                        new Object[] {
+                                createStateEvent(fmlStateEventClass)
+                        }
+                );
+                break;
             }
-
-        } catch(ClassNotFoundException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    "Couldn't find mod class?",
-                    e
-            );
         }
+
     }
 
     private FMLStateEvent createStateEvent(Class<? extends FMLStateEvent> fmlStateEventClass) {
+        final Class<?>[] parameterClasses = new Class<?>[] {
+                Object[].class
+        };
+        Object[] parameters;
+
+        if (fmlStateEventClass == FMLPreInitializationEvent.class) {
+            parameters = new Object[] {
+                    null,
+                    ReTweakResources.RETWEAK_CONFIG_DIRECTORY
+            };
+        } else if (fmlStateEventClass == FMLServerAboutToStartEvent.class || fmlStateEventClass == FMLServerStartingEvent.class) {
+            parameters = new Object[] {
+                    FMLCommonHandler.instance().getMinecraftServerInstance()
+            };
+        } else {
+            parameters = new Object[] {
+                    new Object[0]
+            };
+        }
+
         try {
             FMLStateEvent fmlStateEvent = ReflectionHelper.createFromConstructor(
                     ReflectionHelper.getConstructor(
                             fmlStateEventClass,
-                            new Class<?>[] {
-                                    Object[].class
-                            }
+                            parameterClasses
                     ),
-                    fmlStateEventClass == FMLPreInitializationEvent.class ? new Object[] { null, ReTweakResources.RETWEAK_CONFIG_DIRECTORY } : new Object[] { new Object[0] }
+                    parameters
             );
             if (fmlStateEventClass == FMLPreInitializationEvent.class) {
                 ReflectionHelper.setFieldValue(

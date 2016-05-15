@@ -81,23 +81,33 @@ public final class ReTweakModDiscoverer {
                 if (ReTweakModDiscoverer.archivePattern != null) {
                     if (ReTweakModDiscoverer.archivePattern.matcher(file.getName()).matches()) {
                         ReTweakResources.RETWEAK_LOGGER.info(
-                                "Added archive {} as a candidate mod.",
+                                "Added archive \"{}\" as a candidate mod.",
                                 file.getPath()
                         );
-                        modCandidates.get(gameVersion).add(new ReTweakModCandidate(
+                        ReTweakModCandidate reTweakModCandidate = new ReTweakModCandidate(
                                 gameVersion,
                                 file
-                        ));
+                        );
+                        if (reTweakModCandidate.getASMTable().getClasses() == null) {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "Found non-mod file \"{}\" that is marked as a mod candidate. Removing as candidate...",
+                                    file.getPath()
+                            );
+                            continue;
+                        }
+                        modCandidates.get(gameVersion).add(reTweakModCandidate);
                     }
                 } else {
                     ReTweakResources.RETWEAK_LOGGER.warn(
-                            "Added file {} as a candidate mod. This may or may not be an actual mod.",
+                            "Added file \"{}\" as a candidate mod. This may or may not be an actual mod.",
                             file.getPath()
                     );
-                    modCandidates.get(gameVersion).add(new ReTweakModCandidate(
-                            gameVersion,
-                            file
-                    ));
+                    modCandidates.get(gameVersion).add(
+                            new ReTweakModCandidate(
+                                    gameVersion,
+                                    file
+                            )
+                    );
                 }
             }
         }

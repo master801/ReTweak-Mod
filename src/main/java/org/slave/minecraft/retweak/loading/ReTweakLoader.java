@@ -19,6 +19,7 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 /**
  * <p>
@@ -32,6 +33,17 @@ import java.util.Map.Entry;
 public final class ReTweakLoader {
 
     public static final ReTweakLoader INSTANCE = new ReTweakLoader();
+
+    private static final String[] RESOURCE_NAMES = new String[] {
+            "cavemusic",
+            "music",
+            "sound",
+            "streaming"
+    };
+    private static final Pattern PATTERN_OGG = Pattern.compile(
+            "(.+)(\\.ogg$)",
+            Pattern.MULTILINE
+    );
 
     private final ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer();
 
@@ -94,6 +106,53 @@ public final class ReTweakLoader {
                         e
                 );
             }
+
+            if (gameVersion.hasResources()) {//Search for resources
+                File resources = new File(
+                        gameVersionDir,
+                        "resources"
+                );
+                if (resources.isDirectory()) {
+                    File modResources = new File(
+                            resources,
+                            "mod"
+                    );
+                    if (modResources.isDirectory()) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Found resources folder for game version {}! Searching for usable sub-folders...",
+                                gameVersion.getVersion()
+                        );
+                        for(final String resourceName : RESOURCE_NAMES) {
+                            File resourceFile = new File(
+                                    modResources,
+                                    resourceName
+                            );
+                            if (resourceFile.exists()) {
+                                if (ReTweakResources.DEBUG) {
+                                    ReTweakResources.RETWEAK_LOGGER.info(
+                                            "Resource folder \"{}\" exists! Adding all \"*.ogg\" files to the class-loader...",
+                                            resourceFile.getPath()
+                                    );
+                                }
+                                File[] subFiles = resourceFile.listFiles();
+                                if (subFiles != null && subFiles.length > 0) {
+                                    for(File subFile : subFiles) {
+                                        if (ReTweakLoader.PATTERN_OGG.matcher(subFile.getName()).matches()) {
+                                            ReTweakClassLoader.getInstance().addFile(subFile);
+                                            if (ReTweakResources.DEBUG) {
+                                                ReTweakResources.RETWEAK_LOGGER.info(
+                                                        "Added resource file \"{}\" to the class-loader",
+                                                        subFile.getPath()
+                                                );
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
         //</editor-fold>
 
@@ -141,11 +200,22 @@ public final class ReTweakLoader {
                     );
                 }
             }
-            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
+            Iterator<ReTweakModCandidate> iterator = reTweakModDiscoverer.getModCandidates(gameVersion).iterator();
+            while(iterator.hasNext()) {
+                final ReTweakModCandidate reTweakModCandidate = iterator.next();
                 String modClass = null;
                 String modid = null;
                 String name = null;
                 String version = null;
+
+                if (reTweakModCandidate.getModClasses().isEmpty()) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            "Found a non-mod candidate ({}), removing it...",
+                            reTweakModCandidate.getFile().getPath()
+                    );
+                    iterator.remove();
+                    continue;
+                }
 
                 Entry<Type, String> entry = ModClassVisitor.TYPES.get(reTweakModCandidate.getGameVersion());
                 for(TableClass tableClass : reTweakModCandidate.getModClasses()) {

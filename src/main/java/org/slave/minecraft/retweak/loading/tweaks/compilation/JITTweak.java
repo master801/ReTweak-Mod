@@ -4,11 +4,10 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mapping;
 import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mappings;
-import org.slave.minecraft.retweak.loading.tweaks.Tweak;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Iterator;
@@ -32,13 +31,14 @@ public final class JITTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ReTweakModContainer reTweakModContainer, final ClassNode classNode) {
+    public void tweak(final ClassNode classNode) {
         if (gameVersion == null) return;
         if (classNode.methods != null) {
             Iterator<MethodNode> methodNodeIterator = classNode.methods.iterator();
+            int index = 0;
             while(methodNodeIterator.hasNext()) {
                 MethodNode methodNode = methodNodeIterator.next();
-                if (remap(reTweakModContainer, methodNode)) {
+                if (remap(classNode.name, index, methodNode)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing method \"{}{}\" from class \"{}\"",
@@ -49,13 +49,15 @@ public final class JITTweak implements Tweak {
                         methodNodeIterator.remove();
                     }
                 }
+                index++;
             }
         }
         if (classNode.fields != null) {
             Iterator<FieldNode> fieldNodeIterator = classNode.fields.iterator();
+            int index = 0;
             while(fieldNodeIterator.hasNext()) {
                 FieldNode fieldNode = fieldNodeIterator.next();
-                if (remap(reTweakModContainer, fieldNode)) {
+                if (remap(classNode.name, index, fieldNode)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing field \"{} {}\" from class \"{}\"",
@@ -66,9 +68,14 @@ public final class JITTweak implements Tweak {
                     }
                     fieldNodeIterator.remove();
                 }
+                index++;
             }
         }
-        remap(reTweakModContainer, classNode);
+        remap(
+                classNode.name,
+                0,
+                classNode
+        );
     }
 
     @Override
@@ -76,7 +83,7 @@ public final class JITTweak implements Tweak {
         return 0;
     }
 
-    private boolean remap(final ReTweakModContainer reTweakModContainer, final Object node) {
+    private boolean remap(final String className, final int index, final Object node) {
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -85,29 +92,29 @@ public final class JITTweak implements Tweak {
             );
             return false;
         }
-        if (mapping.remap(reTweakModContainer, node)) return true;
+        if (mapping.remap(className, node, index)) return true;
 
         //Remap method instructions
         if (node instanceof MethodNode) {
             MethodNode methodNode = (MethodNode)node;
             Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
 
-            int index = 0;
+            int _index = 0;
             while(abstractInsnNodeIterator.hasNext()) {
                 AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
-                if (mapping.remap(reTweakModContainer, abstractInsnNode)) {
+                if (mapping.remap(className, abstractInsnNode, index)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\"",
                                 abstractInsnNode,
-                                index,
+                                _index,
                                 methodNode.name,
                                 methodNode.desc
                         );
                     }
                     abstractInsnNodeIterator.remove();
                 }
-                index++;
+                _index++;
             }
         }
         return false;

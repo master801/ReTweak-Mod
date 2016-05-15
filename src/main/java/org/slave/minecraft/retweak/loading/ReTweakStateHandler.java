@@ -34,7 +34,7 @@ public final class ReTweakStateHandler {
      *
      * @param currentState Such a fragile existence...
      */
-    public static void step(LoadController loadController, LoaderState currentState, LoaderState wantedState) {
+    public static void step(LoadController loadController, LoaderState currentState, LoaderState wantedState) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (loadController == null || currentState == null || wantedState == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
                     "An error occurred while stepping (variables for {} are null)! The ASM hacks may have failed?",
@@ -56,11 +56,19 @@ public final class ReTweakStateHandler {
                 ReTweakModController.postInitialization();
                 break;
             case SERVER_ABOUT_TO_START:
+                ReTweakModController.serverAboutToStart();
+                break;
             case SERVER_STARTING:
+                ReTweakModController.serverStarting();
+                break;
             case SERVER_STARTED:
+                ReTweakModController.serverStarted();
+                break;
             case SERVER_STOPPING:
+                ReTweakModController.serverStopping();
+                break;
             case SERVER_STOPPED:
-                //Unsupported -- NOOP
+                ReTweakModController.serverStopped();
                 break;
             case LOADING:
             case AVAILABLE:
@@ -86,7 +94,7 @@ public final class ReTweakStateHandler {
                 return "ReTweak is loaded, this crash may have been caused by it.";
             }
 
-       });
+        });
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakModContainer[] reTweakModContainers = ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion);
@@ -183,17 +191,16 @@ public final class ReTweakStateHandler {
                                     );
 
                                     try {
-                                        Object proxyInstance = ReflectionHelper.createFromConstructor(
-                                                ReflectionHelper.getConstructor(
-                                                        proxyClass,
-                                                        new Class<?>[0]
-                                                ),
-                                                new Object[0]
-                                        );
                                         ReflectionHelper.setFieldValue(
                                                 field,
                                                 null,
-                                                proxyInstance
+                                                ReflectionHelper.createFromConstructor(
+                                                        ReflectionHelper.getConstructor(
+                                                                proxyClass,
+                                                                new Class<?>[0]
+                                                        ),
+                                                        new Object[0]
+                                                )
                                         );
                                     } catch(NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
                                         reTweakModContainer.setEnabled(false);

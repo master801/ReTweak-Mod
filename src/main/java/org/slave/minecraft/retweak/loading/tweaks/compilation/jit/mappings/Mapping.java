@@ -5,7 +5,6 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.slave.minecraft.retweak.loading.ReTweakModContainer;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 /**
@@ -20,47 +19,49 @@ public abstract class Mapping {
     public static final String ANNOTATION_POSTINIT_DESC = "L" + "cpw/mods/fml/common/Mod$PostInit" + ";";
     public static final String ANNOTATION_NETWORKMOD_DESC = "L" + "cpw/mods/fml/common/network/NetworkMod" + ";";
 
-    protected abstract boolean _class(final ReTweakModContainer reTweakModContainer, final ClassNode classNode);
+    protected abstract boolean _class(final String className, final ClassNode classNode);
 
-    protected abstract boolean field(final ReTweakModContainer reTweakModContainer, final FieldNode fieldNode);
+    protected abstract boolean field(final String className, final FieldNode fieldNode);
 
-    protected abstract boolean method(final ReTweakModContainer reTweakModContainer, final MethodNode methodNode);
+    protected abstract boolean method(final String className, final MethodNode methodNode);
 
-    protected abstract boolean fieldInsn(final ReTweakModContainer reTweakModContainer, final FieldInsnNode fieldInsnNode);
+    protected abstract boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode);
 
-    protected abstract boolean methodInsn(final ReTweakModContainer reTweakModContainer, final MethodInsnNode methodInsnNode);
+    protected abstract boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode);
 
     /**
      * @param node {@link org.objectweb.asm.tree.MethodNode} {@link org.objectweb.asm.tree.MethodInsnNode} {@link org.objectweb.asm.tree.FieldNode} {@link org.objectweb.asm.tree.FieldInsnNode}
      */
     @SuppressWarnings("ConstantConditions")
-    public final boolean remap(final ReTweakModContainer reTweakModContainer, final Object node) {
+    public final boolean remap(final String className, final Object node, final int index) {
         if (!(node instanceof ClassNode) && !(node instanceof MethodNode) && !(node instanceof MethodInsnNode) && !(node instanceof FieldNode) && !(node instanceof FieldInsnNode)) return false;
         boolean remove;
         if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
         if (node instanceof ClassNode) {
             remove = _class(
-                    reTweakModContainer,
+                    className,
                     (ClassNode)node
             );
         } else if (node instanceof MethodNode) {
             remove = method(
-                    reTweakModContainer,
+                    className,
                     (MethodNode)node
             );
         } else if (node instanceof MethodInsnNode) {
             remove = methodInsn(
-                    reTweakModContainer,
+                    className,
+                    index,
                     (MethodInsnNode)node
             );
         } else if (node instanceof FieldNode) {
             remove = field(
-                    reTweakModContainer,
+                    className,
                     (FieldNode)node
             );
         } else if (node instanceof FieldInsnNode) {
             remove = fieldInsn(
-                    reTweakModContainer,
+                    className,
+                    index,
                     (FieldInsnNode)node
             );
         } else {

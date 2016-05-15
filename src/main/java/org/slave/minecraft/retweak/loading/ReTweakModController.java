@@ -3,8 +3,15 @@ package org.slave.minecraft.retweak.loading;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Master on 4/26/2016 at 3:26 PM.
@@ -17,7 +24,7 @@ public final class ReTweakModController {
         throw new IllegalStateException();
     }
 
-    static void preInitialization() {
+    static void preInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
@@ -29,7 +36,7 @@ public final class ReTweakModController {
             for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
-                            "Mod {} has been disabled, not calling pre-initialization state",
+                            "Mod {} has been disabled, not calling state \"pre-initialization\"",
                             reTweakModContainer.getModid()
                     );
                     continue;
@@ -44,19 +51,19 @@ public final class ReTweakModController {
         }
     }
 
-    static void initialization() {
+    static void initialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Starting initialization state for game version {}",
+                    "Starting state initialization for game version {}",
                     gameVersion.getVersion()
             );
 
             for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
-                            "Mod {} has been disabled, not calling initialization state",
+                            "Mod {} has been disabled, not calling state \"initialization\"",
                             reTweakModContainer.getModid()
                     );
                     continue;
@@ -65,25 +72,25 @@ public final class ReTweakModController {
             }
 
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Ending initialization state for game version {}",
+                    "Ending state initialization state for game version {}",
                     gameVersion.getVersion()
             );
         }
     }
 
-    static void postInitialization() {
+    static void postInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Starting post-initialization for game version {}",
+                    "Starting state post-initialization for game version {}",
                     gameVersion.getVersion()
             );
 
             for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
-                            "Mod {} has been disabled, not calling post-initialization",
+                            "Mod {} has been disabled, not calling state \"post-initialization\"",
                             reTweakModContainer.getModid()
                     );
                     continue;
@@ -92,7 +99,142 @@ public final class ReTweakModController {
             }
 
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Ending post-initialization for game version {}",
+                    "Ending state post-initialization for game version {}",
+                    gameVersion.getVersion()
+            );
+        }
+    }
+
+    static void serverAboutToStart() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Starting state \"server about to start\" for game version {}",
+                    gameVersion.getVersion()
+            );
+
+            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
+                if (!reTweakModContainer.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not calling state \"server about to start\"",
+                            reTweakModContainer.getModid()
+                    );
+                    continue;
+                }
+                reTweakModContainer.callState(FMLServerAboutToStartEvent.class);
+            }
+
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Ending state \"server about to start\" for game version {}",
+                    gameVersion.getVersion()
+            );
+        }
+    }
+
+    static void serverStarting() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Starting state \"server starting\" for game version {}",
+                    gameVersion.getVersion()
+            );
+
+            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
+                if (!reTweakModContainer.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not calling state \"server starting\"",
+                            reTweakModContainer.getModid()
+                    );
+                    continue;
+                }
+                reTweakModContainer.callState(FMLServerStartingEvent.class);
+            }
+
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Ending state \"server starting\" for game version {}",
+                    gameVersion.getVersion()
+            );
+        }
+    }
+
+    static void serverStarted() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Starting state \"server started\" for game version {}",
+                    gameVersion.getVersion()
+            );
+
+            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
+                if (!reTweakModContainer.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not calling state \"server started\"",
+                            reTweakModContainer.getModid()
+                    );
+                    continue;
+                }
+                reTweakModContainer.callState(FMLServerStartedEvent.class);
+            }
+
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Ending state \"server started\" for game version {}",
+                    gameVersion.getVersion()
+            );
+        }
+    }
+
+    static void serverStopping() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Starting state \"server stopping\" for game version {}",
+                    gameVersion.getVersion()
+            );
+
+            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
+                if (!reTweakModContainer.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not calling state \"server stopping\"",
+                            reTweakModContainer.getModid()
+                    );
+                    continue;
+                }
+                reTweakModContainer.callState(FMLServerStoppingEvent.class);
+            }
+
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Ending state \"server stopping\" for game version {}",
+                    gameVersion.getVersion()
+            );
+        }
+    }
+
+    static void serverStopped() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Starting state \"server stopped\" for game version {}",
+                    gameVersion.getVersion()
+            );
+
+            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
+                if (!reTweakModContainer.isEnabled()) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Mod {} has been disabled, not calling state \"server stopped\"",
+                            reTweakModContainer.getModid()
+                    );
+                    continue;
+                }
+                reTweakModContainer.callState(FMLServerStoppedEvent.class);
+            }
+
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Ending state \"server stopped\" for game version {}",
                     gameVersion.getVersion()
             );
         }

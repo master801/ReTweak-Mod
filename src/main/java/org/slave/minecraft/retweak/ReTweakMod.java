@@ -11,6 +11,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.init.Items;
+import net.minecraft.item.Item;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.loading.ReTweakModConfig;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
@@ -50,6 +52,8 @@ public final class ReTweakMod {
     @EventHandler
     public void init(FMLInitializationEvent event) {
         FMLCommonHandler.instance().bus().register(this);
+
+        Item x = Items.apple;
     }
 
     @EventHandler

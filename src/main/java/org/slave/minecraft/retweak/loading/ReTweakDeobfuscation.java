@@ -1,6 +1,9 @@
 package org.slave.minecraft.retweak.loading;
 
 import LZMA.LzmaInputStream;
+import cpw.mods.fml.common.Loader;
+import net.minecraftforge.common.ForgeVersion;
+import net.minecraftforge.common.MinecraftForge;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
@@ -8,6 +11,7 @@ import org.slave.tool.remapper.SRG;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 /**
@@ -20,6 +24,8 @@ public final class ReTweakDeobfuscation {
     public static final ReTweakDeobfuscation INSTANCE = new ReTweakDeobfuscation();
 
     private final HashMap<GameVersion, SRG> srgs = new HashMap<>();
+
+    private SRG latestSRG;
 
     private ReTweakDeobfuscation() {
     }
@@ -63,10 +69,53 @@ public final class ReTweakDeobfuscation {
                 );
             }
         }
+
+        File forgeDir = new File(
+                System.getProperty("user.home"),
+                ".gradle/caches/minecraft/net/minecraftforge/forge"
+        );
+        File forgeVersionDir = new File(
+                forgeDir,
+                Loader.MC_VERSION + "-" + ForgeVersion.getVersion()
+        );
+        if (!forgeVersionDir.exists()) forgeVersionDir = new File(forgeVersionDir.getAbsolutePath() + "-" + Loader.MC_VERSION);
+        File srgsDir = new File(
+                forgeVersionDir,
+                "srgs"
+        );
+        if (srgsDir.isDirectory()) {
+            File srgMCP = new File(
+                    srgsDir,
+                    "srg-mcp.srg"
+            );
+            if (srgMCP.isFile()) {
+                InputStream inputStream = new FileInputStream(srgMCP);
+                if (ReTweakResources.DEBUG) {
+                    ReTweakResources.RETWEAK_LOGGER.info(
+                            "Found deobfuscation data for the current version ({}) of Minecraft! (Path: \"{}\")",
+                            Loader.MC_VERSION,
+                            srgMCP.getAbsolutePath()
+                    );
+                }
+                try {
+                    latestSRG = SRG.load(inputStream);
+                    inputStream.close();
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            "Something failed while loading deobfuscation data for the current version (" + MinecraftForge.MC_VERSION + ") of Minecraft!",
+                            e
+                    );
+                }
+            }
+        }
     }
 
     public SRG getSRG(GameVersion gameVersion) {
         return srgs.get(gameVersion);
+    }
+
+    SRG getLatestSRG() {
+        return latestSRG;
     }
 
 }
