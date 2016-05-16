@@ -2,6 +2,7 @@ package org.slave.minecraft.retweak.loading;
 
 import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
@@ -27,6 +28,7 @@ public final class ReTweakModContainer {
     private String version;
     private final ReTweakModCandidate reTweakModCandidate;
     private boolean enabled = true;
+    private MetadataCollection metadataCollection;
 
     private Object instance;
 
@@ -58,6 +60,10 @@ public final class ReTweakModContainer {
         this.enabled = enabled;
     }
 
+    public MetadataCollection getMetadataCollection() {
+        return metadataCollection;
+    }
+
     ReTweakModCandidate getReTweakModCandidate() {
         return reTweakModCandidate;
     }
@@ -72,6 +78,10 @@ public final class ReTweakModContainer {
 
     String getModClass() {
         return modClass;
+    }
+
+    void setMetadataCollection(MetadataCollection metadataCollection) {
+        this.metadataCollection = metadataCollection;
     }
 
     public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {

@@ -120,6 +120,10 @@ public final class ReTweakModCandidate {
         return file;
     }
 
+    List<String> getClasses() {
+        return classes;
+    }
+
     List<TableClass> getModClasses() {
         return modClasses;
     }

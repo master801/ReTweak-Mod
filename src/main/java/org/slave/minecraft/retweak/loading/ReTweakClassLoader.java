@@ -210,6 +210,24 @@ public final class ReTweakClassLoader extends URLClassLoader {
     }
 
     /**
+     * Returns jar file for given candidate<br/>
+     * Must have at least one available class file!
+     *
+     * @param reTweakModCandidate
+     *
+     * @return Unclosed JarFile
+     *
+     * @throws IOException
+     */
+    JarFile findJarFileForCandidate(ReTweakModCandidate reTweakModCandidate) throws IOException {
+        if (reTweakModCandidate == null || (reTweakModCandidate.getClasses() == null || reTweakModCandidate.getClasses().isEmpty())) return null;
+        URL url = super.findResource(reTweakModCandidate.getClasses().get(0) + ".class");
+        if (url == null) return null;
+        JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
+        return jarURLConnection.getJarFile();
+    }
+
+    /**
      * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#call()}
      */
     private void loadSRGs() {
@@ -230,7 +248,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         }
     }
 
-    private ReTweakModCandidate findCandidate(String name) throws IOException {
+    private ReTweakModCandidate findCandidate(final String name) throws IOException {
         URL url = super.findResource(name.replace('.', '/') + ".class");
         if (url == null) return null;
         JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
@@ -244,7 +262,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 if (index == -1) index = jarFile.getName().lastIndexOf('/');
                 if (index != -1) index++;
 
-                if (reTweakModCandidate.getFile().getName().equals(jarFile.getName().substring(index))) return reTweakModCandidate;
+                if (reTweakModCandidate.getFile().getName().equals(jarFile.getName().substring(index))) {
+                    jarFile.close();
+                    return reTweakModCandidate;
+                }
             }
         }
         return null;

@@ -1,9 +1,11 @@
 package org.slave.minecraft.retweak.loading;
 
+import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
@@ -13,9 +15,13 @@ import org.slave.lib.resources.ASMTable.TableClass;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
@@ -106,6 +112,35 @@ public final class ReTweakStateHandler {
                     continue;
                 }
                 ReTweakClassLoader.getInstance().addFile(reTweakModContainer.getReTweakModCandidate().getFile());
+
+                //Find mcmod.info for mod
+                try {
+                    JarFile jarFile = ReTweakClassLoader.getInstance().findJarFileForCandidate(reTweakModContainer.getReTweakModCandidate());
+                    JarEntry jarEntry = jarFile.getJarEntry("mcmod.info");
+                    if (jarEntry != null) {
+                        InputStream is = jarFile.getInputStream(jarEntry);
+                        reTweakModContainer.setMetadataCollection(MetadataCollection.from(
+                                is,
+                                jarFile.getName()
+                        ));
+                        is.close();
+                    }
+                    jarFile.close();
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            Kirai.from(
+                                    "Caught exception while getting \"{name}\" from file \"{file_path}\"!"
+                            ).put(
+                                    "name",
+                                    "mcmod.info"
+                            ).put(
+                                    "file_path",
+                                    reTweakModContainer.getReTweakModCandidate().getFile().getPath()
+                            ).format().toString(),
+                            e
+                    );
+                }
+
                 for(TableClass tableClass : reTweakModContainer.getReTweakModCandidate().getModClasses()) {
                     try {
                         Class<?> modClass = Class.forName(
@@ -117,7 +152,7 @@ public final class ReTweakStateHandler {
                                 ReTweakClassLoader.getInstance()
                         );
 
-                        if (modClass.isAnnotationPresent(Mod.class)) {
+                        if (modClass.isAnnotationPresent(Mod.class)) {//Find mod annotation
                             Object classInstance;
                             try {
                                 classInstance = ReflectionHelper.createFromConstructor(
@@ -141,7 +176,8 @@ public final class ReTweakStateHandler {
 
                         for(Field field : modClass.getDeclaredFields()) {
                             field.setAccessible(true);
-                            if (field.isAnnotationPresent(Instance.class)) {
+
+                            if (field.isAnnotationPresent(Instance.class)) {//Set instance
                                 if (!Modifier.isStatic(field.getModifiers())) {
                                     reTweakModContainer.setEnabled(false);
                                     ReTweakResources.RETWEAK_LOGGER.error(
@@ -170,7 +206,7 @@ public final class ReTweakStateHandler {
                                     );
                                     return;
                                 }
-                            } else if (field.isAnnotationPresent(SidedProxy.class)) {
+                            } else if (field.isAnnotationPresent(SidedProxy.class)) {//Set proxy
                                 SidedProxy sidedProxy = field.getAnnotation(SidedProxy.class);
                                 if (!Modifier.isStatic(field.getModifiers())) {
                                     reTweakModContainer.setEnabled(false);
