@@ -70,6 +70,7 @@ public final class ReTweakDeobfuscation {
             }
         }
 
+
         File forgeDir = new File(
                 System.getProperty("user.home"),
                 ".gradle/caches/minecraft/net/minecraftforge/forge"
@@ -114,7 +115,7 @@ public final class ReTweakDeobfuscation {
         return srgs.get(gameVersion);
     }
 
-    SRG getLatestSRG() {
+    public SRG getLatestSRG() {
         return latestSRG;
     }
 

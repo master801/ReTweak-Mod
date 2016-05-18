@@ -45,21 +45,7 @@ public final class ReTweakTweakHandler {
                     tweaks.add(new InterpreterTweak(gameVersion));
                     break;
             }
-            if (ReTweakSetup.isDeobfuscatedEnvironment()) {
-                ReTweakResources.RETWEAK_LOGGER.info(
-                        "Is deobfuscated environment! Adding DeSearge tweak for game version \"{}\"...",
-                        gameVersion.getVersion()
-                );
-                tweaks.add(new DeSeargeTweak(ReTweakDeobfuscation.INSTANCE.getLatestSRG()));
-            } else {
-                if (ReTweakResources.DEBUG) {
-                    ReTweakResources.RETWEAK_LOGGER.info(
-                            "Is not deobfuscated environment... not adding DeSearge tweak for game version {}...",
-                            gameVersion.getVersion()
-                    );
-                }
-
-            }
+            if (ReTweakSetup.isDeobfuscatedEnvironment()) tweaks.add(DeSeargeTweak.getInstance());
             this.tweaks.put(
                     gameVersion,
                     tweaks

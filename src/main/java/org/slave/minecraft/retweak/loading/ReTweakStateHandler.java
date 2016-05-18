@@ -4,10 +4,12 @@ import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.LoadController;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.Instance;
+import cpw.mods.fml.common.Mod.InstanceFactory;
 import cpw.mods.fml.common.SidedProxy;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.lib.helpers.StringHelper;
@@ -19,9 +21,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
 /**
  * Created by Master801 on 4/10/2016 at 9:43 PM.
@@ -116,10 +119,10 @@ public final class ReTweakStateHandler {
                 //Find mcmod.info for mod
                 try {
                     JarFile jarFile = ReTweakClassLoader.getInstance().findJarFileForCandidate(reTweakModContainer.getReTweakModCandidate());
-                    JarEntry jarEntry = jarFile.getJarEntry("mcmod.info");
-                    if (jarEntry != null) {
-                        InputStream is = jarFile.getInputStream(jarEntry);
-                        reTweakModContainer.setMetadataCollection(MetadataCollection.from(
+                    ZipEntry entry = jarFile.getEntry("mcmod.info");
+                    if (entry != null) {
+                        InputStream is = jarFile.getInputStream(entry);
+                        reTweakModContainer.bindMetadata(MetadataCollection.from(
                                 is,
                                 jarFile.getName()
                         ));
@@ -152,17 +155,40 @@ public final class ReTweakStateHandler {
                                 ReTweakClassLoader.getInstance()
                         );
 
+                        //Somewhat stolen from FML
+                        Method factoryMethod = null;
+                        for(Method method : modClass.getDeclaredMethods()) {
+                            if (method.isAnnotationPresent(InstanceFactory.class)) {
+                                if (factoryMethod == null) {
+                                    if (Modifier.isStatic(method.getModifiers()) && method.getParameterTypes().length == 0) {
+                                        method.setAccessible(true);
+                                        factoryMethod = method;
+                                    } else {
+                                        ReTweakResources.RETWEAK_LOGGER.warn(
+                                                "Instance factory method for mod \"{}\" is not static and/or may have parameters!",
+                                                reTweakModContainer.getModid()
+                                        );
+                                    }
+                                } else {
+                                    ReTweakResources.RETWEAK_LOGGER.warn(
+                                            "Found duplicate instance factory methods! Duplicate name: \"{}\"",
+                                            method.getName()
+                                    );
+                                    break;
+                                }
+                            }
+                        }
+
                         if (modClass.isAnnotationPresent(Mod.class)) {//Find mod annotation
                             Object classInstance;
                             try {
-                                classInstance = ReflectionHelper.createFromConstructor(
-                                        ReflectionHelper.getConstructor(
-                                                modClass,
-                                                new Class<?>[0]
-                                        ),
-                                        new Object[0]
+                                classInstance = reTweakModContainer.getLanguageAdapter().getNewInstance(
+                                        null,//No FML mod container...
+                                        modClass,
+                                        Loader.instance().getModClassLoader(),
+                                        factoryMethod
                                 );
-                            } catch(InvocationTargetException | InstantiationException | NoSuchMethodException | IllegalAccessException e) {
+                            } catch(Exception e) {
                                 reTweakModContainer.setEnabled(false);
                                 ReTweakResources.RETWEAK_LOGGER.warn(
                                         "Mod \"{}\" has been disabled due to incorrectly creating a new instance of class \"{}\"",
@@ -172,6 +198,13 @@ public final class ReTweakStateHandler {
                                 return;
                             }
                             reTweakModContainer.setInstance(classInstance);
+                        } else {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "Mod \"{}\" cannot load due to it not being an actual mod? File path: {}",
+                                    reTweakModContainer.getModid(),
+                                    reTweakModContainer.getReTweakModCandidate().getFile().getPath()
+                            );
+                            return;
                         }
 
                         for(Field field : modClass.getDeclaredFields()) {

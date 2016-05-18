@@ -16,8 +16,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
@@ -204,9 +206,7 @@ public final class ReTweakLoader {
             while(iterator.hasNext()) {
                 final ReTweakModCandidate reTweakModCandidate = iterator.next();
                 String modClass = null;
-                String modid = null;
-                String name = null;
-                String version = null;
+                final Map<String, Object> info = new HashMap<>();
 
                 if (reTweakModCandidate.getModClasses().isEmpty()) {
                     ReTweakResources.RETWEAK_LOGGER.warn(
@@ -222,17 +222,24 @@ public final class ReTweakLoader {
                     switch(entry.getKey()) {
                         case EXTENDS:
                             modClass = tableClass.getName();
-                            modid = tableClass.getName();
-                            name = null;//TODO
-                            version = null;//TODO
+                            info.put(
+                                    "modid",
+                                    tableClass.getName()
+                            );
+                            info.put(//TODO
+                                    "name",
+                                    null
+                            );
+                            info.put(//TODO
+                                    "version",
+                                    null
+                            );
                             break;
                         case ANNOTATION:
                             for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
                                 if (asmAnnotation.getDesc().equals(entry.getValue())) {
                                     modClass = tableClass.getName();
-                                    modid = (String)asmAnnotation.get().get("modid");
-                                    name = (String)asmAnnotation.get().get("name");
-                                    version = (String)asmAnnotation.get().get("version");
+                                    info.putAll(asmAnnotation.get());
                                     break;
                                 }
                             }
@@ -240,16 +247,15 @@ public final class ReTweakLoader {
                     }
                 }
 
-                if (modClass != null && modid != null) {
+                if (modClass != null) {
                     mods.get(gameVersion).add(new ReTweakModContainer(
                             modClass.replace(
                                     '/',
                                     '.'
                             ),
-                            modid,
-                            name,
-                            version,
-                            reTweakModCandidate
+                            reTweakModCandidate,
+                            info
+
                     ));
                 }
             }

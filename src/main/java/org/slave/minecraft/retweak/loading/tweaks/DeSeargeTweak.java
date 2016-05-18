@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
+import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
 
@@ -17,9 +18,11 @@ import org.slave.tool.remapper.SRG;
  */
 public final class DeSeargeTweak implements Tweak {
 
+    private static DeSeargeTweak instance;
+
     private final SRG srg;
 
-    public DeSeargeTweak(SRG srg) {
+    private DeSeargeTweak(SRG srg) {
         this.srg = srg;
     }
 
@@ -47,23 +50,22 @@ public final class DeSeargeTweak implements Tweak {
                     if (abstractInsnNode instanceof FieldInsnNode) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                         if (fieldInsnNode.name.startsWith("field_")) {
-                            final String originalName = fieldInsnNode.name;
                             String[] entry = srg.getFieldEntry(
                                     fieldInsnNode.owner,
                                     fieldInsnNode.name
                             );
                             if (entry != null) {
-                                fieldInsnNode.name = entry[3];
                                 if (ReTweakResources.DEBUG) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
-                                            "DeSearged name of field insn ({}) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
+                                            "DeSearged name of field insn ( {} ) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
                                             ASMHelper.toString(fieldInsnNode),
-                                            i,
                                             ASMHelper.toString(methodNode),
+                                            i,
                                             classNode.name,
-                                            originalName,
-                                            fieldInsnNode.name
+                                            fieldInsnNode,
+                                            entry[3]
                                     );
+                                    fieldInsnNode.name = entry[3];
                                 }
                             } else {
                                 ReTweakResources.RETWEAK_LOGGER.warn(
@@ -78,25 +80,24 @@ public final class DeSeargeTweak implements Tweak {
                     } else if (abstractInsnNode instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
                         if (methodInsnNode.name.startsWith("func_")) {
-                            final String originalName = methodInsnNode.name;
                             String[] entry = srg.getMethodEntry(
                                     methodInsnNode.owner,
                                     methodInsnNode.name,
                                     methodInsnNode.desc
                             );
                             if (entry != null) {
-                                methodInsnNode.name = entry[4];
                                 if (ReTweakResources.DEBUG) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
-                                            "DeSearged name of method insn ({}) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
+                                            "DeSearged name of method insn ( {} ) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
                                             ASMHelper.toString(methodInsnNode),
-                                            i,
                                             ASMHelper.toString(methodNode),
+                                            i,
                                             classNode.name,
-                                            originalName,
-                                            methodInsnNode.name
+                                            methodInsnNode.name,
+                                            entry[4]
                                     );
                                 }
+                                methodInsnNode.name = entry[4];
                             } else {
                                 ReTweakResources.RETWEAK_LOGGER.warn(
                                         "Found no entry for method insn \"{}\" at index {}, from method \"{}\", from class \"{}\"!",
@@ -116,6 +117,11 @@ public final class DeSeargeTweak implements Tweak {
     @Override
     public int getWantedSortIndex() {
         return Integer.MAX_VALUE;//Last tweak
+    }
+
+    public static Tweak getInstance() {
+        if (DeSeargeTweak.instance == null) DeSeargeTweak.instance = new DeSeargeTweak(ReTweakDeobfuscation.INSTANCE.getLatestSRG());
+        return DeSeargeTweak.instance;
     }
 
 }
