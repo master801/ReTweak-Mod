@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -14,10 +15,10 @@ import org.slave.minecraft.retweak.resources.ReTweakResources;
  */
 public abstract class Mapping {
 
-    public static final String ANNOTATION_PREINIT_DESC = "L" + "cpw/mods/fml/common/Mod$PreInit" + ";";
+    public static final String ANNOTATION_PRE_INIT_DESC = "L" + "cpw/mods/fml/common/Mod$PreInit" + ";";
     public static final String ANNOTATION_INIT_DESC = "L" + "cpw/mods/fml/common/Mod$Init" + ";";
-    public static final String ANNOTATION_POSTINIT_DESC = "L" + "cpw/mods/fml/common/Mod$PostInit" + ";";
-    public static final String ANNOTATION_NETWORKMOD_DESC = "L" + "cpw/mods/fml/common/network/NetworkMod" + ";";
+    public static final String ANNOTATION_POST_INIT_DESC = "L" + "cpw/mods/fml/common/Mod$PostInit" + ";";
+    public static final String ANNOTATION_NETWORK_MOD_DESC = "L" + "cpw/mods/fml/common/network/NetworkMod" + ";";
 
     protected abstract boolean _class(final String className, final ClassNode classNode);
 
@@ -28,6 +29,8 @@ public abstract class Mapping {
     protected abstract boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode);
 
     protected abstract boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode);
+
+    protected abstract boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode);
 
     /**
      * @param node {@link org.objectweb.asm.tree.MethodNode} {@link org.objectweb.asm.tree.MethodInsnNode} {@link org.objectweb.asm.tree.FieldNode} {@link org.objectweb.asm.tree.FieldInsnNode}
@@ -63,6 +66,12 @@ public abstract class Mapping {
                     className,
                     index,
                     (FieldInsnNode)node
+            );
+        } else if (node instanceof IntInsnNode) {
+            remove = intInsn(
+                    className,
+                    index,
+                    (IntInsnNode)node
             );
         } else {
             return false;

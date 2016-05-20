@@ -8,6 +8,7 @@ import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -28,9 +29,19 @@ public final class ReTweakSetup implements IFMLCallHook {
                             "instance"
                     ),
                     null,
-                    new ReTweakClassLoader((LaunchClassLoader)data.get("classLoader"))
+                    ReflectionHelper.createFromConstructor(
+                            ReflectionHelper.getConstructor(
+                                    ReTweakClassLoader.class,
+                                    new Class<?>[] {
+                                            LaunchClassLoader.class
+                                    }
+                            ),
+                            new Object[] {
+                                    data.get("classloader")
+                            }
+                    )
             );
-        } catch(NoSuchFieldException | IllegalAccessException e) {
+        } catch(NoSuchFieldException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
                     "Failed to create ReTweak classloader instance! ReTweak mods will not be able to load properly!",
                     e

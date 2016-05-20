@@ -33,7 +33,7 @@ public final class ReTweakConfig {
     private ReTweakConfig() {
         config.put(
                 ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
-                CompilationMode.JIT.name(),
+                CompilationMode.INTERPRETER.name(),
                 "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
         );
     }

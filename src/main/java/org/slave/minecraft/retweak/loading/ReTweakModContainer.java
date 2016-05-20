@@ -164,7 +164,7 @@ public final class ReTweakModContainer {
             return;
         }
 
-        final boolean overrideMetadata = !(boolean)info.get("useMetadata");
+        final boolean overrideMetadata = info.containsKey("useMetadata") && !(boolean)info.get("useMetadata");
         if (overrideMetadata || !modMetadata.useDependencyInformation) {
             //TODO DEPENDENCY PARSING
             ReTweakResources.RETWEAK_LOGGER.warn("Dependency parsing is not yet implemented!");
@@ -259,7 +259,7 @@ public final class ReTweakModContainer {
                                 "sourceFile"
                         ),
                         fmlStateEvent,
-                        getReTweakModCandidate().getFile()
+                        getReTweakModCandidate().getSource()
                 );
                 ReflectionHelper.setFieldValue(
                         ReflectionHelper.getField(

@@ -20,12 +20,12 @@ import org.slave.tool.remapper.SRG;
  *
  * @author Master
  */
-final class ReTweakSRG {
+public final class ReTweakSRG {
 
     private final GameVersion gameVersion;
     private final SRG srg;
 
-    ReTweakSRG(GameVersion gameVersion) {
+    public ReTweakSRG(GameVersion gameVersion) {
         this.gameVersion = gameVersion;
         srg = ReTweakDeobfuscation.INSTANCE.getSRG(gameVersion);
     }

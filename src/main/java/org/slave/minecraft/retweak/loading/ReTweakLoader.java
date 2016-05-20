@@ -211,7 +211,7 @@ public final class ReTweakLoader {
                 if (reTweakModCandidate.getModClasses().isEmpty()) {
                     ReTweakResources.RETWEAK_LOGGER.warn(
                             "Found a non-mod candidate ({}), removing it...",
-                            reTweakModCandidate.getFile().getPath()
+                            reTweakModCandidate.getSource().getPath()
                     );
                     iterator.remove();
                     continue;

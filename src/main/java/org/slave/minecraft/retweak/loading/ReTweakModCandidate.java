@@ -112,11 +112,11 @@ public final class ReTweakModCandidate {
         this.enabled = enabled;
     }
 
-    GameVersion getGameVersion() {
+    public GameVersion getGameVersion() {
         return gameVersion;
     }
 
-    File getFile() {
+    public File getSource() {
         return file;
     }
 

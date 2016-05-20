@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
@@ -38,6 +39,8 @@ final class V_1_4_7_Mapping extends Mapping {
 
 
         //<editor-fold desc="FIELD INSN">
+
+        //<editor-fold desc="ITEMS">
         types.get(_Type.FIELD_INSN).put(
                 new Holder(
                         _Type.FIELD_INSN,
@@ -73,6 +76,25 @@ final class V_1_4_7_Mapping extends Mapping {
         types.get(_Type.FIELD_INSN).put(
                 new Holder(
                         _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77770_aF",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151116_aA",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        //</editor-fold>
+
+        /*
+        types.get(_Type.FIELD_INSN).put(
+                new Holder(
+                        _Type.FIELD_INSN,
                         -1,
                         null,
                         null,
@@ -86,6 +108,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
+        */
         //</editor-fold>
 
         //<editor-fold desc="METHOD INSN">
@@ -115,7 +138,7 @@ final class V_1_4_7_Mapping extends Mapping {
             Iterator<AnnotationNode> annotationNodeIterator = classNode.visibleAnnotations.iterator();
             while(annotationNodeIterator.hasNext()) {
                 AnnotationNode annotationNode = annotationNodeIterator.next();
-                if (annotationNode.desc.equals(Mapping.ANNOTATION_NETWORKMOD_DESC)) {
+                if (annotationNode.desc.equals(Mapping.ANNOTATION_NETWORK_MOD_DESC)) {
                     //TODO We should really do something else with the networkmod annotation than remove it...
                     annotationNodeIterator.remove();
                     if (ReTweakResources.DEBUG) {
@@ -137,7 +160,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
         if (methodNode.visibleAnnotations != null) {
             for(AnnotationNode annotationNode : methodNode.visibleAnnotations) {
-                if (annotationNode.desc.equals(Mapping.ANNOTATION_PREINIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_INIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_POSTINIT_DESC)) {
+                if (annotationNode.desc.equals(Mapping.ANNOTATION_PRE_INIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_INIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_POST_INIT_DESC)) {
                     String previousDesc = annotationNode.desc;
                     annotationNode.desc = Type.getDescriptor(EventHandler.class);
                     if (ReTweakResources.DEBUG) {
@@ -262,7 +285,11 @@ final class V_1_4_7_Mapping extends Mapping {
         if (holders != null) {
             for(Holder holder : holders) holder.set(methodInsnNode);
         }
+        return false;
+    }
 
+    @Override
+    protected boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode) {
         return false;
     }
 

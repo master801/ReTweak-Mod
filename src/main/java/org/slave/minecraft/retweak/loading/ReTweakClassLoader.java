@@ -49,7 +49,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private final LaunchClassLoader parent;
     private EnumMap<GameVersion, ReTweakSRG> srgs;
 
-    public ReTweakClassLoader(final LaunchClassLoader parent) {
+    private ReTweakClassLoader(final LaunchClassLoader parent) {
         super(
                 new URL[0],
                 parent
@@ -84,6 +84,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
             String newName = name;
             if (!ReTweakSetup.isDeobfuscatedEnvironment()) throw new IllegalStateException("Non-deobfuscated environments are not yet supported!");
             return parent.loadClass(newName);
+        } else if (name.startsWith("java")) {
+            return super.loadClass(
+                    name,
+                    false
+            );
         }
 
         Class<?> returnClass = null;
@@ -113,12 +118,15 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     0
             );
 
-            if (srgs != null) {
-                srgs.get(reTweakModCandidate.getGameVersion()).srg(classNode);
-            } else {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                        "Failed to load SRGs?"
-                );
+            //Enable SRG for only JIT
+            if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.JIT) {
+                if (srgs != null) {
+                    srgs.get(reTweakModCandidate.getGameVersion()).srg(classNode);
+                } else {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            "Failed to load SRGs?"
+                    );
+                }
             }
 
             try {
@@ -132,7 +140,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                                 "Disabled ReTweak mod candidate \"{file_path}\" because an exception was caught while tweaking!"
                         ).put(
                                 "file_path",
-                                reTweakModCandidate.getFile().getPath()
+                                reTweakModCandidate.getSource().getPath()
                         ).format().toString(),
                         e
                 );
@@ -178,7 +186,15 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
         if (returnClass == null) {
             try {
-                returnClass = super.loadClass(name);
+                //noinspection StringBufferReplaceableByString
+                returnClass = super.loadClass(
+                        new StringBuilder(
+                                "org.slave.minecraft.retweak.loading.tweaks.compilation.interpreter"
+                        ).append(
+                                "."
+                        ).toString(),
+                        false
+                );
             } catch(ClassNotFoundException e) {
                 //Ignore
             }
@@ -262,7 +278,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 if (index == -1) index = jarFile.getName().lastIndexOf('/');
                 if (index != -1) index++;
 
-                if (reTweakModCandidate.getFile().getName().equals(jarFile.getName().substring(index))) {
+                if (reTweakModCandidate.getSource().getName().equals(jarFile.getName().substring(index))) {
                     jarFile.close();
                     return reTweakModCandidate;
                 }

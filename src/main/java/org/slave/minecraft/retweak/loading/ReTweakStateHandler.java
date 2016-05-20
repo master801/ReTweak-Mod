@@ -114,7 +114,7 @@ public final class ReTweakStateHandler {
                     );
                     continue;
                 }
-                ReTweakClassLoader.getInstance().addFile(reTweakModContainer.getReTweakModCandidate().getFile());
+                ReTweakClassLoader.getInstance().addFile(reTweakModContainer.getReTweakModCandidate().getSource());
 
                 //Find mcmod.info for mod
                 try {
@@ -138,7 +138,7 @@ public final class ReTweakStateHandler {
                                     "mcmod.info"
                             ).put(
                                     "file_path",
-                                    reTweakModContainer.getReTweakModCandidate().getFile().getPath()
+                                    reTweakModContainer.getReTweakModCandidate().getSource().getPath()
                             ).format().toString(),
                             e
                     );
@@ -202,7 +202,7 @@ public final class ReTweakStateHandler {
                             ReTweakResources.RETWEAK_LOGGER.warn(
                                     "Mod \"{}\" cannot load due to it not being an actual mod? File path: {}",
                                     reTweakModContainer.getModid(),
-                                    reTweakModContainer.getReTweakModCandidate().getFile().getPath()
+                                    reTweakModContainer.getReTweakModCandidate().getSource().getPath()
                             );
                             return;
                         }
