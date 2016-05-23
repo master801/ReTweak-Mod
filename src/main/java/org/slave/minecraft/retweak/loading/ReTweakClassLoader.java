@@ -22,7 +22,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.jar.JarFile;
 
 /**
@@ -40,26 +40,24 @@ public final class ReTweakClassLoader extends URLClassLoader {
             ReTweakResources.RETWEAK_DIRECTORY,
             "asm"
     );
-
-    /**
-     * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#injectData(java.util.Map)}
-     */
-    private static ReTweakClassLoader instance;
+    private static final HashMap<GameVersion, ReTweakClassLoader> CLASS_LOADERS = new HashMap<>();
 
     private final LaunchClassLoader parent;
-    private EnumMap<GameVersion, ReTweakSRG> srgs;
+    private ReTweakSRG srg;
+    private final GameVersion gameVersion;
 
-    private ReTweakClassLoader(final LaunchClassLoader parent) {
+    private ReTweakClassLoader(final LaunchClassLoader parent, final GameVersion gameVersion) {
         super(
                 new URL[0],
                 parent
         );
         this.parent = parent;
+        this.gameVersion = gameVersion;
     }
 
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        if (srgs == null) {
+        if (srg == null) {
             throw new NullPointerException(
                     Kirai.from(
                             "Method \"{name}\" was not invoked!"
@@ -120,8 +118,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
             //Enable SRG for only JIT
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.JIT) {
-                if (srgs != null) {
-                    srgs.get(reTweakModCandidate.getGameVersion()).srg(classNode);
+                if (srg != null) {
+                    srg.srg(classNode);
                 } else {
                     ReTweakResources.RETWEAK_LOGGER.error(
                             "Failed to load SRGs?"
@@ -186,18 +184,38 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
         if (returnClass == null) {
             try {
-                //noinspection StringBufferReplaceableByString
                 returnClass = super.loadClass(
-                        new StringBuilder(
-                                "org.slave.minecraft.retweak.loading.tweaks.compilation.interpreter"
-                        ).append(
-                                "."
-                        ).toString(),
+                        name,
                         false
                 );
             } catch(ClassNotFoundException e) {
                 //Ignore
             }
+        }
+
+        if (gameVersion.getClasses().contains(name)) {
+            //noinspection StringBufferReplaceableByString
+            returnClass = super.loadClass(
+                    new StringBuffer().append(
+                            getClass().getPackage().getName()
+                    ).append(
+                            '.'
+                    ).append(
+                            "tweaks.compilation.interpreter."
+                    ).append(
+                            '_'
+                    ).append(
+                            gameVersion.getVersion().replace(
+                                    '.',
+                                    '_'
+                            )
+                    ).append(
+                            '.'
+                    ).append(
+                            name
+                    ).toString(),
+                    true
+            );
         }
 
         return returnClass;
@@ -246,22 +264,16 @@ public final class ReTweakClassLoader extends URLClassLoader {
     /**
      * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#call()}
      */
-    private void loadSRGs() {
+    private void loadSRG() {
         Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
-        if (srgs != null && !srgs.isEmpty()) {
+        if (srg != null) {
             ReTweakResources.RETWEAK_LOGGER.error(
                     "Should not have loaded SRGs! This is an unknown error!"
             );
             return;
         }
-        srgs = new EnumMap<>(GameVersion.class);
-        for(GameVersion gameVersion : GameVersion.values()) {
-            srgs.put(
-                    gameVersion,
-                    new ReTweakSRG(gameVersion)
-            );
-        }
+        srg = new ReTweakSRG(gameVersion);
     }
 
     private ReTweakModCandidate findCandidate(final String name) throws IOException {
@@ -287,8 +299,21 @@ public final class ReTweakClassLoader extends URLClassLoader {
         return null;
     }
 
-    static ReTweakClassLoader getInstance() {
-        return ReTweakClassLoader.instance;
+    @SuppressWarnings("FinalStaticMethod")
+    public static final void createClassLoaders(final LaunchClassLoader launchClassLoader) {
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakClassLoader.CLASS_LOADERS.put(
+                    gameVersion,
+                    new ReTweakClassLoader(
+                            launchClassLoader,
+                            gameVersion
+                    )
+            );
+        }
+    }
+
+    public static ReTweakClassLoader getClassLoader(final GameVersion gameVersion) {
+        return ReTweakClassLoader.CLASS_LOADERS.get(gameVersion);
     }
 
 }

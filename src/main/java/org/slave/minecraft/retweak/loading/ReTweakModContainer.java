@@ -205,7 +205,7 @@ public final class ReTweakModContainer {
         Class<?> _modClass = Class.forName(
                 modClass,
                 true,
-                ReTweakClassLoader.getInstance()
+                ReTweakClassLoader.getClassLoader(getReTweakModCandidate().getGameVersion())
         );
 
         for(Method method : _modClass.getDeclaredMethods()) {

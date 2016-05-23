@@ -114,11 +114,12 @@ public final class ReTweakStateHandler {
                     );
                     continue;
                 }
-                ReTweakClassLoader.getInstance().addFile(reTweakModContainer.getReTweakModCandidate().getSource());
+                final ReTweakClassLoader classLoader = ReTweakClassLoader.getClassLoader(gameVersion);
+                classLoader.addFile(reTweakModContainer.getReTweakModCandidate().getSource());
 
                 //Find mcmod.info for mod
                 try {
-                    JarFile jarFile = ReTweakClassLoader.getInstance().findJarFileForCandidate(reTweakModContainer.getReTweakModCandidate());
+                    JarFile jarFile = classLoader.findJarFileForCandidate(reTweakModContainer.getReTweakModCandidate());
                     ZipEntry entry = jarFile.getEntry("mcmod.info");
                     if (entry != null) {
                         InputStream is = jarFile.getInputStream(entry);
@@ -152,7 +153,7 @@ public final class ReTweakStateHandler {
                                         '.'
                                 ),
                                 true,
-                                ReTweakClassLoader.getInstance()
+                                classLoader
                         );
 
                         //Somewhat stolen from FML
@@ -256,7 +257,7 @@ public final class ReTweakStateHandler {
                                     Class<?> proxyClass = Class.forName(
                                             proxyClassName,
                                             true,
-                                            ReTweakClassLoader.getInstance()
+                                            classLoader
                                     );
 
                                     try {

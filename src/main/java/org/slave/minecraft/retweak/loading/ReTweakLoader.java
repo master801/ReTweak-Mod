@@ -140,7 +140,7 @@ public final class ReTweakLoader {
                                 if (subFiles != null && subFiles.length > 0) {
                                     for(File subFile : subFiles) {
                                         if (ReTweakLoader.PATTERN_OGG.matcher(subFile.getName()).matches()) {
-                                            ReTweakClassLoader.getInstance().addFile(subFile);
+                                            ReTweakClassLoader.getClassLoader(gameVersion).addFile(subFile);
                                             if (ReTweakResources.DEBUG) {
                                                 ReTweakResources.RETWEAK_LOGGER.info(
                                                         "Added resource file \"{}\" to the class-loader",

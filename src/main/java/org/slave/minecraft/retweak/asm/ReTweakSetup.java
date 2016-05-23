@@ -5,10 +5,10 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -22,61 +22,22 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        try {
-            ReflectionHelper.setFieldValue(
-                    ReflectionHelper.getField(
-                            ReTweakClassLoader.class,
-                            "instance"
-                    ),
-                    null,
-                    ReflectionHelper.createFromConstructor(
-                            ReflectionHelper.getConstructor(
-                                    ReTweakClassLoader.class,
-                                    new Class<?>[] {
-                                            LaunchClassLoader.class
-                                    }
-                            ),
-                            new Object[] {
-                                    data.get("classloader")
-                            }
-                    )
-            );
-        } catch(NoSuchFieldException | NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to create ReTweak classloader instance! ReTweak mods will not be able to load properly!",
-                    e
-            );
-        }
+        ReTweakClassLoader.createClassLoaders((LaunchClassLoader)data.get("classloader"));
         ReTweakSetup.deobfuscatedEnvironment = !(boolean)data.get("runtimeDeobfuscationEnabled");
     }
 
     @Override
     public Void call() throws Exception {
         if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
-        try {
-            Object instance = ReflectionHelper.invokeMethod(
-                    ReflectionHelper.getMethod(
-                            ReTweakClassLoader.class,
-                            "getInstance",
-                            new Class<?>[0]
-                    ),
-                    null,
-                    new Object[0]
-            );
-
+        for(GameVersion gameVersion : GameVersion.values()) {
             ReflectionHelper.invokeMethod(
                     ReflectionHelper.getMethod(
                             ReTweakClassLoader.class,
-                            "loadSRGs",
+                            "loadSRG",
                             new Class<?>[0]
                     ),
-                    instance,
+                    ReTweakClassLoader.getClassLoader(gameVersion),
                     new Object[0]
-            );
-        } catch(Exception e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to load SRGs!",
-                    e
             );
         }
         ReTweakConfig.INSTANCE.update(true);
