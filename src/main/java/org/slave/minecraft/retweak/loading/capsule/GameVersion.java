@@ -1457,11 +1457,24 @@ public enum GameVersion {
 
     private final String version;
     private final List<String> mcClasses;
+    private final String interpreterPackagePrefix;
     private final boolean hasResources;
 
-    GameVersion(final String string, final List<String> classes, final boolean hasResources) {
-        this.version = string;
+    GameVersion(final String version, final List<String> classes, final boolean hasResources) {
+        this.version = version;
         this.mcClasses = classes;
+        this.interpreterPackagePrefix = getClass().getPackage().getName().substring(
+                0,
+                getClass().getPackage().getName().lastIndexOf('.')
+        ) +
+                "tweaks.compilation.interpreter" +
+                '.' +
+                '_' +
+                version.replace(
+                        '.',
+                        '_'
+                ) +
+                '.';
         this.hasResources = hasResources;
     }
 
@@ -1471,6 +1484,10 @@ public enum GameVersion {
 
     public List<String> getClasses() {
         return mcClasses;
+    }
+
+    public String getInterpreterPackagePrefix() {
+        return interpreterPackagePrefix;
     }
 
     public boolean hasResources() {

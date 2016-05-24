@@ -196,24 +196,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (gameVersion.getClasses().contains(name)) {
             //noinspection StringBufferReplaceableByString
             returnClass = super.loadClass(
-                    new StringBuffer().append(
-                            getClass().getPackage().getName()
-                    ).append(
-                            '.'
-                    ).append(
-                            "tweaks.compilation.interpreter."
-                    ).append(
-                            '_'
-                    ).append(
-                            gameVersion.getVersion().replace(
-                                    '.',
-                                    '_'
-                            )
-                    ).append(
-                            '.'
-                    ).append(
-                            name
-                    ).toString(),
+                    gameVersion.getInterpreterPackagePrefix() + name,
                     true
             );
         }
