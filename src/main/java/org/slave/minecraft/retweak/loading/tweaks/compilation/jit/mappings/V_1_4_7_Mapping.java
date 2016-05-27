@@ -117,11 +117,11 @@ final class V_1_4_7_Mapping extends Mapping {
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
                         Mapping.ANNOTATION_PRE_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_PRE_INIT_DESC.length() - 1
+                                Mapping.ANNOTATION_PRE_INIT_DESC.indexOf('$')
                         ),
                         Mapping.ANNOTATION_PRE_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_PRE_INIT_DESC.indexOf('$')
+                                Mapping.ANNOTATION_PRE_INIT_DESC.length() - 1
                         ),
                         Mapping.ANNOTATION_PRE_INIT_DESC.substring(
                                 Mapping.ANNOTATION_PRE_INIT_DESC.lastIndexOf('$') + 1,
@@ -131,11 +131,11 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.INNER_CLASS,
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
-                        EventHandler.class.getName().replace(
+                        Mod.class.getCanonicalName().replace(
                                 '.',
                                 '/'
                         ),
-                        Mod.class.getCanonicalName().replace(
+                        EventHandler.class.getName().replace(
                                 '.',
                                 '/'
                         ),
@@ -148,11 +148,11 @@ final class V_1_4_7_Mapping extends Mapping {
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
                         Mapping.ANNOTATION_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_INIT_DESC.length() - 1
+                                Mapping.ANNOTATION_INIT_DESC.indexOf('$')
                         ),
                         Mapping.ANNOTATION_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_INIT_DESC.indexOf('$')
+                                Mapping.ANNOTATION_INIT_DESC.length() - 1
                         ),
                         Mapping.ANNOTATION_INIT_DESC.substring(
                                 Mapping.ANNOTATION_INIT_DESC.lastIndexOf('$') + 1,
@@ -162,11 +162,11 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.INNER_CLASS,
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
-                        EventHandler.class.getName().replace(
+                        Mod.class.getCanonicalName().replace(
                                 '.',
                                 '/'
                         ),
-                        Mod.class.getCanonicalName().replace(
+                        EventHandler.class.getName().replace(
                                 '.',
                                 '/'
                         ),
@@ -179,11 +179,11 @@ final class V_1_4_7_Mapping extends Mapping {
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
                         Mapping.ANNOTATION_POST_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_POST_INIT_DESC.length() - 1
+                                Mapping.ANNOTATION_POST_INIT_DESC.indexOf('$')
                         ),
                         Mapping.ANNOTATION_POST_INIT_DESC.substring(
                                 1,
-                                Mapping.ANNOTATION_POST_INIT_DESC.indexOf('$')
+                                Mapping.ANNOTATION_POST_INIT_DESC.length() - 1
                         ),
                         Mapping.ANNOTATION_POST_INIT_DESC.substring(
                                 Mapping.ANNOTATION_POST_INIT_DESC.lastIndexOf('$') + 1,
@@ -193,11 +193,11 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.INNER_CLASS,
                         Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
-                        EventHandler.class.getName().replace(
+                        Mod.class.getCanonicalName().replace(
                                 '.',
                                 '/'
                         ),
-                        Mod.class.getCanonicalName().replace(
+                        EventHandler.class.getName().replace(
                                 '.',
                                 '/'
                         ),
@@ -805,27 +805,27 @@ final class V_1_4_7_Mapping extends Mapping {
                     }
                     innerClassNode.access = getOpcode();
                 }
-                if (!StringHelper.isNullOrEmpty(getName())) {//Outer-name
-                    if (ReTweakResources.DEBUG) {
-                        ReTweakResources.RETWEAK_LOGGER.info(
-                                "Holder - {} -- Set outer-name from \"{}\" to \"{}\"",
-                                getType().name(),
-                                innerClassNode.outerName,
-                                getName()
-                        );
-                    }
-                    innerClassNode.outerName = getName();
-                }
-                if (!StringHelper.isNullOrEmpty(getOwner())) {//Name
+                if (!StringHelper.isNullOrEmpty(getName())) {//Name
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set name from \"{}\" to \"{}\"",
                                 getType().name(),
                                 innerClassNode.name,
+                                getName()
+                        );
+                    }
+                    innerClassNode.name = getName();
+                }
+                if (!StringHelper.isNullOrEmpty(getOwner())) {//Outer-name
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set outer-name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                innerClassNode.outerName,
                                 getOwner()
                         );
                     }
-                    innerClassNode.name = getOwner();
+                    innerClassNode.outerName = getOwner();
                 }
                 if (!StringHelper.isNullOrEmpty(getDesc())) {//Inner-name
                     if (ReTweakResources.DEBUG) {

@@ -22,7 +22,7 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public void injectData(Map<String, Object> data) {
-        ReTweakClassLoader.createClassLoaders((LaunchClassLoader)data.get("classloader"));
+        ReTweakClassLoader.createClassLoaders((LaunchClassLoader)data.get("classLoader"));
         ReTweakSetup.deobfuscatedEnvironment = !(boolean)data.get("runtimeDeobfuscationEnabled");
     }
 

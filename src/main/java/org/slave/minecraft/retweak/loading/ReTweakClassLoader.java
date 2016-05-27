@@ -201,7 +201,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
             }
         }
         if (returnClass == null) {
-            returnClass = super.loadClass(name);
+            returnClass = super.loadClass(
+                    name,
+                    true
+            );
         }
         return returnClass;
     }
@@ -291,6 +294,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @SuppressWarnings("FinalStaticMethod")
     public static final void createClassLoaders(final LaunchClassLoader launchClassLoader) {
+        if (launchClassLoader == null) throw new NullPointerException();
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakClassLoader.CLASS_LOADERS.put(
                     gameVersion,
