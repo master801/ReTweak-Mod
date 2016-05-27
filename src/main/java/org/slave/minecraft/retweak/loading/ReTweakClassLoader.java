@@ -51,8 +51,21 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 new URL[0],
                 parent
         );
+        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         this.parent = parent;
         this.gameVersion = gameVersion;
+
+        if (this.parent == null || super.getParent() == null) {
+            throw new NullPointerException(
+                    Kirai.from(
+                            "Parent class loader \"{parent_class_loader}\" is null!"
+                    ).put(
+                            "parent_class_loader",
+                            LaunchClassLoader.class.getSimpleName()
+                    ).format().toString()
+            );
+        }
     }
 
     @Override
@@ -270,7 +283,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
     }
 
     private ReTweakModCandidate findCandidate(final String name) throws IOException {
-        URL url = super.findResource(name.replace('.', '/') + ".class");
+        URL url = super.findResource(name.replace(
+                '.',
+                '/'
+        ) + ".class");
         if (url == null) return null;
         JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
         JarFile jarFile = jarURLConnection.getJarFile();

@@ -33,7 +33,7 @@ public final class ReTweakConfig {
     private ReTweakConfig() {
         config.put(
                 ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
-                CompilationMode.INTERPRETER.name(),
+                ReTweakResources.DEBUG ? CompilationMode.JIT.name() : CompilationMode.INTERPRETER.name(),
                 "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
         );
     }
@@ -47,9 +47,13 @@ public final class ReTweakConfig {
 
         //TODO
         if (config.hasKey(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE)) {
-            compilationMode = CompilationMode.valueOf((String)config.get(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE));
+            try {
+                compilationMode = CompilationMode.valueOf((String)config.get(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE));
+            } catch(IllegalArgumentException e) {
+                compilationMode = CompilationMode.INTERPRETER;
+            }
         } else {
-            compilationMode = CompilationMode.JIT;
+            compilationMode = CompilationMode.INTERPRETER;
         }
 
         if (!load || !ReTweakConfig.CONFIG_FILE.exists()) {

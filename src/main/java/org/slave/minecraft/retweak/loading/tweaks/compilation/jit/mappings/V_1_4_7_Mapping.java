@@ -109,6 +109,9 @@ final class V_1_4_7_Mapping extends Mapping {
 
         //</editor-fold>
 
+        //<editor-fold desc="CLASS">
+        //</editor-fold>
+
         //<editor-fold desc="INNER CLASS">
         final HashMap<Holder, Holder> innerClassMap = types.get(_Type.INNER_CLASS);
         innerClassMap.put(
@@ -204,6 +207,12 @@ final class V_1_4_7_Mapping extends Mapping {
                         EventHandler.class.getSimpleName()
                 )
         );
+        //</editor-fold>
+
+        //<editor-fold desc="FIELD">
+        //</editor-fold>
+
+        //<editor-fold desc="METHOD">
         //</editor-fold>
 
         //<editor-fold desc="FIELD INSN">
@@ -386,6 +395,62 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
+    protected boolean field(final String className, final FieldNode fieldNode) {
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING FIELD: {} {}",
+                    fieldNode.name,
+                    fieldNode.desc
+            );
+        }
+
+        if (fieldNode.visibleAnnotations != null) {
+            Iterator<AnnotationNode> annotationNodeIterator = fieldNode.visibleAnnotations.iterator();
+            while(annotationNodeIterator.hasNext()) {
+                AnnotationNode annotationNode = annotationNodeIterator.next();
+                Holder[] holders = getHolders(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        annotationNode.desc
+                );
+                if (holders != null) {
+                    for(Holder holder : holders) {
+                        if (holder == null) {//Remove annotation
+                            annotationNodeIterator.remove();
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Removed annotation \"{}\" from field {}",
+                                        annotationNode.desc,
+                                        ASMHelper.toString(fieldNode)
+                                );
+                            }
+                            continue;
+                        }
+                        holder.set(annotationNode);
+                    }
+                }
+            }
+        }
+
+        Holder[] holders = getHolders(
+                _Type.FIELD,
+                -1,
+                null,
+                fieldNode.name,
+                fieldNode.desc
+        );
+        if (!ArrayHelper.isNullOrEmpty(holders)) {
+            for(Holder holder : holders) {
+                if (holder == null) continue;
+                holder.set(fieldNode);
+            }
+        }
+        return false;
+    }
+
+    @Override
     protected boolean method(final String className, final MethodNode methodNode) {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
@@ -439,62 +504,6 @@ final class V_1_4_7_Mapping extends Mapping {
             }
         }
 
-        return false;
-    }
-
-    @Override
-    protected boolean field(final String className, final FieldNode fieldNode) {
-        if (ReTweakResources.DEBUG) {
-            ReTweakResources.RETWEAK_LOGGER.info(
-                    "MAPPING FIELD: {} {}",
-                    fieldNode.name,
-                    fieldNode.desc
-            );
-        }
-
-        if (fieldNode.visibleAnnotations != null) {
-            Iterator<AnnotationNode> annotationNodeIterator = fieldNode.visibleAnnotations.iterator();
-            while(annotationNodeIterator.hasNext()) {
-                AnnotationNode annotationNode = annotationNodeIterator.next();
-                Holder[] holders = getHolders(
-                        _Type.ANNOTATION,
-                        -1,
-                        null,
-                        null,
-                        annotationNode.desc
-                );
-                if (holders != null) {
-                    for(Holder holder : holders) {
-                        if (holder == null) {//Remove annotation
-                            annotationNodeIterator.remove();
-                            if (ReTweakResources.DEBUG) {
-                                ReTweakResources.RETWEAK_LOGGER.info(
-                                        "Removed annotation \"{}\" from field {}",
-                                        annotationNode.desc,
-                                        ASMHelper.toString(fieldNode)
-                                );
-                            }
-                            continue;
-                        }
-                        holder.set(annotationNode);
-                    }
-                }
-            }
-        }
-
-        Holder[] holders = getHolders(
-                _Type.FIELD,
-                -1,
-                null,
-                fieldNode.name,
-                fieldNode.desc
-        );
-        if (!ArrayHelper.isNullOrEmpty(holders)) {
-            for(Holder holder : holders) {
-                if (holder == null) continue;
-                holder.set(fieldNode);
-            }
-        }
         return false;
     }
 
@@ -624,6 +633,58 @@ final class V_1_4_7_Mapping extends Mapping {
         );
         if (holders != null) {
             for(Holder holder : holders) holder.set(methodInsnNode);
+        }
+        if (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC) {
+            if (methodInsnNode.owner.equals("cpw/mods/fml/common/registry/GameRegistry")) {
+                if (methodInsnNode.name.equals("addSmelting") && methodInsnNode.desc.equals("(ILnet/minecraft/item/ItemStack;F)V")) {
+                    if (methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious() instanceof FieldInsnNode) {
+                        FieldInsnNode fieldInsnNode = (FieldInsnNode)methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious();
+                        if (fieldInsnNode.desc.equals("L" + "net/minecraft/item/Item" + ";")) {
+                            final String originalDesc = methodInsnNode.desc;
+                            methodInsnNode.desc =
+                                    "(" +
+                                            ("L" + "net/minecraft/item/Item" + ";") +
+                                            "Lnet/minecraft/item/ItemStack;F)V";
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                        ASMHelper.toString(methodInsnNode),
+                                        originalDesc,
+                                        methodInsnNode.desc
+                                );
+                            }
+                        } else if (fieldInsnNode.desc.equals("L" + "net/minecraft/block/Block" + ";")) {
+                            final String originalDesc = methodInsnNode.desc;
+                            methodInsnNode.desc =
+                                    "(" +
+                                            ("L" + "net/minecraft/block/Block" + ";") +
+                                            "Lnet/minecraft/item/ItemStack;F)V";
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                        ASMHelper.toString(methodInsnNode),
+                                        originalDesc,
+                                        methodInsnNode.desc
+                                );
+                            }
+                        } else if (fieldInsnNode.desc.equals("L" + "net/minecraft/item/ItemStack" + ";")) {
+                            final String originalDesc = methodInsnNode.desc;
+                            methodInsnNode.desc =
+                                    "(" +
+                                            ("L" + "net/minecraft/item/ItemStack" + ";") +
+                                            "Lnet/minecraft/item/ItemStack;F)V";
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                        ASMHelper.toString(methodInsnNode),
+                                        originalDesc,
+                                        methodInsnNode.desc
+                                );
+                            }
+                        }
+                    }
+                }
+            }
         }
         return false;
     }

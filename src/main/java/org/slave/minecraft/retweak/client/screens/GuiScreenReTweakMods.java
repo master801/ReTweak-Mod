@@ -5,13 +5,10 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.slave.minecraft.library.client.texture.ColoredTexture;
-import org.slave.minecraft.library.helpers.TextureHelper;
-
-import java.awt.Color;
+import org.slave.minecraft.retweak.resources.ReTweakStrings;
 
 /**
  * Created by Master on 5/15/2016 at 10:05 AM.
@@ -22,12 +19,16 @@ import java.awt.Color;
 @SuppressWarnings({ "unchecked", "RedundantArrayCreation" })
 public final class GuiScreenReTweakMods extends GuiScreen {
 
-    private static final Color BACKGROUND_COLOR = new Color(0xFDD2D9);
-    private static final Color BORDER_COLOR = new Color(0xF795A6);
-    private static final int BORDER_THICKNESS = 5;
+    private static final ResourceLocation RESOURCE_LOCATION_RETWEAK_MODS_BACKGROUND = new ResourceLocation(
+            ReTweakStrings.RETWEAK_MOD.toLowerCase(),
+            ReTweakStrings.RETWEAK_TEXTURES_GUI_RETWEAK_MODS + "Background.png"
+    );
+    private static final ResourceLocation RESOURCE_LOCATION_RETWEAK_MODS_BORDER = new ResourceLocation(
+            ReTweakStrings.RETWEAK_MOD.toLowerCase(),
+            ReTweakStrings.RETWEAK_TEXTURES_GUI_RETWEAK_MODS + "Border.png"
+    );
 
     private final GuiScreen parentScreen;
-    private AbstractTexture backgroundTexture;
 
     public GuiScreenReTweakMods(final GuiScreen parentScreen) {
         this.parentScreen = parentScreen;
@@ -68,11 +69,6 @@ public final class GuiScreenReTweakMods extends GuiScreen {
         done.xPosition = (width / 2) - (done.width / 2);
         done.yPosition = height - (20 + 12);
         buttonList.add(done);
-        backgroundTexture = new ColoredTexture(
-                width,
-                height,
-                GuiScreenReTweakMods.BACKGROUND_COLOR
-        );
         //TODO Add mods
         super.initGui();
     }
@@ -89,10 +85,7 @@ public final class GuiScreenReTweakMods extends GuiScreen {
     }
 
     private void drawBackground() {
-        //Bind texture
-        TextureHelper.bindTexture(backgroundTexture);
-
-        //Render texture
+        mc.getTextureManager().bindTexture(GuiScreenReTweakMods.RESOURCE_LOCATION_RETWEAK_MODS_BACKGROUND);
         super.drawTexturedModalRect(
                 0,
                 0,
@@ -104,37 +97,42 @@ public final class GuiScreenReTweakMods extends GuiScreen {
     }
 
     private void drawForeground() {
-        Tessellator.instance.startDrawing(GL11.GL_LINE_LOOP);
-        GL11.glLineWidth(GuiScreenReTweakMods.BORDER_THICKNESS);
-        Tessellator.instance.setColorRGBA(
-                GuiScreenReTweakMods.BORDER_COLOR.getRed(),
-                GuiScreenReTweakMods.BORDER_COLOR.getGreen(),
-                GuiScreenReTweakMods.BORDER_COLOR.getBlue(),
-                GuiScreenReTweakMods.BORDER_COLOR.getAlpha()
-        );
-        Tessellator.instance.addVertex(
-                0.0D,
-                0.0D,
-                0.0D
-        );
-        Tessellator.instance.addVertex(
-                width,
-                0.0D,
-                0.0D
-        );
-        Tessellator.instance.addVertex(
-                width,
-                height,
-                0.0D
-        );
-        Tessellator.instance.addVertex(
-                0.0D,
-                height,
-                0.0D
-        );
-        Tessellator.instance.draw();
+        mc.getTextureManager().bindTexture(GuiScreenReTweakMods.RESOURCE_LOCATION_RETWEAK_MODS_BORDER);
+        final Tessellator tessellator = Tessellator.instance;
 
-        //TODO WTF fullscreen?
+        tessellator.startDrawingQuads();
+        //Draw bottom-left corner
+        tessellator.addVertex(
+                0.0D,
+                (double)height,
+                0.0D
+        );
+
+        //Draw bottom-right corner
+        tessellator.addVertex(
+                (double)width,
+                (double)height,
+                0.0D
+        );
+
+        //Draw top-right corner
+        tessellator.addVertex(
+                (double)width,
+                0.0D,
+                0.0D
+        );
+
+        //Draw top-left corner
+        tessellator.addVertex(
+                0.0D,
+                0.0D,
+                0.0D
+        );
+        tessellator.setTextureUV(
+                0.0D,
+                0.0D
+        );
+        tessellator.draw();
     }
 
 }

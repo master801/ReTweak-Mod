@@ -11,3 +11,6 @@
 
 #Gradle
 /.gradle
+
+#Garbage
+Thumbs.db
