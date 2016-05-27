@@ -42,8 +42,8 @@ jar {
 
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['sl4j-version']
-    compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
+    compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
 
     compile fileTree(
             dir: 'libs',

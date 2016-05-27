@@ -62,11 +62,11 @@ public final class DeSeargeTweak implements Tweak {
                                             ASMHelper.toString(methodNode),
                                             i,
                                             classNode.name,
-                                            fieldInsnNode,
+                                            fieldInsnNode.name,
                                             entry[3]
                                     );
-                                    fieldInsnNode.name = entry[3];
                                 }
+                                fieldInsnNode.name = entry[3];
                             } else {
                                 ReTweakResources.RETWEAK_LOGGER.warn(
                                         "Found no entry for field insn \"{}\" at index {}, from method \"{}\", from class \"{}\"!",

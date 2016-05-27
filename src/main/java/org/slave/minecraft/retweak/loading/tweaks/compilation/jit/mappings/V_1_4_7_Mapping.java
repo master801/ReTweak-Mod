@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings;
 
 import com.github.pwittchen.kirai.library.Kirai;
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -8,10 +9,12 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InnerClassNode;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
+import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -37,11 +40,176 @@ final class V_1_4_7_Mapping extends Mapping {
             );
         }
 
+        //<editor-fold desc="ANNOTATION">
+        final HashMap<Holder, Holder> annotationMap = types.get(_Type.ANNOTATION);
+
+        //<editor-fold desc="CLASS">
+        annotationMap.put(
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Mapping.ANNOTATION_NETWORK_MOD_DESC
+                ),
+                null
+        );
+        //</editor-fold>
+
+        //<editor-fold desc="METHOD">
+        annotationMap.put(
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Mapping.ANNOTATION_PRE_INIT_DESC
+                ),
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Type.getDescriptor(EventHandler.class)
+                )
+        );
+        annotationMap.put(
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Mapping.ANNOTATION_INIT_DESC
+                ),
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Type.getDescriptor(EventHandler.class)
+                )
+        );
+        annotationMap.put(
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Mapping.ANNOTATION_POST_INIT_DESC
+                ),
+                new Holder(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        Type.getDescriptor(EventHandler.class)
+                )
+        );
+        //</editor-fold>
+
+        //</editor-fold>
+
+        //<editor-fold desc="INNER CLASS">
+        final HashMap<Holder, Holder> innerClassMap = types.get(_Type.INNER_CLASS);
+        innerClassMap.put(
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        Mapping.ANNOTATION_PRE_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_PRE_INIT_DESC.length() - 1
+                        ),
+                        Mapping.ANNOTATION_PRE_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_PRE_INIT_DESC.indexOf('$')
+                        ),
+                        Mapping.ANNOTATION_PRE_INIT_DESC.substring(
+                                Mapping.ANNOTATION_PRE_INIT_DESC.lastIndexOf('$') + 1,
+                                Mapping.ANNOTATION_PRE_INIT_DESC.length() - 1
+                        )
+                ),
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        EventHandler.class.getName().replace(
+                                '.',
+                                '/'
+                        ),
+                        Mod.class.getCanonicalName().replace(
+                                '.',
+                                '/'
+                        ),
+                        EventHandler.class.getSimpleName()
+                )
+        );
+        innerClassMap.put(
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        Mapping.ANNOTATION_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_INIT_DESC.length() - 1
+                        ),
+                        Mapping.ANNOTATION_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_INIT_DESC.indexOf('$')
+                        ),
+                        Mapping.ANNOTATION_INIT_DESC.substring(
+                                Mapping.ANNOTATION_INIT_DESC.lastIndexOf('$') + 1,
+                                Mapping.ANNOTATION_INIT_DESC.length() - 1
+                        )
+                ),
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        EventHandler.class.getName().replace(
+                                '.',
+                                '/'
+                        ),
+                        Mod.class.getCanonicalName().replace(
+                                '.',
+                                '/'
+                        ),
+                        EventHandler.class.getSimpleName()
+                )
+        );
+        innerClassMap.put(
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        Mapping.ANNOTATION_POST_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_POST_INIT_DESC.length() - 1
+                        ),
+                        Mapping.ANNOTATION_POST_INIT_DESC.substring(
+                                1,
+                                Mapping.ANNOTATION_POST_INIT_DESC.indexOf('$')
+                        ),
+                        Mapping.ANNOTATION_POST_INIT_DESC.substring(
+                                Mapping.ANNOTATION_POST_INIT_DESC.lastIndexOf('$') + 1,
+                                Mapping.ANNOTATION_POST_INIT_DESC.length() - 1
+                        )
+                ),
+                new Holder(
+                        _Type.INNER_CLASS,
+                        Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_ANNOTATION + Opcodes.ACC_ABSTRACT + Opcodes.ACC_INTERFACE,
+                        EventHandler.class.getName().replace(
+                                '.',
+                                '/'
+                        ),
+                        Mod.class.getCanonicalName().replace(
+                                '.',
+                                '/'
+                        ),
+                        EventHandler.class.getSimpleName()
+                )
+        );
+        //</editor-fold>
 
         //<editor-fold desc="FIELD INSN">
-
+        final HashMap<Holder, Holder> fieldInsnMap = types.get(_Type.FIELD_INSN);
         //<editor-fold desc="ITEMS">
-        types.get(_Type.FIELD_INSN).put(
+        fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
@@ -57,7 +225,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
-        types.get(_Type.FIELD_INSN).put(
+        fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
@@ -73,7 +241,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
-        types.get(_Type.FIELD_INSN).put(
+        fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
@@ -112,7 +280,8 @@ final class V_1_4_7_Mapping extends Mapping {
         //</editor-fold>
 
         //<editor-fold desc="METHOD INSN">
-        types.get(_Type.METHOD_INSN).put(
+        final HashMap<Holder, Holder> methodInsnMap = types.get(_Type.METHOD_INSN);
+        methodInsnMap.put(
                 new Holder(
                         _Type.METHOD_INSN,
                         -1,
@@ -133,22 +302,84 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean _class(final String className, final ClassNode classNode) {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING CLASS: {} {}", classNode.name, classNode.superName);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING CLASS: {} {}",
+                    classNode.name,
+                    classNode.superName
+            );
+        }
         if (classNode.visibleAnnotations != null) {
             Iterator<AnnotationNode> annotationNodeIterator = classNode.visibleAnnotations.iterator();
             while(annotationNodeIterator.hasNext()) {
                 AnnotationNode annotationNode = annotationNodeIterator.next();
-                if (annotationNode.desc.equals(Mapping.ANNOTATION_NETWORK_MOD_DESC)) {
-                    //TODO We should really do something else with the networkmod annotation than remove it...
-                    annotationNodeIterator.remove();
-                    if (ReTweakResources.DEBUG) {
-                        ReTweakResources.RETWEAK_LOGGER.info(
-                                "Removed annotation \"{}\" from class {}",
-                                annotationNode.desc,
-                                classNode.name
-                        );
+                Holder[] holders = getHolders(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        annotationNode.desc
+                );
+                if (!ArrayHelper.isNullOrEmpty(holders)) {
+                    for(Holder holder : holders) {
+                        if (holder == null) {//Remove annotation
+                            annotationNodeIterator.remove();
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Removed annotation \"{}\" from class {}",
+                                        annotationNode.desc,
+                                        classNode.name
+                                );
+                            }
+                            continue;
+                        }
+                        holder.set(annotationNode);
                     }
                 }
+            }
+        }
+        if (classNode.innerClasses != null) {
+            Iterator<InnerClassNode> innerClassNodeIterator = classNode.innerClasses.iterator();
+            while(innerClassNodeIterator.hasNext()) {
+                InnerClassNode innerClassNode = innerClassNodeIterator.next();
+                Holder[] holders = getHolders(
+                        _Type.INNER_CLASS,
+                        innerClassNode.access,
+                        innerClassNode.outerName,
+                        innerClassNode.name,
+                        innerClassNode.innerName
+                );
+                if (holders != null) {
+                    for(Holder holder : holders) {
+                        if (holder == null) {
+                            innerClassNodeIterator.remove();
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Removed inner-class \"{}\" from class {}",
+                                        innerClassNode.name,
+                                        classNode.name
+                                );
+                            }
+                            continue;
+                        }
+                        holder.set(innerClassNode);
+                    }
+                }
+                //TODO
+            }
+        }
+
+        Holder[] holders = getHolders(
+                _Type.CLASS,
+                -1,
+                null,
+                classNode.name,
+                null
+        );
+        if (!ArrayHelper.isNullOrEmpty(holders)) {
+            for(Holder holder : holders) {
+                if (holder == null) continue;
+                holder.set(classNode);
             }
         }
         return false;
@@ -156,22 +387,55 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean method(final String className, final MethodNode methodNode) {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD: {}{}", methodNode.name, methodNode.desc);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING METHOD: {}{}",
+                    methodNode.name,
+                    methodNode.desc
+            );
+        }
 
         if (methodNode.visibleAnnotations != null) {
-            for(AnnotationNode annotationNode : methodNode.visibleAnnotations) {
-                if (annotationNode.desc.equals(Mapping.ANNOTATION_PRE_INIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_INIT_DESC) || annotationNode.desc.equals(Mapping.ANNOTATION_POST_INIT_DESC)) {
-                    String previousDesc = annotationNode.desc;
-                    annotationNode.desc = Type.getDescriptor(EventHandler.class);
-                    if (ReTweakResources.DEBUG) {
-                        ReTweakResources.RETWEAK_LOGGER.info(
-                                "Remapped annotation desc from \"{}\" to \"{}\"",
-                                previousDesc,
-                                annotationNode.desc
-                        );
+            Iterator<AnnotationNode> annotationNodeIterator = methodNode.visibleAnnotations.iterator();
+            while(annotationNodeIterator.hasNext()) {
+                AnnotationNode annotationNode = annotationNodeIterator.next();
+                Holder[] holders = getHolders(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        annotationNode.desc
+                );
+                if (!ArrayHelper.isNullOrEmpty(holders)) {
+                    for(Holder holder : holders) {
+                        if (holder == null) {
+                            annotationNodeIterator.remove();
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Removed annotation \"{}\" from method {}",
+                                        annotationNode.desc,
+                                        ASMHelper.toString(methodNode)
+                                );
+                            }
+                            continue;
+                        }
+                        holder.set(annotationNode);
                     }
-                    break;
                 }
+            }
+        }
+
+        Holder[] holders = getHolders(
+                _Type.METHOD,
+                -1,
+                null,
+                methodNode.name,
+                methodNode.desc
+        );
+        if (!ArrayHelper.isNullOrEmpty(holders)) {
+            for(Holder holder : holders) {
+                if (holder == null) continue;
+                holder.set(methodNode);
             }
         }
 
@@ -180,14 +444,83 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean field(final String className, final FieldNode fieldNode) {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING FIELD: {} {}", fieldNode.name, fieldNode.desc);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING FIELD: {} {}",
+                    fieldNode.name,
+                    fieldNode.desc
+            );
+        }
 
+        if (fieldNode.visibleAnnotations != null) {
+            Iterator<AnnotationNode> annotationNodeIterator = fieldNode.visibleAnnotations.iterator();
+            while(annotationNodeIterator.hasNext()) {
+                AnnotationNode annotationNode = annotationNodeIterator.next();
+                Holder[] holders = getHolders(
+                        _Type.ANNOTATION,
+                        -1,
+                        null,
+                        null,
+                        annotationNode.desc
+                );
+                if (holders != null) {
+                    for(Holder holder : holders) {
+                        if (holder == null) {//Remove annotation
+                            annotationNodeIterator.remove();
+                            if (ReTweakResources.DEBUG) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Removed annotation \"{}\" from field {}",
+                                        annotationNode.desc,
+                                        ASMHelper.toString(fieldNode)
+                                );
+                            }
+                            continue;
+                        }
+                        holder.set(annotationNode);
+                    }
+                }
+            }
+        }
+
+        Holder[] holders = getHolders(
+                _Type.FIELD,
+                -1,
+                null,
+                fieldNode.name,
+                fieldNode.desc
+        );
+        if (!ArrayHelper.isNullOrEmpty(holders)) {
+            for(Holder holder : holders) {
+                if (holder == null) continue;
+                holder.set(fieldNode);
+            }
+        }
         return false;
     }
 
     @Override
     protected boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode) {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING FIELD INSN: {}/{} {}", fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING FIELD INSN: {}/{} {}",
+                    fieldInsnNode.owner,
+                    fieldInsnNode.name,
+                    fieldInsnNode.desc
+            );
+        }
+
+        //<editor-fold desc="Unsupported fields">
+        String[][] fields = new String[0][];//No fields are yet unsupported...
+        for(String[] field : fields) {
+            if (ArrayHelper.isNullOrEmpty(field)) continue;
+            checkFieldInsn(
+                    field[0],
+                    field[1],
+                    field[2],
+                    fieldInsnNode
+            );
+        }
+        //</editor-fold>
 
         Holder[] holders = getHolders(
                 _Type.FIELD_INSN,
@@ -226,16 +559,22 @@ final class V_1_4_7_Mapping extends Mapping {
                 return true;//Remove item id instruction
             }
         }
-
         return false;
     }
 
     @Override
     protected boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode) {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING METHOD INSN: {}/{}{}", methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "MAPPING METHOD INSN: {}/{}{}",
+                    methodInsnNode.owner,
+                    methodInsnNode.name,
+                    methodInsnNode.desc
+            );
+        }
 
         //<editor-fold desc="Unsupported method invokes">
-        if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL) {
+        if (ASMHelper.isInvokeOpcode(methodInsnNode.getOpcode())) {
             String[][] methods = new String[][] {
                     new String[] {
                             "cpw/mods/fml/common/event/FMLPreInitializationEvent",
@@ -265,6 +604,7 @@ final class V_1_4_7_Mapping extends Mapping {
             };
 
             for(String[] method : methods) {
+                if (ArrayHelper.isNullOrEmpty(method)) continue;
                 checkMethodInsn(
                         method[0],
                         method[1],
@@ -312,11 +652,35 @@ final class V_1_4_7_Mapping extends Mapping {
         }
     }
 
+    private void checkFieldInsn(final String owner, final String name, final String desc, final FieldInsnNode fieldInsnNode) {
+        if (fieldInsnNode.owner.equals(owner) && fieldInsnNode.name.equals(name) && fieldInsnNode.desc.equals(desc)) {
+            throw new UnsupportedOperationException(
+                    Kirai.from(
+                            "Mod cannot get or set field \"{class}/{name}{desc}\"!"
+                    ).put(
+                            "class",
+                            fieldInsnNode.owner
+                    ).put(
+                            "name",
+                            fieldInsnNode.name
+                    ).put(
+                            "desc",
+                            fieldInsnNode.desc
+                    ).format().toString()
+            );
+        }
+    }
+
     private Holder[] getHolders(final _Type type, final int opcode, final String owner, final String name, final String desc) {
-        if (type == null || (StringHelper.isNullOrEmpty(owner) && type != _Type.CLASS) || (StringHelper.isNullOrEmpty(desc) && type != _Type.CLASS)) return null;
+        if (type == null || (StringHelper.isNullOrEmpty(owner) && (type != _Type.CLASS && type != _Type.ANNOTATION)) || (StringHelper.isNullOrEmpty(desc) && (type != _Type.CLASS && type != _Type.ANNOTATION))) return null;
         List<Holder> holders = new ArrayList<>();
         for(Holder holder : types.get(type).keySet()) {
             switch(type) {
+                case ANNOTATION:
+                    if ((holder.getOpcode() == -1 && opcode == -1) && (StringHelper.isNullOrEmpty(holder.getOwner()) && StringHelper.isNullOrEmpty(owner)) && (StringHelper.isNullOrEmpty(holder.getName()) && StringHelper.isNullOrEmpty(name)) && (!StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc))) {
+                        holders.add(types.get(type).get(holder));
+                    }
+                    break;
                 case CLASS:
                     if (holder.getName().equals(name)) {
                         return new Holder[] {
@@ -324,13 +688,22 @@ final class V_1_4_7_Mapping extends Mapping {
                         };
                     }
                     break;
+                case INNER_CLASS:
+                    if (holder.getOpcode() == opcode && (!StringHelper.isNullOrEmpty(holder.getOwner()) && holder.getOwner().equals(owner)) && (!StringHelper.isNullOrEmpty(holder.getName()) && holder.getName().equals(name)) && (!StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc))) {
+                        holders.add(types.get(type).get(holder));
+                    }
+                    break;
                 case FIELD:
                 case METHOD:
-                    if ((opcode == -1 || holder.getOpcode() == opcode) && (name == null || holder.getName().equals(name)) && holder.getDesc().equals(desc)) holders.add(types.get(type).get(holder));
+                    if ((opcode == -1 || holder.getOpcode() == opcode) && (name == null || holder.getName().equals(name)) && holder.getDesc().equals(desc)) {
+                        holders.add(types.get(type).get(holder));
+                    }
                     break;
                 case FIELD_INSN:
                 case METHOD_INSN:
-                        if ((holder.getOwner() == null || owner.equals(holder.getOwner())) && ((opcode == -1 || holder.getOpcode() == -1) || holder.getOpcode() == opcode) && ((name == null || holder.getName() == null) || name.equals(holder.getName())) && desc.equals(holder.getDesc())) holders.add(types.get(type).get(holder));
+                        if ((holder.getOwner() == null || owner.equals(holder.getOwner())) && ((opcode == -1 || holder.getOpcode() == -1) || holder.getOpcode() == opcode) && ((name == null || holder.getName() == null) || name.equals(holder.getName())) && desc.equals(holder.getDesc())) {
+                            holders.add(types.get(type).get(holder));
+                        }
                     break;
             }
         }
@@ -339,7 +712,11 @@ final class V_1_4_7_Mapping extends Mapping {
 
     private enum _Type {
 
+        ANNOTATION,
+
         CLASS,
+
+        INNER_CLASS,
 
         FIELD,
 
@@ -392,15 +769,75 @@ final class V_1_4_7_Mapping extends Mapping {
         public boolean equals(final Object obj) {
             if (obj instanceof Holder) {
                 Holder holder = (Holder)obj;
-                return holder.getType() == getType() && (holder.getOpcode() == getOpcode()) && holder.getOwner().equals(getOwner()) && (getType() == _Type.FIELD_INSN || holder.getName().equals(getName())) && holder.getDesc().equals(getDesc());
+                if (holder.getType() != getType()) return false;
+                return (holder.getOpcode() == getOpcode()) && holder.getOwner().equals(getOwner()) && (getType() == _Type.FIELD_INSN || holder.getName().equals(getName())) && holder.getDesc().equals(getDesc());
             }
             return super.equals(obj);
         }
 
         public void set(final Object object) {
-            if (getType() == _Type.CLASS && object instanceof ClassNode) {
+            if (getType() == _Type.ANNOTATION && object instanceof AnnotationNode) {
+                AnnotationNode annotationNode = (AnnotationNode)object;
+                if (!StringHelper.isNullOrEmpty(getDesc())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set op code from {} to {}",
+                                getType().name(),
+                                annotationNode.desc,
+                                getDesc()
+                        );
+                    }
+                    annotationNode.desc = getDesc();
+                }
+            } else if (getType() == _Type.CLASS && object instanceof ClassNode) {
                 ClassNode classNode = (ClassNode)object;
                 //TODO
+            } else if (getType() == _Type.INNER_CLASS && object instanceof InnerClassNode) {
+                InnerClassNode innerClassNode = (InnerClassNode)object;
+                if (getOpcode() != -1) {//Access
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set access from {} to {}",
+                                getType().name(),
+                                innerClassNode.access,
+                                getOpcode()
+                        );
+                    }
+                    innerClassNode.access = getOpcode();
+                }
+                if (!StringHelper.isNullOrEmpty(getName())) {//Outer-name
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set outer-name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                innerClassNode.outerName,
+                                getName()
+                        );
+                    }
+                    innerClassNode.outerName = getName();
+                }
+                if (!StringHelper.isNullOrEmpty(getOwner())) {//Name
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                innerClassNode.name,
+                                getOwner()
+                        );
+                    }
+                    innerClassNode.name = getOwner();
+                }
+                if (!StringHelper.isNullOrEmpty(getDesc())) {//Inner-name
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set inner-name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                innerClassNode.innerName,
+                                getDesc()
+                        );
+                    }
+                    innerClassNode.innerName = getDesc();
+                }
             } else if (getType() == _Type.FIELD && object instanceof FieldNode) {
                 FieldNode fieldNode = (FieldNode)object;
                 //TODO
@@ -409,16 +846,100 @@ final class V_1_4_7_Mapping extends Mapping {
                 //TODO
             } else if (getType() == _Type.FIELD_INSN && object instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode)object;
-                if (getOpcode() != -1) fieldInsnNode.setOpcode(getOpcode());
-                if (!StringHelper.isNullOrEmpty(getOwner())) fieldInsnNode.owner = getOwner();
-                if (!StringHelper.isNullOrEmpty(getName())) fieldInsnNode.name = getName();
-                if (!StringHelper.isNullOrEmpty(getDesc())) fieldInsnNode.desc = getDesc();
+                if (getOpcode() != -1) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set op code from {} to {}",
+                                getType().name(),
+                                fieldInsnNode.getOpcode(),
+                                getOpcode()
+                        );
+                    }
+                    fieldInsnNode.setOpcode(getOpcode());
+                }
+                if (!StringHelper.isNullOrEmpty(getOwner())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set owner from \"{}\" to \"{}\"",
+                                getType().name(),
+                                fieldInsnNode.owner,
+                                getOwner()
+                        );
+                    }
+                    fieldInsnNode.owner = getOwner();
+                }
+                if (!StringHelper.isNullOrEmpty(getName())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                fieldInsnNode.name,
+                                getName()
+                        );
+                    }
+                    fieldInsnNode.name = getName();
+                }
+                if (!StringHelper.isNullOrEmpty(getDesc())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set desc from \"{}\" to \"{}\"",
+                                getType().name(),
+                                fieldInsnNode.desc,
+                                getDesc()
+                        );
+                    }
+                    fieldInsnNode.desc = getDesc();
+                }
             } else if (getType() == _Type.METHOD_INSN && object instanceof MethodInsnNode) {
                 MethodInsnNode methodInsnNode = (MethodInsnNode)object;
-                if (getOpcode() != -1) methodInsnNode.setOpcode(getOpcode());
-                if (!StringHelper.isNullOrEmpty(getOwner())) methodInsnNode.owner = getOwner();
-                if (!StringHelper.isNullOrEmpty(getName())) methodInsnNode.name = getName();
-                if (!StringHelper.isNullOrEmpty(getDesc())) methodInsnNode.desc = getDesc();
+                if (getOpcode() != -1) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set owner from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodInsnNode.owner,
+                                getOwner()
+                        );
+                    }
+                    methodInsnNode.setOpcode(getOpcode());
+                }
+                if (!StringHelper.isNullOrEmpty(getOwner())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set owner from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodInsnNode.owner,
+                                getOwner()
+                        );
+                    }
+                    methodInsnNode.owner = getOwner();
+                }
+                if (!StringHelper.isNullOrEmpty(getName())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodInsnNode.name,
+                                getName()
+                        );
+                    }
+                    methodInsnNode.name = getName();
+                }
+                if (!StringHelper.isNullOrEmpty(getDesc())) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set desc from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodInsnNode.owner,
+                                getDesc()
+                        );
+                    }
+                    methodInsnNode.desc = getDesc();
+                }
+            } else {
+                throw new UnsupportedOperationException(
+                        getType().name()
+                );
             }
         }
 

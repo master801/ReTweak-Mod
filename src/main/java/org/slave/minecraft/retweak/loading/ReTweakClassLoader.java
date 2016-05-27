@@ -67,7 +67,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     ).format().toString()
             );
         }
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("LOAD: {}", name);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "LOAD: {}",
+                    name
+            );
+        }
         if (name.startsWith("net.minecraft.")) {
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER) {
                 throw new IllegalStateException(
@@ -80,7 +85,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 );
             }
             String newName = name;
-            if (!ReTweakSetup.isDeobfuscatedEnvironment()) throw new IllegalStateException("Non-deobfuscated environments are not yet supported!");
+            if (!ReTweakSetup.isDeobfuscatedEnvironment()) {
+                throw new IllegalStateException(
+                        "Non-deobfuscated environments are not yet supported!"
+                );
+            }
             return parent.loadClass(newName);
         } else if (name.startsWith("java")) {
             return super.loadClass(
@@ -182,31 +191,29 @@ public final class ReTweakClassLoader extends URLClassLoader {
             //Ignore
         }
 
+        //Load only when in interpreter mode
         if (returnClass == null) {
-            try {
+            if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER && gameVersion.getClasses().contains(name)) {
                 returnClass = super.loadClass(
-                        name,
-                        false
+                        gameVersion.getInterpreterPackagePrefix() + name,
+                        true
                 );
-            } catch(ClassNotFoundException e) {
-                //Ignore
             }
         }
-
-        if (gameVersion.getClasses().contains(name)) {
-            //noinspection StringBufferReplaceableByString
-            returnClass = super.loadClass(
-                    gameVersion.getInterpreterPackagePrefix() + name,
-                    true
-            );
+        if (returnClass == null) {
+            returnClass = super.loadClass(name);
         }
-
         return returnClass;
     }
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("FIND: {}", name);
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.info(
+                    "FIND: {}",
+                    name
+            );
+        }
         return super.findClass(name);
     }
 
