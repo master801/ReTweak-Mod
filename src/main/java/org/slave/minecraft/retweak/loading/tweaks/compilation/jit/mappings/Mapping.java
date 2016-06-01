@@ -4,8 +4,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 /**
@@ -26,58 +28,76 @@ public abstract class Mapping {
 
     protected abstract boolean method(final String className, final MethodNode methodNode);
 
+    protected abstract void postMethodNode(final String className, final int index, final MethodNode methodNode);
+
     protected abstract boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode);
 
     protected abstract boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode);
 
     protected abstract boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode);
 
-    /**
-     * @param node {@link org.objectweb.asm.tree.MethodNode} {@link org.objectweb.asm.tree.MethodInsnNode} {@link org.objectweb.asm.tree.FieldNode} {@link org.objectweb.asm.tree.FieldInsnNode}
-     */
+    protected abstract boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode);
+
     @SuppressWarnings("ConstantConditions")
     public final boolean remap(final String className, final Object node, final int index) {
-        if (!(node instanceof ClassNode) && !(node instanceof MethodNode) && !(node instanceof MethodInsnNode) && !(node instanceof FieldNode) && !(node instanceof FieldInsnNode)) return false;
-        boolean remove;
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
-        if (node instanceof ClassNode) {
-            remove = _class(
-                    className,
-                    (ClassNode)node
-            );
-        } else if (node instanceof MethodNode) {
-            remove = method(
-                    className,
-                    (MethodNode)node
-            );
-        } else if (node instanceof MethodInsnNode) {
-            remove = methodInsn(
-                    className,
-                    index,
-                    (MethodInsnNode)node
-            );
-        } else if (node instanceof FieldNode) {
-            remove = field(
-                    className,
-                    (FieldNode)node
-            );
-        } else if (node instanceof FieldInsnNode) {
-            remove = fieldInsn(
-                    className,
-                    index,
-                    (FieldInsnNode)node
-            );
-        } else if (node instanceof IntInsnNode) {
-            remove = intInsn(
-                    className,
-                    index,
-                    (IntInsnNode)node
-            );
-        } else {
-            return false;
+        if (StringHelper.isNullOrEmpty(className) || node == null) throw new NullPointerException();
+        if (index < 0) throw new IndexOutOfBoundsException();
+        if (node instanceof ClassNode || node instanceof MethodNode || node instanceof MethodInsnNode || node instanceof FieldNode || node instanceof FieldInsnNode || node instanceof IntInsnNode || node instanceof LdcInsnNode) {
+            boolean remove = false;
+            if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
+            if (node instanceof ClassNode) {
+                remove = _class(
+                        className,
+                        (ClassNode)node
+                );
+            } else if (node instanceof MethodNode) {
+                remove = method(
+                        className,
+                        (MethodNode)node
+                );
+            } else if (node instanceof MethodInsnNode) {
+                remove = methodInsn(
+                        className,
+                        index,
+                        (MethodInsnNode)node
+                );
+            } else if (node instanceof FieldNode) {
+                remove = field(
+                        className,
+                        (FieldNode)node
+                );
+            } else if (node instanceof FieldInsnNode) {
+                remove = fieldInsn(
+                        className,
+                        index,
+                        (FieldInsnNode)node
+                );
+            } else if (node instanceof IntInsnNode) {
+                remove = intInsn(
+                        className,
+                        index,
+                        (IntInsnNode)node
+                );
+            } else if (node instanceof LdcInsnNode) {
+                remove = ldcInsn(
+                        className,
+                        index,
+                        (LdcInsnNode)node
+                );
+            }
+
+            if (node instanceof MethodNode && !remove) {
+                postMethodNode(
+                        className,
+                        index,
+                        (MethodNode)node
+                );
+            }
+
+            if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");
+            return remove;
         }
-        if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");
-        return remove;
+        return false;
     }
 
 }

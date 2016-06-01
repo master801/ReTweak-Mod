@@ -93,7 +93,7 @@ public final class ReTweakMod {
                 //02 = Multi-player
                 //06 = Mods
                 //14 = Realms
-                if (guiButton.id == 1 || guiButton.id == 2 || guiButton.id == 14) guiButton.yPosition -= 12;
+                if (guiButton.id == 1 || guiButton.id == 2 || guiButton.id == 14) guiButton.yPosition -= 12;//Move buttons up to make room for more
                 if (guiButton.id == 6) modsButton = guiButton;
                 if (guiButton.id == 2) multiPlayerButton = guiButton;
                 if (guiButton.id == 14 && multiPlayerButton != null) guiButton.width = multiPlayerButton.width;

@@ -33,25 +33,6 @@ public final class JITTweak implements Tweak {
     @Override
     public void tweak(final ClassNode classNode) {
         if (gameVersion == null) return;
-        if (classNode.methods != null) {
-            Iterator<MethodNode> methodNodeIterator = classNode.methods.iterator();
-            int index = 0;
-            while(methodNodeIterator.hasNext()) {
-                MethodNode methodNode = methodNodeIterator.next();
-                if (remap(classNode.name, index, methodNode)) {
-                    if (ReTweakResources.DEBUG) {
-                        ReTweakResources.RETWEAK_LOGGER.info(
-                                "Removing method \"{}{}\" from class \"{}\"",
-                                methodNode.name,
-                                methodNode.desc,
-                                classNode.name
-                        );
-                        methodNodeIterator.remove();
-                    }
-                }
-                index++;
-            }
-        }
         if (classNode.fields != null) {
             Iterator<FieldNode> fieldNodeIterator = classNode.fields.iterator();
             int index = 0;
@@ -67,6 +48,25 @@ public final class JITTweak implements Tweak {
                         );
                     }
                     fieldNodeIterator.remove();
+                }
+                index++;
+            }
+        }
+        if (classNode.methods != null) {
+            Iterator<MethodNode> methodNodeIterator = classNode.methods.iterator();
+            int index = 0;
+            while(methodNodeIterator.hasNext()) {
+                MethodNode methodNode = methodNodeIterator.next();
+                if (remap(classNode.name, index, methodNode)) {
+                    if (ReTweakResources.DEBUG) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Removing method \"{}{}\" from class \"{}\"",
+                                methodNode.name,
+                                methodNode.desc,
+                                classNode.name
+                        );
+                        methodNodeIterator.remove();
+                    }
                 }
                 index++;
             }
@@ -105,11 +105,12 @@ public final class JITTweak implements Tweak {
                 if (mapping.remap(className, abstractInsnNode, index)) {
                     if (ReTweakResources.DEBUG) {
                         ReTweakResources.RETWEAK_LOGGER.info(
-                                "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\"",
+                                "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\", in class {}",
                                 abstractInsnNode,
                                 _index,
                                 methodNode.name,
-                                methodNode.desc
+                                methodNode.desc,
+                                className
                         );
                     }
                     abstractInsnNodeIterator.remove();

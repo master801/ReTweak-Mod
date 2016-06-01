@@ -5,12 +5,14 @@ import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
 import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
@@ -266,6 +268,318 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77703_o",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151042_j",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_72002_bp",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150411_aY",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77669_D",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151055_y",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_72061_ba",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150423_aK",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77686_W",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151027_R",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77685_T",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151015_O",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        //No entry holders available for field "field_77683_K"
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_71956_V",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150320_F",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_71963_Z",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150331_J",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77804_ap",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151145_ak",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77767_aC",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151137_ax",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77725_bx",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151064_bs",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77722_bw",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151065_br",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77756_aW",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151100_aR",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        //No holders available for field "field_71987_y"
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_82796_bJ",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151162_bE",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77746_aZ",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151105_aU",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77771_aG",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151117_aB",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_77747_aY",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151102_aT",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "field_82791_bT",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151158_bO",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+
+
+        /*
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        null,
+                        "",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        */
+
+
         //</editor-fold>
 
         /*
@@ -503,7 +817,6 @@ final class V_1_4_7_Mapping extends Mapping {
                 holder.set(methodNode);
             }
         }
-
         return false;
     }
 
@@ -553,22 +866,53 @@ final class V_1_4_7_Mapping extends Mapping {
             return true;
         }
         if (fieldInsnNode.owner.equals("net/minecraft/item/Item")) {
-            if (fieldInsnNode.desc.equals("I") && fieldInsnNode.getPrevious() instanceof FieldInsnNode && ((FieldInsnNode)fieldInsnNode.getPrevious()).desc.equals("L" + fieldInsnNode.owner + ";")) {//Get item id from item
+            if (fieldInsnNode.desc.equals("I") && fieldInsnNode.getPrevious() instanceof FieldInsnNode) {//Get item id from item
                 FieldInsnNode fi = (FieldInsnNode)fieldInsnNode.getPrevious();
-                holders = getHolders(
-                        _Type.FIELD_INSN,
-                        fi.getOpcode(),
-                        fi.owner,
-                        fi.name,
-                        fi.desc
-                );
-                if (holders != null) {
-                    for(Holder holder : holders) holder.set(fi);
+                if (fi.desc.equals("L" + fieldInsnNode.owner + ";")) {
+                    holders = getHolders(
+                            _Type.FIELD_INSN,
+                            fi.getOpcode(),
+                            fi.owner,
+                            fi.name,
+                            fi.desc
+                    );
+                    if (holders != null) {
+                        for(Holder holder : holders) holder.set(fi);
+                    }
+                    return true;//Remove item id instruction
                 }
-                return true;//Remove item id instruction
             }
         }
+        switch(fieldInsnNode.getOpcode()) {
+            case Opcodes.GETFIELD:
+                switch(fieldInsnNode.owner) {
+                    case "net/minecraft/item/Item":
+                        if (fieldInsnNode.name.equals("field_77779_bT") && fieldInsnNode.desc.equals("I")) {
+                            return true;//Remove item id call
+                        }
+                        break;
+                }
+                break;
+        }
         return false;
+    }
+
+    @Override
+    protected void postMethodNode(final String className, final int index, final MethodNode methodNode) {
+        if (methodNode.instructions != null) {
+            Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
+            int i = 0;
+
+            while(abstractInsnNodeIterator.hasNext()) {
+                AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
+                if (abstractInsnNode instanceof FieldInsnNode) {
+                    FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
+                } else if (abstractInsnNode instanceof MethodInsnNode) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
+                }
+                i++;
+            }
+        }
     }
 
     @Override
@@ -635,55 +979,69 @@ final class V_1_4_7_Mapping extends Mapping {
             for(Holder holder : holders) holder.set(methodInsnNode);
         }
         if (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC) {
-            if (methodInsnNode.owner.equals("cpw/mods/fml/common/registry/GameRegistry")) {
-                if (methodInsnNode.name.equals("addSmelting") && methodInsnNode.desc.equals("(ILnet/minecraft/item/ItemStack;F)V")) {
-                    if (methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious() instanceof FieldInsnNode) {
-                        FieldInsnNode fieldInsnNode = (FieldInsnNode)methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious();
-                        if (fieldInsnNode.desc.equals("L" + "net/minecraft/item/Item" + ";")) {
-                            final String originalDesc = methodInsnNode.desc;
-                            methodInsnNode.desc =
-                                    "(" +
-                                            ("L" + "net/minecraft/item/Item" + ";") +
-                                            "Lnet/minecraft/item/ItemStack;F)V";
-                            if (ReTweakResources.DEBUG) {
-                                ReTweakResources.RETWEAK_LOGGER.info(
-                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                        ASMHelper.toString(methodInsnNode),
-                                        originalDesc,
-                                        methodInsnNode.desc
-                                );
-                            }
-                        } else if (fieldInsnNode.desc.equals("L" + "net/minecraft/block/Block" + ";")) {
-                            final String originalDesc = methodInsnNode.desc;
-                            methodInsnNode.desc =
-                                    "(" +
-                                            ("L" + "net/minecraft/block/Block" + ";") +
-                                            "Lnet/minecraft/item/ItemStack;F)V";
-                            if (ReTweakResources.DEBUG) {
-                                ReTweakResources.RETWEAK_LOGGER.info(
-                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                        ASMHelper.toString(methodInsnNode),
-                                        originalDesc,
-                                        methodInsnNode.desc
-                                );
-                            }
-                        } else if (fieldInsnNode.desc.equals("L" + "net/minecraft/item/ItemStack" + ";")) {
-                            final String originalDesc = methodInsnNode.desc;
-                            methodInsnNode.desc =
-                                    "(" +
-                                            ("L" + "net/minecraft/item/ItemStack" + ";") +
-                                            "Lnet/minecraft/item/ItemStack;F)V";
-                            if (ReTweakResources.DEBUG) {
-                                ReTweakResources.RETWEAK_LOGGER.info(
-                                        "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                        ASMHelper.toString(methodInsnNode),
-                                        originalDesc,
-                                        methodInsnNode.desc
-                                );
+            switch(methodInsnNode.owner) {
+                case "cpw/mods/fml/common/registry/GameRegistry":
+                    if (methodInsnNode.name.equals("addSmelting") && methodInsnNode.desc.equals("(ILnet/minecraft/item/ItemStack;F)V")) {
+                        if (methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious() instanceof FieldInsnNode) {
+                            FieldInsnNode fieldInsnNode = (FieldInsnNode)methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious();
+                            switch(fieldInsnNode.desc) {
+                                case "L" + "net/minecraft/item/Item" + ";": {
+                                    final String originalDesc = methodInsnNode.desc;
+                                    methodInsnNode.desc =
+                                            "(" +
+                                                    ("L" + "net/minecraft/item/Item" + ";") +
+                                                    "Lnet/minecraft/item/ItemStack;F)V";
+                                    if (ReTweakResources.DEBUG) {
+                                        ReTweakResources.RETWEAK_LOGGER.info(
+                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                ASMHelper.toString(methodInsnNode),
+                                                originalDesc,
+                                                methodInsnNode.desc
+                                        );
+                                    }
+                                    break;
+                                }
+                                case "L" + "net/minecraft/block/Block" + ";": {
+                                    final String originalDesc = methodInsnNode.desc;
+                                    methodInsnNode.desc =
+                                            "(" +
+                                                    ("L" + "net/minecraft/block/Block" + ";") +
+                                                    "Lnet/minecraft/item/ItemStack;F)V";
+                                    if (ReTweakResources.DEBUG) {
+                                        ReTweakResources.RETWEAK_LOGGER.info(
+                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                ASMHelper.toString(methodInsnNode),
+                                                originalDesc,
+                                                methodInsnNode.desc
+                                        );
+                                    }
+                                    break;
+                                }
+                                case "L" + "net/minecraft/item/ItemStack" + ";": {
+                                    final String originalDesc = methodInsnNode.desc;
+                                    methodInsnNode.desc =
+                                            "(" +
+                                                    ("L" + "net/minecraft/item/ItemStack" + ";") +
+                                                    "Lnet/minecraft/item/ItemStack;F)V";
+                                    if (ReTweakResources.DEBUG) {
+                                        ReTweakResources.RETWEAK_LOGGER.info(
+                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                ASMHelper.toString(methodInsnNode),
+                                                originalDesc,
+                                                methodInsnNode.desc
+                                        );
+                                    }
+                                    break;
+                                }
                             }
                         }
                     }
-                }
+                    break;
+                case "net/minecraftforge/client/MinecraftForgeClient":
+                    if (methodInsnNode.name.equals("preloadTexture") && methodInsnNode.desc.equals("(Ljava/lang/String;)V")) {
+                        return true;//Remove method insn call
+                    }
+                    break;
             }
         }
         return false;
@@ -691,6 +1049,21 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode) {
+        return false;
+    }
+
+    @Override
+    protected boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode) {
+        if (ldcInsnNode.getNext() instanceof MethodInsnNode) {
+            MethodInsnNode methodInsnNodeNext = (MethodInsnNode)ldcInsnNode.getNext();
+            if (methodInsnNodeNext.getOpcode() == Opcodes.INVOKESTATIC) {
+                if (methodInsnNodeNext.owner.equals("net/minecraftforge/client/MinecraftForgeClient")) {
+                    if (methodInsnNodeNext.name.equals("preloadTexture") && methodInsnNodeNext.desc.equals("(Ljava/lang/String;)V")) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
