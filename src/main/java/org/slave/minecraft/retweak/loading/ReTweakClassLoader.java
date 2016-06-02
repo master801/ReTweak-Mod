@@ -32,10 +32,12 @@ import java.util.jar.JarFile;
  */
 public final class ReTweakClassLoader extends URLClassLoader {
 
-    private static final Boolean OUTPUT_CLASS = Boolean.valueOf(System.getProperty(
-            "org.slave.minecraft.retweak.class_loader.output_class",
-            Boolean.FALSE.toString()
-    ));
+    private static final Boolean OUTPUT_CLASS = Boolean.valueOf(
+            System.getProperty(
+                    "org.slave.minecraft.retweak.class_loader.output_class",
+                    Boolean.FALSE.toString()
+            )
+    );
     private static final File ASM_CLASSES_DIRECTORY = new File(
             ReTweakResources.RETWEAK_DIRECTORY,
             "asm"

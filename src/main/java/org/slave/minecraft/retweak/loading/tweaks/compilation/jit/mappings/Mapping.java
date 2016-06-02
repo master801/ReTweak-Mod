@@ -7,6 +7,7 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -38,11 +39,13 @@ public abstract class Mapping {
 
     protected abstract boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode);
 
+    protected abstract boolean typeInsn(final String className, final int index, final TypeInsnNode typeInsnNode);
+
     @SuppressWarnings("ConstantConditions")
     public final boolean remap(final String className, final Object node, final int index) {
         if (StringHelper.isNullOrEmpty(className) || node == null) throw new NullPointerException();
         if (index < 0) throw new IndexOutOfBoundsException();
-        if (node instanceof ClassNode || node instanceof MethodNode || node instanceof MethodInsnNode || node instanceof FieldNode || node instanceof FieldInsnNode || node instanceof IntInsnNode || node instanceof LdcInsnNode) {
+        if (node instanceof ClassNode || node instanceof MethodNode || node instanceof MethodInsnNode || node instanceof FieldNode || node instanceof FieldInsnNode || node instanceof IntInsnNode || node instanceof LdcInsnNode || node instanceof TypeInsnNode) {
             boolean remove = false;
             if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
             if (node instanceof ClassNode) {
@@ -83,6 +86,12 @@ public abstract class Mapping {
                         className,
                         index,
                         (LdcInsnNode)node
+                );
+            } else if (node instanceof TypeInsnNode) {
+                remove = typeInsn(
+                        className,
+                        index,
+                        (TypeInsnNode)node
                 );
             }
 

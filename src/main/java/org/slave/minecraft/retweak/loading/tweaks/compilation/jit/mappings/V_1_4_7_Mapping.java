@@ -15,12 +15,14 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.lib.helpers.ASMHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,15 +34,17 @@ import java.util.List;
  */
 final class V_1_4_7_Mapping extends Mapping {
 
-    private final HashMap<_Type, HashMap<Holder, Holder>> types = new HashMap<>();
+    private final EnumMap<_Type, HashMap<Holder, Holder>> types = new EnumMap<>(_Type.class);
 
     V_1_4_7_Mapping() {
+        //<editor-fold desc="Automation">
         for(_Type type : _Type.values()) {
             types.put(
                     type,
                     new HashMap<Holder, Holder>()
             );
         }
+        //</editor-fold>
 
         //<editor-fold desc="ANNOTATION">
         final HashMap<Holder, Holder> annotationMap = types.get(_Type.ANNOTATION);
@@ -643,7 +647,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         null,
                         annotationNode.desc
                 );
-                if (!ArrayHelper.isNullOrEmpty(holders)) {
+                if (holders != null) {
                     for(Holder holder : holders) {
                         if (holder == null) {//Remove annotation
                             annotationNodeIterator.remove();
@@ -699,7 +703,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 classNode.name,
                 null
         );
-        if (!ArrayHelper.isNullOrEmpty(holders)) {
+        if (holders != null) {
             for(Holder holder : holders) {
                 if (holder == null) continue;
                 holder.set(classNode);
@@ -755,7 +759,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 fieldNode.name,
                 fieldNode.desc
         );
-        if (!ArrayHelper.isNullOrEmpty(holders)) {
+        if (holders != null) {
             for(Holder holder : holders) {
                 if (holder == null) continue;
                 holder.set(fieldNode);
@@ -785,7 +789,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         null,
                         annotationNode.desc
                 );
-                if (!ArrayHelper.isNullOrEmpty(holders)) {
+                if (holders != null) {
                     for(Holder holder : holders) {
                         if (holder == null) {
                             annotationNodeIterator.remove();
@@ -811,7 +815,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 methodNode.name,
                 methodNode.desc
         );
-        if (!ArrayHelper.isNullOrEmpty(holders)) {
+        if (holders != null) {
             for(Holder holder : holders) {
                 if (holder == null) continue;
                 holder.set(methodNode);
@@ -901,16 +905,68 @@ final class V_1_4_7_Mapping extends Mapping {
     protected void postMethodNode(final String className, final int index, final MethodNode methodNode) {
         if (methodNode.instructions != null) {
             Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
-            int i = 0;
+            int tickHandler = -1;
 
+            int i = 0;
             while(abstractInsnNodeIterator.hasNext()) {
                 AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
                 if (abstractInsnNode instanceof FieldInsnNode) {
                     FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                 } else if (abstractInsnNode instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
+                    switch(methodInsnNode.getOpcode()) {
+                        case Opcodes.INVOKESTATIC:
+                            switch(methodInsnNode.owner) {
+                                case "cpw/mods/fml/common/registry/TickRegistry":
+                                    if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V")) {
+                                        tickHandler = i;
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
+                    switch(methodInsnNode.owner) {
+                        case "net/minecraftforge/common/Configuration":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
+                            break;
+                        case "net/minecraftforge/common/Property":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                            break;
+                    }
+                } else if (abstractInsnNode instanceof TypeInsnNode) {
+                    TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
                 }
                 i++;
+            }
+
+            if (tickHandler != -1) {
+                int cache = tickHandler - 1;
+                try {
+                    while(methodNode.instructions.get(cache) != null) {
+                        AbstractInsnNode abstractInsnNode = methodNode.instructions.get(cache);
+                        if (abstractInsnNode instanceof TypeInsnNode) {
+                            TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
+                            if (typeInsnNode.getOpcode() == Opcodes.NEW) {
+                                break;
+                            }
+                        }
+                        cache--;
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            methodNode.name + methodNode.desc + " - Index: " + cache,
+                            e
+                    );
+                     cache = tickHandler - 1;
+                }
+
+                if (cache != (tickHandler - 1)) {
+                    int buffer = tickHandler;
+                    while(buffer > cache - 1) {
+                        methodNode.instructions.remove(methodNode.instructions.get(buffer));
+                        buffer--;
+                    }
+                }
             }
         }
     }
@@ -1067,6 +1123,18 @@ final class V_1_4_7_Mapping extends Mapping {
         return false;
     }
 
+    @Override
+    protected boolean typeInsn(final String className, final int index, final TypeInsnNode typeInsnNode) {
+        switch(typeInsnNode.getOpcode()) {
+            case Opcodes.NEW:
+                if (typeInsnNode.desc.equals("net/minecraftforge/common/Configuration")) {
+                    typeInsnNode.desc = "net/minecraftforge/common/config/Configuration";
+                }
+                break;
+        }
+        return false;
+    }
+
     private void checkMethodInsn(final String owner, final String name, final String desc, final MethodInsnNode methodInsnNode) throws UnsupportedOperationException {
         if (methodInsnNode.owner.equals(owner) && methodInsnNode.name.equals(name) && methodInsnNode.desc.equals(desc)) {
             throw new UnsupportedOperationException(
@@ -1141,6 +1209,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     break;
             }
         }
+        if (holders.isEmpty()) return null;
         return holders.toArray(new Holder[holders.size()]);
     }
 
