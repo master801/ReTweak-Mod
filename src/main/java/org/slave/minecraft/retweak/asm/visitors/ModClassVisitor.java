@@ -7,6 +7,7 @@ import org.slave.lib.resources.Bulk;
 import org.slave.lib.resources.EnumMap;
 import org.slave.lib.resources.wrappingdata.WrappingDataT.WrappingDataT2;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.Type;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Map.Entry;
@@ -19,6 +20,10 @@ import java.util.Map.Entry;
 @Deprecated
 public final class ModClassVisitor extends ClassVisitor {
 
+    /**
+     * @deprecated {@link org.slave.minecraft.retweak.loading.capsule.GameVersion#getModType()}
+     */
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static final EnumMap<GameVersion, Entry<Type, String>> TYPES = new EnumMap<>(
             GameVersion.class,
@@ -103,17 +108,6 @@ public final class ModClassVisitor extends ClassVisitor {
         Entry<Type, String> entry = TYPES.get(gameVersion);
         if (entry == null) return null;
         return entry.getValue();
-    }
-
-    public enum Type {
-
-        EXTENDS,
-
-        ANNOTATION;
-
-        Type() {
-        }
-
     }
 
 }

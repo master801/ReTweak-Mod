@@ -6,9 +6,8 @@ import org.slave.lib.helpers.FileHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
-import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor.Type;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.Type;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
@@ -217,7 +216,7 @@ public final class ReTweakLoader {
                     continue;
                 }
 
-                Entry<Type, String> entry = ModClassVisitor.TYPES.get(reTweakModCandidate.getGameVersion());
+                Entry<Type, String> entry = reTweakModCandidate.getGameVersion().getModType();
                 for(TableClass tableClass : reTweakModCandidate.getModClasses()) {
                     switch(entry.getKey()) {
                         case EXTENDS:

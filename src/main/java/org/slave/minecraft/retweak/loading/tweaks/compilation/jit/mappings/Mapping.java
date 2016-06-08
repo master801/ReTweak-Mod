@@ -25,6 +25,8 @@ public abstract class Mapping {
 
     protected abstract boolean _class(final String className, final ClassNode classNode);
 
+    protected abstract void postClass(final String className, final ClassNode classNode);
+
     protected abstract boolean field(final String className, final FieldNode fieldNode);
 
     protected abstract boolean method(final String className, final MethodNode methodNode);
@@ -95,12 +97,19 @@ public abstract class Mapping {
                 );
             }
 
-            if (node instanceof MethodNode && !remove) {
-                postMethodNode(
-                        className,
-                        index,
-                        (MethodNode)node
-                );
+            if (!remove) {
+                if (node instanceof ClassNode) {
+                    postClass(
+                            className,
+                            (ClassNode)node
+                    );
+                } else if (node instanceof MethodNode) {
+                    postMethodNode(
+                            className,
+                            index,
+                            (MethodNode)node
+                    );
+                }
             }
 
             if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");

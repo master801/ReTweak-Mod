@@ -4,9 +4,8 @@ import org.slave.lib.helpers.IterableHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor;
-import org.slave.minecraft.retweak.asm.visitors.ModClassVisitor.Type;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.Type;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +53,7 @@ public final class ReTweakModCandidate {
 
     private void findModClasses() {
         for(TableClass tableClass : asmTable.getClasses()) {
-            Entry<Type, String> entry = ModClassVisitor.TYPES.get(gameVersion);
+            Entry<Type, String> entry = gameVersion.getModType();
             switch(entry.getKey()) {
                 case EXTENDS:
                     if (tableClass.getSuperName().equals(entry.getValue())) modClasses.add(tableClass);
@@ -83,7 +82,7 @@ public final class ReTweakModCandidate {
         if (modids == null && !modClasses.isEmpty()) {
             ArrayList<String> modids = new ArrayList<>();
             for(TableClass tableClass : asmTable.getClasses()) {
-                Entry<Type, String> entry = ModClassVisitor.TYPES.get(gameVersion);
+                Entry<Type, String> entry = gameVersion.getModType();
                 switch(entry.getKey()) {
                     case EXTENDS:
                         if (tableClass.getSuperName().equals(entry.getValue())) {

@@ -224,11 +224,7 @@ public final class ReTweakModContainer {
     }
 
     private FMLStateEvent createStateEvent(Class<? extends FMLStateEvent> fmlStateEventClass) {
-        final Class<?>[] parameterClasses = new Class<?>[] {
-                Object[].class
-        };
         Object[] parameters;
-
         if (fmlStateEventClass == FMLPreInitializationEvent.class) {
             parameters = new Object[] {
                     null,
@@ -239,19 +235,22 @@ public final class ReTweakModContainer {
                     FMLCommonHandler.instance().getMinecraftServerInstance()
             };
         } else {
-            parameters = new Object[] {
-                    new Object[0]
-            };
+            parameters = new Object[0];
         }
 
         try {
             FMLStateEvent fmlStateEvent = ReflectionHelper.createFromConstructor(
                     ReflectionHelper.getConstructor(
                             fmlStateEventClass,
-                            parameterClasses
+                            new Class<?>[] {
+                                Object[].class
+                            }
                     ),
-                    parameters
+                    new Object[] {
+                            parameters
+                    }
             );
+            //TODO Find out what is wrong with the pre-initialization event arguments (wrong num of arguments?); and find out how to hack sound from (audio) files in (fake sounds.json file?)
             if (fmlStateEventClass == FMLPreInitializationEvent.class) {
                 ReflectionHelper.setFieldValue(
                         ReflectionHelper.getField(

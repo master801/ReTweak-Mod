@@ -216,9 +216,11 @@ final class V_1_4_7_Mapping extends Mapping {
         //</editor-fold>
 
         //<editor-fold desc="FIELD">
+        final HashMap<Holder, Holder> fieldMap = types.get(_Type.FIELD);
         //</editor-fold>
 
         //<editor-fold desc="METHOD">
+        final HashMap<Holder, Holder> methodMap = types.get(_Type.METHOD);
         //</editor-fold>
 
         //<editor-fold desc="FIELD INSN">
@@ -713,6 +715,10 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
+    protected void postClass(final String className, final ClassNode classNode) {
+    }
+
+    @Override
     protected boolean field(final String className, final FieldNode fieldNode) {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
@@ -1099,6 +1105,12 @@ final class V_1_4_7_Mapping extends Mapping {
                     }
                     break;
             }
+        }
+        if (methodInsnNode.desc.contains("Lnet/minecraftforge/common/Property;")) {
+            methodInsnNode.desc = methodInsnNode.desc.replace(
+                    "Lnet/minecraftforge/common/Property;",
+                    "Lnet/minecraftforge/common/config/Property;"
+            );
         }
         return false;
     }

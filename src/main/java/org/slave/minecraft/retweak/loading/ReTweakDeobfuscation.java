@@ -7,9 +7,12 @@ import net.minecraftforge.common.MinecraftForge;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
+import org.slave.tool.remapper.api.Super;
+import org.slave.tool.retweak.mapping.Mapping;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -24,19 +27,20 @@ public final class ReTweakDeobfuscation {
     public static final ReTweakDeobfuscation INSTANCE = new ReTweakDeobfuscation();
 
     private final HashMap<GameVersion, SRG> srgs = new HashMap<>();
+    private final HashMap<GameVersion, Mapping> superMappings = new HashMap<>();
 
     private SRG latestSRG;
 
     private ReTweakDeobfuscation() {
     }
 
-    public void loadSRGs(File dir) throws IOException {
+    public void loadSRGs(final File dir) throws IOException {
         for(GameVersion gameVersion : GameVersion.values()) {
             File dataFile = new File(
                     dir,
                     "deobfuscation_data-" + gameVersion.getVersion() + ".lzma"
             );
-            if (dataFile.exists()) {
+            if (dataFile.isFile()) {
                 ReTweakResources.RETWEAK_LOGGER.debug(
                         "SRG file \"{}\" was found, JIT compiler will now work.",
                         dataFile.getPath()
@@ -111,8 +115,43 @@ public final class ReTweakDeobfuscation {
         }
     }
 
+    /**
+     * Must be called after loading SRGs.
+     */
+    public void loadSupers(final File dir) throws IOException {
+        if (dir == null || !dir.isDirectory()) throw new FileNotFoundException();
+        for(GameVersion gameVersion : GameVersion.values()) {
+            File superFile = new File(
+                    dir,
+                    "supers_" + gameVersion.getVersion() + ".super"
+            );
+            if (superFile.isFile()) {
+                FileInputStream fileInputStream = new FileInputStream(superFile);
+                Super _super = Super.createInstance();
+                _super.load(fileInputStream);
+                Mapping mapping = new Mapping();
+                mapping.loadFromSRG(getSRG(gameVersion));
+                mapping.loadSuper(_super);
+                superMappings.put(
+                        gameVersion,
+                        mapping
+                );
+                fileInputStream.close();
+            } else {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Super file \"{}\" was not found... deobfuscation will not work correctly...",
+                        superFile.getPath()
+                );
+            }
+        }
+    }
+
     public SRG getSRG(GameVersion gameVersion) {
         return srgs.get(gameVersion);
+    }
+
+    public Mapping getSuperMappings(GameVersion gameVersion) {
+        return superMappings.get(gameVersion);
     }
 
     public SRG getLatestSRG() {

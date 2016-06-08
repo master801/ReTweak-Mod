@@ -1,7 +1,7 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.exceptions.IncorrectSortException;
+import org.slave.lib.exceptions.InvalidSortException;
 import org.slave.minecraft.retweak.asm.ReTweakSetup;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.DeSeargeTweak;
@@ -91,8 +91,8 @@ public final class ReTweakTweakHandler {
 
         @Override
         public int compare(final Tweak o1, final Tweak o2) {
-            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new IncorrectSortException("Cannot have sort index less than zero!");
-            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new IncorrectSortException("Sort index of Tweak cannot be the same!");
+            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new InvalidSortException("Cannot have sort index less than zero!");
+            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new InvalidSortException("Sort index of Tweak cannot be the same!");
             if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
             if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
             return 0;

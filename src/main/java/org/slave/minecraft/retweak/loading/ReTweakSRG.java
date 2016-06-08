@@ -14,6 +14,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
+import org.slave.tool.retweak.mapping.Mapping;
 
 /**
  * Created by Master on 4/27/2016 at 7:22 AM.
@@ -24,10 +25,12 @@ public final class ReTweakSRG {
 
     private final GameVersion gameVersion;
     private final SRG srg;
+    private final Mapping superMapping;
 
     public ReTweakSRG(GameVersion gameVersion) {
         this.gameVersion = gameVersion;
         srg = ReTweakDeobfuscation.INSTANCE.getSRG(gameVersion);
+        superMapping = ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion);
     }
 
     public void srg(final ClassNode classNode) {

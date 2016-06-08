@@ -28,7 +28,10 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public Void call() throws Exception {
-        if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
+        if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) {
+            ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
+            ReTweakDeobfuscation.INSTANCE.loadSupers(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
+        }
         for(GameVersion gameVersion : GameVersion.values()) {
             ReflectionHelper.invokeMethod(
                     ReflectionHelper.getMethod(
