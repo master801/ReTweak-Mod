@@ -116,7 +116,7 @@ public final class ReTweakDeobfuscation {
     }
 
     /**
-     * Must be called after loading SRGs.
+     * Must be called after {@link #loadSRGs(java.io.File)}.
      */
     public void loadSupers(final File dir) throws IOException {
         if (dir == null || !dir.isDirectory()) throw new FileNotFoundException();
@@ -130,8 +130,14 @@ public final class ReTweakDeobfuscation {
                 Super _super = Super.createInstance();
                 _super.load(fileInputStream);
                 Mapping mapping = new Mapping();
-                mapping.loadFromSRG(getSRG(gameVersion));
-                mapping.loadSuper(_super);
+                mapping.loadFromSRG(
+                        getSRG(
+                                gameVersion
+                        )
+                );
+                mapping.loadSuper(
+                        _super
+                );
                 superMappings.put(
                         gameVersion,
                         mapping
