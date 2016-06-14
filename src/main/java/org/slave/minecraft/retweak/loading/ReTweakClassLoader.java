@@ -72,13 +72,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        if (srg == null) {
+        CompilationMode x = ReTweakConfig.INSTANCE.getCompilationMode();
+        if (srg == null && x == CompilationMode.JIT) {
             throw new NullPointerException(
                     Kirai.from(
                             "Method \"{name}\" was not invoked!"
                     ).put(
                             "name",
-                            "loadSRGs"
+                            "loadSRG"
                     ).format().toString()
             );
         }
@@ -99,13 +100,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
                         ).format().toString()
                 );
             }
-            String newName = name;
             if (!ReTweakSetup.isDeobfuscatedEnvironment()) {
                 throw new IllegalStateException(
                         "Non-deobfuscated environments are not yet supported!"
                 );
             }
-            return parent.loadClass(newName);
+            return parent.loadClass(name);
         } else if (name.startsWith("java")) {
             return super.loadClass(
                     name,
@@ -132,7 +132,9 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     '/'
             ) + ".class";
             InputStream inputStream = super.getResourceAsStream(resourceName);
-            ClassReader classReader = new ClassReader(IOHelper.toByteArray(inputStream));
+            ClassReader classReader = new ClassReader(
+                    IOHelper.toByteArray(inputStream)
+            );
             ClassNode classNode = new ClassNode();
 
             classReader.accept(
@@ -237,7 +239,9 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     public void addFile(File file) {
         try {
-            super.addURL(file.toURI().toURL());
+            super.addURL(
+                    file.toURI().toURL()
+            );
         } catch(MalformedURLException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
                     Kirai.from(
@@ -263,7 +267,9 @@ public final class ReTweakClassLoader extends URLClassLoader {
      */
     JarFile findJarFileForCandidate(ReTweakModCandidate reTweakModCandidate) throws IOException {
         if (reTweakModCandidate == null || (reTweakModCandidate.getClasses() == null || reTweakModCandidate.getClasses().isEmpty())) return null;
-        URL url = super.findResource(reTweakModCandidate.getClasses().get(0) + ".class");
+        URL url = super.findResource(
+                reTweakModCandidate.getClasses().get(0) + ".class"
+        );
         if (url == null) return null;
         JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
         return jarURLConnection.getJarFile();
@@ -275,6 +281,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private void loadSRG() {
         Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
+        if (ReTweakConfig.INSTANCE.getCompilationMode() != CompilationMode.JIT) return;
         if (srg != null) {
             ReTweakResources.RETWEAK_LOGGER.error(
                     "Should not have loaded SRGs! This is an unknown error!"
@@ -285,10 +292,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
     }
 
     private ReTweakModCandidate findCandidate(final String name) throws IOException {
-        URL url = super.findResource(name.replace(
-                '.',
-                '/'
-        ) + ".class");
+        URL url = super.findResource(
+                name.replace(
+                        '.',
+                        '/'
+                ) + ".class"
+        );
         if (url == null) return null;
         JarURLConnection jarURLConnection = (JarURLConnection)url.openConnection();
         JarFile jarFile = jarURLConnection.getJarFile();

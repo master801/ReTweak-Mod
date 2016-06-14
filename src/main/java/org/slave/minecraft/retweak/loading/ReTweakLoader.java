@@ -247,18 +247,19 @@ public final class ReTweakLoader {
                 }
 
                 if (modClass != null) {
-                    mods.get(gameVersion).add(new ReTweakModContainer(
-                            modClass.replace(
-                                    '/',
-                                    '.'
-                            ),
-                            reTweakModCandidate,
-                            info
+                    mods.get(gameVersion).add(
+                            new ReTweakModContainer(
+                                    modClass.replace(
+                                            '/',
+                                            '.'
+                                    ),
+                                    reTweakModCandidate,
+                                    info
 
-                    ));
+                            )
+                    );
                 }
             }
-
             //TODO
 
             /*

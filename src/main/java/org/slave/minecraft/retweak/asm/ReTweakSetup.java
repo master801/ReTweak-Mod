@@ -28,6 +28,9 @@ public final class ReTweakSetup implements IFMLCallHook {
 
     @Override
     public Void call() throws Exception {
+        ReTweakConfig.INSTANCE.update(true);
+
+
         if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) {
             ReTweakDeobfuscation.INSTANCE.loadSRGs(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
             ReTweakDeobfuscation.INSTANCE.loadSupers(ReTweakResources.RETWEAK_PLAY_DIRECTORY);
@@ -39,11 +42,12 @@ public final class ReTweakSetup implements IFMLCallHook {
                             "loadSRG",
                             new Class<?>[0]
                     ),
-                    ReTweakClassLoader.getClassLoader(gameVersion),
+                    ReTweakClassLoader.getClassLoader(
+                            gameVersion
+                    ),
                     new Object[0]
             );
         }
-        ReTweakConfig.INSTANCE.update(true);
         return null;
     }
 

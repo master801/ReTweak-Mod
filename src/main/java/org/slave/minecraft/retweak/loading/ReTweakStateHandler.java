@@ -123,10 +123,12 @@ public final class ReTweakStateHandler {
                     ZipEntry entry = jarFile.getEntry("mcmod.info");
                     if (entry != null) {
                         InputStream is = jarFile.getInputStream(entry);
-                        reTweakModContainer.bindMetadata(MetadataCollection.from(
-                                is,
-                                jarFile.getName()
-                        ));
+                        reTweakModContainer.bindMetadata(
+                                MetadataCollection.from(
+                                        is,
+                                        jarFile.getName()
+                                )
+                        );
                         is.close();
                     }
                     jarFile.close();
@@ -223,7 +225,9 @@ public final class ReTweakStateHandler {
                                 }
                                 Instance instance = field.getAnnotation(Instance.class);
                                 if (!instance.value().equals(reTweakModContainer.getModid())) {
-                                    throw new UnsupportedOperationException("Instance annotation value must be the mod's modid! Injecting other mods' instances is not yet supported!");
+                                    throw new UnsupportedOperationException(
+                                            "Instance annotation value must be the mod's modid! Injecting other mods' instances is not yet supported!"
+                                    );
                                 }
                                 try {
                                     ReflectionHelper.setFieldValue(
@@ -251,7 +255,11 @@ public final class ReTweakStateHandler {
                                     );
                                     return;
                                 }
-                                if (!StringHelper.isNullOrEmpty(sidedProxy.modId())) throw new UnsupportedOperationException("Modids for SidedProxies are not yet supported!");
+                                if (!StringHelper.isNullOrEmpty(sidedProxy.modId())) {
+                                    throw new UnsupportedOperationException(
+                                            "Modids for SidedProxies are not yet supported!"
+                                    );
+                                }
                                 String proxyClassName = FMLCommonHandler.instance().getSide().isClient() ? sidedProxy.clientSide() : sidedProxy.serverSide();
                                 try {
                                     Class<?> proxyClass = Class.forName(
