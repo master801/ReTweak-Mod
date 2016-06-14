@@ -22,7 +22,7 @@ public final class DeSeargeTweak implements Tweak {
 
     private final SRG srg;
 
-    private DeSeargeTweak(SRG srg) {
+    private DeSeargeTweak(final SRG srg) {
         this.srg = srg;
     }
 
