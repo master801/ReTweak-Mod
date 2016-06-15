@@ -9,6 +9,7 @@ import org.slave.lib.resources.ASMTable.TableClass;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.capsule.Type;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
+import org.slave.tool.retweak.mapping.Mapping;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
+import java.util.zip.ZipFile;
 
 /**
  * <p>
@@ -246,6 +248,18 @@ public final class ReTweakLoader {
                     }
                 }
 
+                try {
+                    ZipFile zipFile = new ZipFile(reTweakModCandidate.getSource());
+                    Mapping mapping = ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion);
+                    mapping.read(zipFile);
+                    zipFile.close();
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            "Failed to read candidate mod \"{}\" to super mappings.",
+                            reTweakModCandidate.getSource().getPath()
+                    );
+                }
+
                 if (modClass != null) {
                     mods.get(gameVersion).add(
                             new ReTweakModContainer(
@@ -273,6 +287,9 @@ public final class ReTweakLoader {
         //</editor-fold>
 
         //<editor-fold desc="Sort">
+        for(final GameVersion gameVersion : GameVersion.values()) {
+            ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion).sort();
+        }
         //TODO
         //</editor-fold>
     }

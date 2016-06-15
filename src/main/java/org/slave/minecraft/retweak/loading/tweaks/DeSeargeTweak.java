@@ -88,10 +88,10 @@ public final class DeSeargeTweak implements Tweak {
                             if (entry != null) {
                                 if (ReTweakResources.DEBUG) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
-                                            "DeSearged name of method insn ( {} ) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
+                                            "DeSearged name of method insn ( {} ) at index {}, from method \"{}\", from class \"{}\", from \"{}\" to \"{}\"",
                                             ASMHelper.toString(methodInsnNode),
-                                            ASMHelper.toString(methodNode),
                                             i,
+                                            ASMHelper.toString(methodNode),
                                             classNode.name,
                                             methodInsnNode.name,
                                             entry[4]

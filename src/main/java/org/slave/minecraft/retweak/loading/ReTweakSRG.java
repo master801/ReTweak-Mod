@@ -77,6 +77,8 @@ public final class ReTweakSRG {
     }
 
     private void superName(ClassNode classNode) {
+        final String originalSuperName = classNode.superName;
+
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "[SRG] SUPER-NAME: {}",
@@ -87,13 +89,39 @@ public final class ReTweakSRG {
                 org.slave.tool.retweak.mapping.Type.OBFUSCATED,
                 classNode.name
         );
-        if (classMapping != null && classMapping.getSuperName() != null) {
-            classNode.superName = classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+        if (classMapping != null && (classMapping.getSuperName() != null || classMapping.getSuperClass() != null)) {
+            boolean set = false;
+
+            if (classMapping.getSuperClass() != null) {
+                classNode.superName = classMapping.getSuperClass().getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                set = true;
+            }
+            if (!set && classMapping.getSuperName() != null) {
+                classNode.superName = classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                set = true;
+            }
             if (ReTweakResources.DEBUG) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped super-class from \"{}\" to \"{}\"",
                         classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
                         classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
+                );
+            }
+            return;
+        }
+        classMapping = mapping.getClass(
+                org.slave.tool.retweak.mapping.Type.OBFUSCATED,
+                classNode.superName
+        );
+        if (classMapping != null) {
+            classNode.superName = classMapping.getName().getName(
+                    org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+            ).getString();
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.info(
+                        "Remapped super-class from \"{}\" to \"{}\"",
+                        originalSuperName,
+                        classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
                 );
             }
         }
@@ -189,13 +217,12 @@ public final class ReTweakSRG {
                         descriptor.lastIndexOf('[') + 1
                 );
             }
-            descriptor = descriptor.substring(
-                    1,
-                    descriptor.length() - 1
-            );
             ClassMapping _classMapping = mapping.getClass(
                     org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                    descriptor
+                    descriptor.substring(
+                            1,
+                            descriptor.length() - 1
+                    )
             );
             if (_classMapping != null) {
                 newType = Type.getType(
@@ -241,11 +268,18 @@ public final class ReTweakSRG {
                 org.slave.tool.retweak.mapping.Type.OBFUSCATED,
                 classNode.name
         );
+        if (classMapping == null) {
+            classMapping = mapping.getClass(
+                    org.slave.tool.retweak.mapping.Type.OBFUSCATED,
+                    classNode.superName
+            );
+        }
         if (classMapping != null) {
             MethodMapping methodMapping = classMapping.findMethod(
                     org.slave.tool.retweak.mapping.Type.OBFUSCATED,
                     methodNode.name,
-                    methodNode.desc
+                    methodNode.desc,
+                    true
             );
             if (methodMapping != null) {
                 methodNode.name = methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
@@ -368,20 +402,21 @@ public final class ReTweakSRG {
                         descriptor.lastIndexOf('[') + 1
                 );
             }
-            descriptor = descriptor.substring(
-                    1,
-                    descriptor.length() - 1
-            );
             ClassMapping _classMapping = mapping.getClass(
                     org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                    descriptor
+                    descriptor.substring(
+                            1,
+                            descriptor.length() - 1
+                    )
             );
             if (_classMapping != null) {
                 descriptor = 'L' + _classMapping.getName().getName(
                         org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                 ).getString() + ';';
             }
-            newType = Type.getType(array + descriptor);
+            newType = Type.getType(
+                    array + descriptor
+            );
         } else {
             newType = type;
         }
@@ -481,7 +516,7 @@ public final class ReTweakSRG {
                             className
                     );
                 }
-                if (!methodInsnNode.name.equals("<init>") || !methodInsnNode.name.equals("<clinit>")) return;//Skip constructors
+                if (!methodInsnNode.name.equals("<init>") && !methodInsnNode.name.equals("<clinit>")) return;//Skip constructors
             }
             methodInsnNode.owner = classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
         }
@@ -505,8 +540,21 @@ public final class ReTweakSRG {
                 );
             }
 
+            ClassMapping _classMapping = mapping.getClass(
+                    org.slave.tool.retweak.mapping.Type.OBFUSCATED,
+                    returnTypeClassName.substring(
+                            1,
+                            returnTypeClassName.length() - 1
+                    )
+            );
+            if (_classMapping != null) {
+                returnTypeClassName = 'L' + _classMapping.getName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString() + ';';
+            }
+
             newReturnType = Type.getType(
-                    array + "L" + returnTypeClassName + ";"
+                    array + returnTypeClassName
             );
         } else {
             newReturnType = returnType;
@@ -518,42 +566,41 @@ public final class ReTweakSRG {
         for(int i = 0; i < argumentTypes.length; ++i) {
             final Type argumentType = argumentTypes[i];
 
-            if (argumentType.getSort() != Type.OBJECT && argumentType.getSort() != Type.ARRAY) {
+            if (argumentType.getSort() == Type.OBJECT || argumentType.getSort() == Type.ARRAY) {
+                String array = "";
+
+                String argumentTypeClassName = argumentType.getDescriptor().replace(
+                        '.',
+                        '/'
+                );
+                if (argumentType.getSort() == Type.ARRAY) {
+                    array = argumentTypeClassName.substring(
+                            argumentTypeClassName.indexOf('['),
+                            argumentTypeClassName.lastIndexOf('[') + 1
+                    );
+                    argumentTypeClassName = argumentTypeClassName.substring(
+                            argumentTypeClassName.lastIndexOf('[') + 1
+                    );
+                }
+                ClassMapping _classMapping = mapping.getClass(
+                        org.slave.tool.retweak.mapping.Type.OBFUSCATED,
+                        argumentTypeClassName.substring(
+                                1,
+                                argumentTypeClassName.length() - 1
+                        )
+                );
+                if (_classMapping != null) {
+                    argumentTypeClassName = 'L' + _classMapping.getName().getName(
+                            org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                    ).getString() + ';';
+                }
+
+                newArgumentTypes[i] = Type.getType(
+                        array + argumentTypeClassName
+                );
+            } else {
                 newArgumentTypes[i] = argumentType;
-                continue;
             }
-            String array = "";
-
-            String argumentTypeClassName = argumentType.getDescriptor().replace(
-                    '.',
-                    '/'
-            );
-            if (argumentType.getSort() == Type.ARRAY) {
-                array = argumentTypeClassName.substring(
-                        argumentTypeClassName.indexOf('['),
-                        argumentTypeClassName.lastIndexOf('[') + 1
-                );
-                argumentTypeClassName = argumentTypeClassName.substring(
-                        argumentTypeClassName.lastIndexOf('[') + 1
-                );
-            }
-            argumentTypeClassName = argumentTypeClassName.substring(
-                    1,
-                    argumentTypeClassName.length() - 1
-            );
-            ClassMapping _classMapping = mapping.getClass(
-                    org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                    argumentTypeClassName
-            );
-            if (_classMapping != null) {
-                argumentTypeClassName = "L" + _classMapping.getName().getName(
-                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
-                ).getString() + ";";
-            }
-
-            newArgumentTypes[i] = Type.getType(
-                    array + argumentTypeClassName
-            );
         }
 
         methodInsnNode.desc = Type.getMethodDescriptor(
@@ -692,13 +739,12 @@ public final class ReTweakSRG {
                         descriptor.lastIndexOf('[') + 1
                 );
             }
-            descriptor = descriptor.substring(
-                    0,
-                    descriptor.length() - 1
-            );
             ClassMapping classMapping = mapping.getClass(
                     org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                    descriptor
+                    descriptor.substring(
+                            1,
+                            descriptor.length() - 1
+                    )
             );
             if (classMapping != null) {
                 newDescType = Type.getType(
@@ -755,11 +801,11 @@ public final class ReTweakSRG {
                             classDesc.lastIndexOf('[') + 1
                     );
                     classDesc = classDesc.substring(
-                            classDesc.indexOf('[') + 1
+                            classDesc.lastIndexOf('[') + 1
                     );
                 }
                 ClassMapping classMapping = mapping.getClass(
-                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED,
+                        org.slave.tool.retweak.mapping.Type.OBFUSCATED,
                         classDesc.substring(
                                 1,
                                 classDesc.length() - 1
@@ -778,36 +824,36 @@ public final class ReTweakSRG {
             }
         }
 
-        String className = returnType.getDescriptor().replace(
+        String classDesc = returnType.getDescriptor().replace(
                 '.',
                 '/'
         );
         if (returnType.getSort() == Type.OBJECT || returnType.getSort() == Type.ARRAY) {
             String array = "";
             if (returnType.getSort() == Type.ARRAY) {
-                array = className.substring(
-                        className.indexOf('['),
-                        className.lastIndexOf('[') + 1
+                array = classDesc.substring(
+                        classDesc.indexOf('['),
+                        classDesc.lastIndexOf('[') + 1
                 );
-                className = className.substring(
-                        className.lastIndexOf('[') + 1
+                classDesc = classDesc.substring(
+                        classDesc.lastIndexOf('[') + 1
                 );
             }
 
             ClassMapping classMapping = mapping.getClass(
                     org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                    className.substring(
+                    classDesc.substring(
                             1,
-                            className.length() - 1
+                            classDesc.length() - 1
                     )
             );
             if (classMapping != null) {
-                className = 'L' + classMapping.getName().getName(
+                classDesc = 'L' + classMapping.getName().getName(
                         org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                 ).getString() + ';';
             }
 
-            newReturnType = Type.getType(array + className);
+            newReturnType = Type.getType(array + classDesc);
         } else {
             newReturnType = returnType;
         }
