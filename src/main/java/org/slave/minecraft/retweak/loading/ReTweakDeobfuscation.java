@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 /**
@@ -130,14 +131,30 @@ public final class ReTweakDeobfuscation {
                 Super _super = Super.createInstance();
                 _super.load(fileInputStream);
                 Mapping mapping = new Mapping();
-                mapping.loadFromSRG(
-                        getSRG(
-                                gameVersion
-                        )
-                );
-                mapping.loadSuper(
-                        _super
-                );
+                try {
+                    mapping.loadFromSRG(
+                            getSRG(
+                                    gameVersion
+                            )
+                    );
+                } catch(ClassNotFoundException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            "Failed to load from SRG for Mapping!",
+                            e
+                    );
+                    return;
+                }
+                try {
+                    mapping.loadSuper(
+                            _super
+                    );
+                } catch(IllegalAccessException | NoSuchFieldException | NoSuchMethodException | InvocationTargetException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            "Failed to load from Super for Mapping!",
+                            e
+                    );
+                    return;
+                }
                 superMappings.put(
                         gameVersion,
                         mapping

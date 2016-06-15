@@ -1,8 +1,9 @@
+import scala.tools.nsc.io.Jar
+
 buildscript {
     repositories {
         mavenCentral()
         jcenter()
-        //flatDirs dirs: 'gradle_repository'
         maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
@@ -77,23 +78,7 @@ processResources {
 }
 
 task proguard(type: proguard.gradle.ProGuardTask) {
-    keepattributes 'Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,EnclosingMethod'
-    keepattributes '*Annotation*'
-    keep 'public class * { \
-        public protected *; \
-    }'
-    keepclassmembers allowshrinking:true, 'enum * { \
-        public static **[] values(); \
-        public static ** valueOf(java.lang.String); \
-    }'
-    keepclassmembers 'class * implements java.io.Serializable { \
-        static final long serialVersionUID; \
-        static final java.io.ObjectStreamField[] serialPersistentFields; \
-        private void writeObject(java.io.ObjectOutputStream); \
-        private void readObject(java.io.ObjectInputStream); \
-        java.lang.Object writeReplace(); \
-        java.lang.Object readResolve(); \
-    }'
+    configuration 'configuration.pro'
 }
 
 task mkSrcJar(type: Jar) {

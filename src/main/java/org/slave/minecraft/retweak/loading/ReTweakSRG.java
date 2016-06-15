@@ -56,24 +56,6 @@ public final class ReTweakSRG {
                     classNode.name
             );
         }
-
-        ClassMapping classMapping = mapping.getClass(
-                org.slave.tool.retweak.mapping.Type.OBFUSCATED,
-                classNode.name
-        );
-        if (classMapping != null) {
-            if (!ReTweakResources.DEBUG) {//Throw exception unless in DEBUG mode
-                throw new IllegalStateException("Found Minecraft related class file? ReTweak-Mod cannot load base-classes from Minecraft!");
-            }
-            classNode.name = classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
-            if (ReTweakResources.DEBUG) {
-                ReTweakResources.RETWEAK_LOGGER.info(
-                        "Remapped class name from \"{}\" to \"{}\"",
-                        classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
-                        classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
-                );
-            }
-        }
     }
 
     private void superName(ClassNode classNode) {
