@@ -19,6 +19,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.lib.helpers.ASMHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.StringHelper;
+import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.ArrayList;
@@ -37,6 +38,8 @@ final class V_1_4_7_Mapping extends Mapping {
     private final EnumMap<_Type, HashMap<Holder, Holder>> types = new EnumMap<>(_Type.class);
 
     V_1_4_7_Mapping() {
+        super(GameVersion.V_1_4_7);
+
         //<editor-fold desc="Automation">
         for(_Type type : _Type.values()) {
             types.put(
@@ -831,6 +834,76 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
+    protected void postMethodNode(final String className, final int index, final MethodNode methodNode) {
+        if (methodNode.instructions != null) {
+            Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
+            int tickHandler = -1;
+
+            int i = 0;
+            while(abstractInsnNodeIterator.hasNext()) {
+                AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
+                if (abstractInsnNode instanceof FieldInsnNode) {
+                    FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
+                } else if (abstractInsnNode instanceof MethodInsnNode) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
+                    switch(methodInsnNode.getOpcode()) {
+                        case Opcodes.INVOKESTATIC:
+                            switch(methodInsnNode.owner) {
+                                case "cpw/mods/fml/common/registry/TickRegistry":
+                                    if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V")) {
+                                        tickHandler = i;
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
+                    switch(methodInsnNode.owner) {
+                        case "net/minecraftforge/common/Configuration":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
+                            break;
+                        case "net/minecraftforge/common/Property":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                            break;
+                    }
+                } else if (abstractInsnNode instanceof TypeInsnNode) {
+                    TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
+                }
+                i++;
+            }
+
+            if (tickHandler != -1) {
+                int cache = tickHandler - 1;
+                try {
+                    while(methodNode.instructions.get(cache) != null) {
+                        AbstractInsnNode abstractInsnNode = methodNode.instructions.get(cache);
+                        if (abstractInsnNode instanceof TypeInsnNode) {
+                            TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
+                            if (typeInsnNode.getOpcode() == Opcodes.NEW) {
+                                break;
+                            }
+                        }
+                        cache--;
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                            methodNode.name + methodNode.desc + " - Index: " + cache,
+                            e
+                    );
+                    cache = tickHandler - 1;
+                }
+
+                if (cache != (tickHandler - 1)) {
+                    int buffer = tickHandler;
+                    while(buffer > cache - 1) {
+                        methodNode.instructions.remove(methodNode.instructions.get(buffer));
+                        buffer--;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     protected boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode) {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.info(
@@ -905,76 +978,6 @@ final class V_1_4_7_Mapping extends Mapping {
                 break;
         }
         return false;
-    }
-
-    @Override
-    protected void postMethodNode(final String className, final int index, final MethodNode methodNode) {
-        if (methodNode.instructions != null) {
-            Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
-            int tickHandler = -1;
-
-            int i = 0;
-            while(abstractInsnNodeIterator.hasNext()) {
-                AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
-                if (abstractInsnNode instanceof FieldInsnNode) {
-                    FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
-                } else if (abstractInsnNode instanceof MethodInsnNode) {
-                    MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
-                    switch(methodInsnNode.getOpcode()) {
-                        case Opcodes.INVOKESTATIC:
-                            switch(methodInsnNode.owner) {
-                                case "cpw/mods/fml/common/registry/TickRegistry":
-                                    if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V")) {
-                                        tickHandler = i;
-                                    }
-                                    break;
-                            }
-                            break;
-                    }
-                    switch(methodInsnNode.owner) {
-                        case "net/minecraftforge/common/Configuration":
-                            methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
-                            break;
-                        case "net/minecraftforge/common/Property":
-                            methodInsnNode.owner = "net/minecraftforge/common/config/Property";
-                            break;
-                    }
-                } else if (abstractInsnNode instanceof TypeInsnNode) {
-                    TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
-                }
-                i++;
-            }
-
-            if (tickHandler != -1) {
-                int cache = tickHandler - 1;
-                try {
-                    while(methodNode.instructions.get(cache) != null) {
-                        AbstractInsnNode abstractInsnNode = methodNode.instructions.get(cache);
-                        if (abstractInsnNode instanceof TypeInsnNode) {
-                            TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
-                            if (typeInsnNode.getOpcode() == Opcodes.NEW) {
-                                break;
-                            }
-                        }
-                        cache--;
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    ReTweakResources.RETWEAK_LOGGER.error(
-                            methodNode.name + methodNode.desc + " - Index: " + cache,
-                            e
-                    );
-                     cache = tickHandler - 1;
-                }
-
-                if (cache != (tickHandler - 1)) {
-                    int buffer = tickHandler;
-                    while(buffer > cache - 1) {
-                        methodNode.instructions.remove(methodNode.instructions.get(buffer));
-                        buffer--;
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -1107,6 +1110,7 @@ final class V_1_4_7_Mapping extends Mapping {
             }
         }
         if (methodInsnNode.desc.contains("Lnet/minecraftforge/common/Property;")) {
+            //I don't even care right now
             methodInsnNode.desc = methodInsnNode.desc.replace(
                     "Lnet/minecraftforge/common/Property;",
                     "Lnet/minecraftforge/common/config/Property;"

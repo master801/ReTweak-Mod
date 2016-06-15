@@ -11,6 +11,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.lib.helpers.StringHelper;
+import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 /**
@@ -44,6 +46,14 @@ public abstract class Mapping {
     protected abstract boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode);
 
     protected abstract boolean typeInsn(final String className, final int index, final TypeInsnNode typeInsnNode);
+
+    private final GameVersion gameVersion;
+    private final org.slave.tool.retweak.mapping.Mapping mapping;
+
+    Mapping(final GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
+        mapping = ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion);
+    }
 
     @SuppressWarnings("ConstantConditions")
     public final boolean remap(final String className, final Object node, final int index) {
@@ -118,6 +128,14 @@ public abstract class Mapping {
             return remove;
         }
         return false;
+    }
+
+    public final GameVersion getGameVersion() {
+        return gameVersion;
+    }
+
+    public final org.slave.tool.retweak.mapping.Mapping getMapping() {
+        return mapping;
     }
 
     enum _Type {
@@ -354,4 +372,5 @@ public abstract class Mapping {
         }
 
     }
+
 }

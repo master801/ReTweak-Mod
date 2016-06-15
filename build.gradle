@@ -1,6 +1,8 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
+        //flatDirs dirs: 'gradle_repository'
         maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
@@ -12,11 +14,15 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+        classpath 'net.sf.proguard:proguard-gradle:5.2.1'
+
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'forge'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
@@ -68,6 +74,26 @@ processResources {
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+task proguard(type: proguard.gradle.ProGuardTask) {
+    keepattributes 'Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,EnclosingMethod'
+    keepattributes '*Annotation*'
+    keep 'public class * { \
+        public protected *; \
+    }'
+    keepclassmembers allowshrinking:true, 'enum * { \
+        public static **[] values(); \
+        public static ** valueOf(java.lang.String); \
+    }'
+    keepclassmembers 'class * implements java.io.Serializable { \
+        static final long serialVersionUID; \
+        static final java.io.ObjectStreamField[] serialPersistentFields; \
+        private void writeObject(java.io.ObjectOutputStream); \
+        private void readObject(java.io.ObjectInputStream); \
+        java.lang.Object writeReplace(); \
+        java.lang.Object readResolve(); \
+    }'
 }
 
 task mkSrcJar(type: Jar) {
