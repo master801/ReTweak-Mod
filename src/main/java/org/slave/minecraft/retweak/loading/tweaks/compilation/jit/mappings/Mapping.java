@@ -1,15 +1,18 @@
 package org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings;
 
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
@@ -37,15 +40,19 @@ public abstract class Mapping {
 
     protected abstract void postMethodNode(final ClassNode classNode, final int index, final MethodNode methodNode);
 
-    protected abstract boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode);
+    protected abstract boolean fieldInsn(final String className, final int index, final InsnList insnList, final FieldInsnNode fieldInsnNode);
 
-    protected abstract boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode);
+    protected abstract boolean methodInsn(final String className, final int index, final InsnList insnList, final MethodInsnNode methodInsnNode);
 
-    protected abstract boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode);
+    protected abstract boolean intInsn(final String className, final int index, final InsnList insnList, final IntInsnNode intInsnNode);
 
-    protected abstract boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode);
+    protected abstract boolean ldcInsn(final String className, final int index, final InsnList insnList, final LdcInsnNode ldcInsnNode);
 
-    protected abstract boolean typeInsn(final String className, final int index, final TypeInsnNode typeInsnNode);
+    protected abstract boolean typeInsn(final String className, final int index, final InsnList insnList, final TypeInsnNode typeInsnNode);
+
+    public abstract boolean ignoreField(final int opcode, final String owner, final String name, final String desc);
+
+    public abstract boolean ignoreMethod(final int opcode, final String owner, final String name, final String desc);
 
     private final GameVersion gameVersion;
     private final org.slave.tool.retweak.mapping.Mapping mapping;
@@ -56,7 +63,7 @@ public abstract class Mapping {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public final boolean remap(final ClassNode classNode, final Object node, final int index) {
+    public final boolean remap(final ClassNode classNode, final InsnList insnList, final Object node, final int index) {
         if (classNode == null || node == null) throw new NullPointerException();
         if (index < 0) throw new IndexOutOfBoundsException();
         if (node instanceof ClassNode || node instanceof MethodNode || node instanceof MethodInsnNode || node instanceof FieldNode || node instanceof FieldInsnNode || node instanceof IntInsnNode || node instanceof LdcInsnNode || node instanceof TypeInsnNode) {
@@ -74,9 +81,11 @@ public abstract class Mapping {
                         (MethodNode)node
                 );
             } else if (node instanceof MethodInsnNode) {
+                if (insnList == null) throw new NullPointerException();
                 remove = methodInsn(
                         className,
                         index,
+                        insnList,
                         (MethodInsnNode)node
                 );
             } else if (node instanceof FieldNode) {
@@ -85,27 +94,35 @@ public abstract class Mapping {
                         (FieldNode)node
                 );
             } else if (node instanceof FieldInsnNode) {
+                if (insnList == null) throw new NullPointerException();
                 remove = fieldInsn(
                         className,
                         index,
+                        insnList,
                         (FieldInsnNode)node
                 );
             } else if (node instanceof IntInsnNode) {
+                if (insnList == null) throw new NullPointerException();
                 remove = intInsn(
                         className,
                         index,
+                        insnList,
                         (IntInsnNode)node
                 );
             } else if (node instanceof LdcInsnNode) {
+                if (insnList == null) throw new NullPointerException();
                 remove = ldcInsn(
                         className,
                         index,
+                        insnList,
                         (LdcInsnNode)node
                 );
             } else if (node instanceof TypeInsnNode) {
+                if (insnList == null) throw new NullPointerException();
                 remove = typeInsn(
                         className,
                         index,
+                        insnList,
                         (TypeInsnNode)node
                 );
             }
@@ -166,6 +183,19 @@ public abstract class Mapping {
         private final int opcode;
         private final String owner, name, desc;
 
+        private AbstractInsnNode[] abstractInsnNodes;
+
+        public Holder(final _Type type, final AbstractInsnNode[] abstractInsnNodes) {
+            this(
+                    type,
+                    -1,
+                    null,
+                    null,
+                    null
+            );
+            this.abstractInsnNodes = abstractInsnNodes;
+        }
+
         public Holder(final _Type type, final int opcode, final String owner, final String name, final String desc) {
             this.type = type;
             this.opcode = opcode;
@@ -194,17 +224,20 @@ public abstract class Mapping {
             return desc;
         }
 
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj instanceof Holder) {
-                Holder holder = (Holder)obj;
-                if (holder.getType() != getType()) return false;
-                return (holder.getOpcode() == getOpcode()) && holder.getOwner().equals(getOwner()) && (getType() == _Type.FIELD_INSN || holder.getName().equals(getName())) && holder.getDesc().equals(getDesc());
-            }
-            return super.equals(obj);
+        public AbstractInsnNode[] getAbstractInsnNodes() {
+            return abstractInsnNodes;
         }
 
         public void set(final Object object) {
+            set(
+                    object,
+                    null
+            );
+        }
+
+        public void set(final Object object, final InsnList insnList) {
+            if (object == null) throw new NullPointerException();
+
             if (getType() == _Type.ANNOTATION && object instanceof AnnotationNode) {
                 AnnotationNode annotationNode = (AnnotationNode)object;
                 if (!StringHelper.isNullOrEmpty(getDesc())) {
@@ -275,6 +308,18 @@ public abstract class Mapping {
                 //TODO
             } else if (getType() == _Type.FIELD_INSN && object instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode)object;
+
+                if (insnList != null && !ArrayHelper.isNullOrEmpty(getAbstractInsnNodes())) {
+                    final InsnList inject = new InsnList();
+                    for(AbstractInsnNode iterating : getAbstractInsnNodes()) inject.add(iterating);
+                    insnList.insert(
+                            fieldInsnNode,
+                            inject
+                    );
+                    insnList.remove(fieldInsnNode);
+                    return;
+                }
+
                 if (getOpcode() != -1) {
                     if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
@@ -320,7 +365,19 @@ public abstract class Mapping {
                     fieldInsnNode.desc = getDesc();
                 }
             } else if (getType() == _Type.METHOD_INSN && object instanceof MethodInsnNode) {
-                MethodInsnNode methodInsnNode = (MethodInsnNode)object;
+                final MethodInsnNode methodInsnNode = (MethodInsnNode)object;
+
+                if (insnList != null && !ArrayHelper.isNullOrEmpty(getAbstractInsnNodes())) {
+                    final InsnList inject = new InsnList();
+                    for(AbstractInsnNode iterating : getAbstractInsnNodes()) inject.add(iterating);
+                    insnList.insert(
+                            methodInsnNode,
+                            inject
+                    );
+                    insnList.remove(methodInsnNode);
+                    return;
+                }
+
                 if (getOpcode() != -1) {
                     if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
@@ -370,6 +427,16 @@ public abstract class Mapping {
                         getType().name()
                 );
             }
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof Holder) {
+                Holder holder = (Holder)obj;
+                if (holder.getType() != getType()) return false;
+                return (holder.getOpcode() == getOpcode()) && holder.getOwner().equals(getOwner()) && (getType() == _Type.FIELD_INSN || holder.getName().equals(getName())) && holder.getDesc().equals(getDesc());
+            }
+            return super.equals(obj);
         }
 
     }

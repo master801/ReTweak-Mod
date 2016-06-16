@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.loading.tweaks.compilation;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.Tweak;
@@ -31,14 +32,14 @@ public final class JITTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ClassNode classNode) {
+    public void tweak(final ClassNode classNode, final GameVersion gameVersion) {
         if (gameVersion == null) return;
         if (classNode.fields != null) {
             Iterator<FieldNode> fieldNodeIterator = classNode.fields.iterator();
             int index = 0;
             while(fieldNodeIterator.hasNext()) {
                 FieldNode fieldNode = fieldNodeIterator.next();
-                if (remap(classNode, index, fieldNode)) {
+                if (remap(classNode, index, null, fieldNode)) {
                     if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing field \"{} {}\" from class \"{}\"",
@@ -57,7 +58,7 @@ public final class JITTweak implements Tweak {
             int index = 0;
             while(methodNodeIterator.hasNext()) {
                 MethodNode methodNode = methodNodeIterator.next();
-                if (remap(classNode, index, methodNode)) {
+                if (remap(classNode, index, methodNode.instructions, methodNode)) {
                     if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing method \"{}{}\" from class \"{}\"",
@@ -74,6 +75,7 @@ public final class JITTweak implements Tweak {
         remap(
                 classNode,
                 0,
+                null,
                 classNode
         );
     }
@@ -83,7 +85,7 @@ public final class JITTweak implements Tweak {
         return 0;
     }
 
-    private boolean remap(final ClassNode classNode, final int index, final Object node) {
+    private boolean remap(final ClassNode classNode, final int index, final InsnList insnList, final Object node) {
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -92,7 +94,7 @@ public final class JITTweak implements Tweak {
             );
             return false;
         }
-        if (mapping.remap(classNode, node, index)) return true;
+        if (mapping.remap(classNode, insnList, node, index)) return true;
 
         //Remap method instructions
         if (node instanceof MethodNode) {
@@ -102,7 +104,7 @@ public final class JITTweak implements Tweak {
             int _index = 0;
             while(abstractInsnNodeIterator.hasNext()) {
                 AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
-                if (mapping.remap(classNode, abstractInsnNode, index)) {
+                if (mapping.remap(classNode, insnList, abstractInsnNode, index)) {
                     if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\", in class {}",

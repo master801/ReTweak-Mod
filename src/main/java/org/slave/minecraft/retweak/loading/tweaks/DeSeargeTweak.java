@@ -9,6 +9,9 @@ import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
+import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mapping;
+import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mappings;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
 import org.slave.tool.remapper.SRG_Type;
@@ -34,7 +37,7 @@ public final class DeSeargeTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ClassNode classNode) throws TweakException {
+    public void tweak(final ClassNode classNode, final GameVersion gameVersion) throws TweakException {
         if (srg == null) {
             throw new NullPointerException(
                     Kirai.from(
@@ -45,6 +48,11 @@ public final class DeSeargeTweak implements Tweak {
                     ).format().toString()
             );
         }
+
+        final Mapping mapping = Mappings.INSTANCE.getMapping(
+                gameVersion
+        );
+
         if (classNode.methods != null) {
             for(MethodNode methodNode : classNode.methods) {
                 for(int i = 0; i < methodNode.instructions.size(); ++i) {
@@ -52,6 +60,8 @@ public final class DeSeargeTweak implements Tweak {
                     if (abstractInsnNode instanceof FieldInsnNode) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                         if (fieldInsnNode.name.startsWith("field_")) {
+                            if (mapping != null && mapping.ignoreField(fieldInsnNode.getOpcode(), fieldInsnNode.owner, fieldInsnNode.name, fieldInsnNode.desc)) continue;
+
                             String[] entry = getFieldEntry(
                                     fieldInsnNode.owner,
                                     fieldInsnNode.name
@@ -82,6 +92,8 @@ public final class DeSeargeTweak implements Tweak {
                     } else if (abstractInsnNode instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
                         if (methodInsnNode.name.startsWith("func_")) {
+                            if (mapping != null && mapping.ignoreMethod(methodInsnNode.getOpcode(), methodInsnNode.owner, methodInsnNode.name, methodInsnNode.desc)) continue;
+
                             String[] entry = getMethodEntry(
                                     methodInsnNode.owner,
                                     methodInsnNode.name,

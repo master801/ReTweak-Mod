@@ -51,33 +51,47 @@ public final class LoadControllerTransformer extends BasicTransformer implements
 
             if (injectionNode != null) {
                 InsnList instructionsToInject = new InsnList();
-                instructionsToInject.add(new LabelNode(new Label()));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        0
-                ));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        0
-                ));
-                instructionsToInject.add(new FieldInsnNode(
-                        Opcodes.GETFIELD,
-                        "cpw/mods/fml/common/LoadController",
-                        "state",
-                        "Lcpw/mods/fml/common/LoaderState;"
-                ));
-                instructionsToInject.add(new VarInsnNode(
-                        Opcodes.ALOAD,
-                        1
-                ));
+                instructionsToInject.add(
+                        new LabelNode(
+                                new Label()
+                        )
+                );
+                instructionsToInject.add(
+                        new VarInsnNode(
+                                Opcodes.ALOAD,
+                                0
+                        )
+                );
+                instructionsToInject.add(
+                        new VarInsnNode(
+                                Opcodes.ALOAD,
+                                0
+                        )
+                );
+                instructionsToInject.add(
+                        new FieldInsnNode(
+                                Opcodes.GETFIELD,
+                                "cpw/mods/fml/common/LoadController",
+                                "state",
+                                "Lcpw/mods/fml/common/LoaderState;"
+                        )
+                );
+                instructionsToInject.add(
+                        new VarInsnNode(
+                                Opcodes.ALOAD,
+                                1
+                        )
+                );
 
-                instructionsToInject.add(new MethodInsnNode(
-                        Opcodes.INVOKESTATIC,
-                        "org/slave/minecraft/retweak/loading/ReTweakStateHandler",
-                        "step",
-                        "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
-                        false
-                ));
+                instructionsToInject.add(
+                        new MethodInsnNode(
+                                Opcodes.INVOKESTATIC,
+                                "org/slave/minecraft/retweak/loading/ReTweakStateHandler",
+                                "step",
+                                "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
+                                false
+                        )
+                );
 
                 transition.instructions.insert(
                         injectionNode,

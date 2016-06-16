@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweaks;
 
 import org.objectweb.asm.tree.ClassNode;
+import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 
 /**
  * Created by Master on 4/27/2016 at 7:21 AM.
@@ -11,11 +12,11 @@ public interface Tweak {
 
     String getName();
 
-    void tweak(final ClassNode classNode) throws TweakException;
+    void tweak(final ClassNode classNode, final GameVersion gameVersion) throws TweakException;
 
     int getWantedSortIndex();
 
-    class TweakException extends Exception {
+    class TweakException extends RuntimeException {
 
         private static final long serialVersionUID = 1990489569439481334L;
 

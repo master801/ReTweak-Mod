@@ -71,7 +71,10 @@ public final class ReTweakTweakHandler {
                         tweak.getName()
                 );
             }
-            tweak.tweak(classNode);
+            tweak.tweak(
+                    classNode,
+                    gameVersion
+            );
             if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "End Tweak\n\n",

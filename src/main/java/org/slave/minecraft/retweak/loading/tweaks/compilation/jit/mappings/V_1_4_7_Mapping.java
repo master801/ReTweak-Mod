@@ -11,6 +11,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -19,6 +20,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.slave.lib.helpers.ASMHelper;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.helpers.StringHelper;
+import org.slave.minecraft.retweak.handlers.TextureHandler;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -232,7 +234,35 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
+                        "field_77683_K",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        new AbstractInsnNode[] {
+                                new FieldInsnNode(
+                                        Opcodes.GETSTATIC,
+                                        "net/minecraft/init/Blocks",
+                                        "field_150321_G",
+                                        "Lnet/minecraft/block/Block;"
+                                ),
+                                new MethodInsnNode(
+                                        Opcodes.INVOKESTATIC,
+                                        "net/minecraft/item/Item",
+                                        "func_150898_a",
+                                        "(Lnet/minecraft/block/Block;)Lnet/minecraft/item/Item;",
+                                        false
+                                )
+                        }
+                )
+        );
+
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/item/Item",
                         "field_77737_bm",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -248,7 +278,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77770_aF",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -264,7 +294,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77770_aF",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -280,7 +310,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77703_o",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -296,23 +326,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
-                        "field_72002_bp",
-                        "Lnet/minecraft/block/Block;"
-                ),
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        "net/minecraft/init/Blocks",
-                        "field_150411_aY",
-                        "Lnet/minecraft/block/Block;"
-                )
-        );
-        fieldInsnMap.put(
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77669_D",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -328,23 +342,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
-                        "field_72061_ba",
-                        "Lnet/minecraft/block/Block;"
-                ),
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        "net/minecraft/init/Blocks",
-                        "field_150423_aK",
-                        "Lnet/minecraft/block/Block;"
-                )
-        );
-        fieldInsnMap.put(
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77686_W",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -360,7 +358,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77685_T",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -372,44 +370,28 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
-        //No entry holders available for field "field_77683_K"
-        fieldInsnMap.put(
+
+        types.get(_Type.FIELD_INSN).put(
                 new Holder(
                         _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
+                        -1,
                         null,
-                        "field_71956_V",
-                        "Lnet/minecraft/block/Block;"
+                        null,
+                        "Lnet/minecraft/item/Item;"
                 ),
                 new Holder(
                         _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        "net/minecraft/init/Blocks",
-                        "field_150320_F",
-                        "Lnet/minecraft/block/Block;"
+                        -1,
+                        "net/minecraft/init/Items",
+                        null,
+                        "Lnet/minecraft/item/Item;"
                 )
         );
         fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
-                        "field_71963_Z",
-                        "Lnet/minecraft/block/Block;"
-                ),
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        "net/minecraft/init/Blocks",
-                        "field_150331_J",
-                        "Lnet/minecraft/block/Block;"
-                )
-        );
-        fieldInsnMap.put(
-                new Holder(
-                        _Type.FIELD_INSN,
-                        Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77804_ap",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -425,7 +407,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77767_aC",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -441,7 +423,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77725_bx",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -457,7 +439,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77722_bw",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -473,7 +455,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77756_aW",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -485,12 +467,11 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
-        //No holders available for field "field_71987_y"
         fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_82796_bJ",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -506,7 +487,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77746_aZ",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -522,7 +503,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77771_aG",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -538,7 +519,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_77747_aY",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -554,7 +535,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "field_82791_bT",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -590,24 +571,89 @@ final class V_1_4_7_Mapping extends Mapping {
 
         //</editor-fold>
 
-        /*
-        types.get(_Type.FIELD_INSN).put(
+        //<editor-fold desc="BLOCKS">
+        fieldInsnMap.put(
                 new Holder(
                         _Type.FIELD_INSN,
-                        -1,
-                        null,
-                        null,
-                        "Lnet/minecraft/item/Item;"
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/block/Block",
+                        "field_72002_bp",
+                        "Lnet/minecraft/block/Block;"
                 ),
                 new Holder(
                         _Type.FIELD_INSN,
-                        -1,
-                        "net/minecraft/init/Items",
-                        null,
-                        "Lnet/minecraft/item/Item;"
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150411_aY",
+                        "Lnet/minecraft/block/Block;"
                 )
         );
-        */
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/block/Block",
+                        "field_72061_ba",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150423_aK",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/block/Block",
+                        "field_71956_V",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150320_F",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/block/Block",
+                        "field_71963_Z",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150331_J",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/block/Block",
+                        "field_71987_y",
+                        "Lnet/minecraft/block/Block;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Blocks",
+                        "field_150345_g",
+                        "Lnet/minecraft/block/Block;"
+                )
+        );
+        //</editor-fold>
+
         //</editor-fold>
 
         //<editor-fold desc="METHOD INSN">
@@ -626,6 +672,38 @@ final class V_1_4_7_Mapping extends Mapping {
                         "net/minecraft/item/crafting/FurnaceRecipes",
                         "func_151396_a",
                         "(Lnet/minecraft/item/Item;Lnet/minecraft/item/ItemStack;F)V"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/client/renderer/entity/RenderLiving",
+                        "func_77031_a",
+                        "(Lnet/minecraft/entity/EntityLiving;DDDFF)V"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/client/renderer/entity/RenderLiving",
+                        "func_76986_a",
+                        "(Lnet/minecraft/entity/EntityLiving;DDDFF)V"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/client/renderer/entity/RenderLiving",
+                        "func_77031_a",
+                        "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/client/renderer/entity/RenderLiving",
+                        "func_76986_a",
+                        "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V"
                 )
         );
         //</editor-fold>
@@ -837,6 +915,7 @@ final class V_1_4_7_Mapping extends Mapping {
         if (methodNode.instructions != null) {
             Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
             int tickHandler = -1;
+            int loadTexture_func_76985_a = -1;
 
             int i = 0;
             while(abstractInsnNodeIterator.hasNext()) {
@@ -849,7 +928,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         case Opcodes.INVOKESTATIC:
                             switch(methodInsnNode.owner) {
                                 case "cpw/mods/fml/common/registry/TickRegistry":
-                                    if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V")) {
+                                    if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V") && tickHandler == -1) {
                                         tickHandler = i;
                                     }
                                     break;
@@ -862,6 +941,11 @@ final class V_1_4_7_Mapping extends Mapping {
                                     break;
                                 case "net/minecraftforge/common/Property":
                                     methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                                    break;
+                                case "net/minecraft/client/renderer/entity/Render":
+                                    if (methodInsnNode.name.equals("func_76985_a") && methodInsnNode.desc.equals("(Ljava/lang/String;)V") && loadTexture_func_76985_a == -1) {
+                                        loadTexture_func_76985_a = i;
+                                    }
                                     break;
                             }
                             break;
@@ -879,9 +963,7 @@ final class V_1_4_7_Mapping extends Mapping {
                         AbstractInsnNode abstractInsnNode = methodNode.instructions.get(cache);
                         if (abstractInsnNode instanceof TypeInsnNode) {
                             TypeInsnNode typeInsnNode = (TypeInsnNode)abstractInsnNode;
-                            if (typeInsnNode.getOpcode() == Opcodes.NEW) {
-                                break;
-                            }
+                            if (typeInsnNode.getOpcode() == Opcodes.NEW) break;
                         }
                         cache--;
                     }
@@ -900,6 +982,28 @@ final class V_1_4_7_Mapping extends Mapping {
                         buffer--;
                     }
                 }
+            }
+
+            if (loadTexture_func_76985_a != -1) {
+                MethodInsnNode methodInsnNode = (MethodInsnNode)methodNode.instructions.get(loadTexture_func_76985_a);
+                methodInsnNode.setOpcode(Opcodes.INVOKESTATIC);
+                methodInsnNode.owner = TextureHandler.class.getCanonicalName().replace(
+                        '.',
+                        '/'
+                );
+                methodInsnNode.name = "bindTexture";
+                methodInsnNode.desc = "(Ljava/lang/Class;Ljava/lang/String;)V";
+
+                methodNode.instructions.insert(
+                        methodNode.instructions.get(loadTexture_func_76985_a - 2),//ALOAD 0
+                        new MethodInsnNode(
+                                Opcodes.INVOKEVIRTUAL,
+                                "java/lang/Object",
+                                "getClass",
+                                "()Ljava/lang/Class;",
+                                false
+                        )
+                );
             }
         }
 
@@ -939,7 +1043,7 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
-    protected boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode) {
+    protected boolean fieldInsn(final String className, final int index, final InsnList insnList, final FieldInsnNode fieldInsnNode) {
         if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING FIELD INSN: {}/{} {}",
@@ -970,7 +1074,12 @@ final class V_1_4_7_Mapping extends Mapping {
                 fieldInsnNode.desc
         );
         if (holders != null) {
-            for(Holder holder : holders) holder.set(fieldInsnNode);
+            for(Holder holder : holders) {
+                holder.set(
+                        fieldInsnNode,
+                        insnList
+                );
+            }
         }
         if (fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC && fieldInsnNode.owner.equals("net/minecraft/client/renderer/ChestItemRenderHelper") && fieldInsnNode.name.equals("field_78545_a") && fieldInsnNode.desc.equals("Lnet/minecraft/client/renderer/ChestItemRenderHelper;")) {
             if (ReTweakResources.DEBUG_MESSAGES) {
@@ -1016,7 +1125,7 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
-    protected boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode) {
+    protected boolean methodInsn(final String className, final int index, final InsnList insnList, final MethodInsnNode methodInsnNode) {
         if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING METHOD INSN: {}/{}{}",
@@ -1076,7 +1185,12 @@ final class V_1_4_7_Mapping extends Mapping {
                 methodInsnNode.desc
         );
         if (holders != null) {
-            for(Holder holder : holders) holder.set(methodInsnNode);
+            for(Holder holder : holders) {
+                holder.set(
+                        methodInsnNode,
+                        insnList
+                );
+            }
         }
         if (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC) {
             switch(methodInsnNode.owner) {
@@ -1162,12 +1276,12 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
-    protected boolean intInsn(final String className, final int index, final IntInsnNode intInsnNode) {
+    protected boolean intInsn(final String className, final int index, final InsnList insnList, final IntInsnNode intInsnNode) {
         return false;
     }
 
     @Override
-    protected boolean ldcInsn(final String className, final int index, final LdcInsnNode ldcInsnNode) {
+    protected boolean ldcInsn(final String className, final int index, final InsnList insnList, final LdcInsnNode ldcInsnNode) {
         if (ldcInsnNode.getNext() instanceof MethodInsnNode) {
             MethodInsnNode methodInsnNodeNext = (MethodInsnNode)ldcInsnNode.getNext();
             if (methodInsnNodeNext.getOpcode() == Opcodes.INVOKESTATIC) {
@@ -1182,12 +1296,37 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
-    protected boolean typeInsn(final String className, final int index, final TypeInsnNode typeInsnNode) {
+    protected boolean typeInsn(final String className, final int index, final InsnList insnList, final TypeInsnNode typeInsnNode) {
         switch(typeInsnNode.getOpcode()) {
             case Opcodes.NEW:
                 if (typeInsnNode.desc.equals("net/minecraftforge/common/Configuration")) {
                     typeInsnNode.desc = "net/minecraftforge/common/config/Configuration";
                 }
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean ignoreField(final int opcode, final String owner, final String name, final String desc) {
+        if (opcode == -1 || StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name) || StringHelper.isNullOrEmpty(desc)) return false;
+        switch(owner) {
+            default:
+                if (name.equals("field_40331_g") && desc.equals("F")) return true;
+                if (name.equals("field_40332_n") && desc.equals("F")) return true;
+                if (name.equals("field_752_b") && desc.equals("F")) return true;
+                if (name.equals("field_757_d") && desc.equals("F")) return true;
+                if (name.equals("field_756_e") && desc.equals("F")) return true;
+                break;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean ignoreMethod(final int opcode, final String owner, final String name, final String desc) {
+        if (opcode == -1 || StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name) || StringHelper.isNullOrEmpty(desc)) return false;
+        switch(owner) {
+            default:
                 break;
         }
         return false;
@@ -1235,35 +1374,52 @@ final class V_1_4_7_Mapping extends Mapping {
         if (type == null || (StringHelper.isNullOrEmpty(owner) && (type != _Type.CLASS && type != _Type.ANNOTATION)) || (StringHelper.isNullOrEmpty(desc) && (type != _Type.CLASS && type != _Type.ANNOTATION))) return null;
         List<Holder> holders = new ArrayList<>();
         for(Holder holder : types.get(type).keySet()) {
+            boolean flag_1, flag_2, flag_3, flag_4;
             switch(type) {
                 case ANNOTATION:
-                    if ((holder.getOpcode() == -1 && opcode == -1) && (StringHelper.isNullOrEmpty(holder.getOwner()) && StringHelper.isNullOrEmpty(owner)) && (StringHelper.isNullOrEmpty(holder.getName()) && StringHelper.isNullOrEmpty(name)) && (!StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc))) {
+                    flag_1 = holder.getOpcode() == -1 && opcode == -1;
+                    flag_2 = StringHelper.isNullOrEmpty(holder.getOwner()) && StringHelper.isNullOrEmpty(owner);
+                    flag_3 = StringHelper.isNullOrEmpty(holder.getName()) && StringHelper.isNullOrEmpty(name);
+                    flag_4 = !StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc);
+                    if (flag_1 && flag_2 && flag_3 && flag_4) {
                         holders.add(types.get(type).get(holder));
                     }
                     break;
                 case CLASS:
-                    if (holder.getName().equals(name)) {
+                    flag_1 = holder.getName().equals(name);
+                    if (flag_1) {
                         return new Holder[] {
                                 holder
                         };
                     }
                     break;
                 case INNER_CLASS:
-                    if (holder.getOpcode() == opcode && (!StringHelper.isNullOrEmpty(holder.getOwner()) && holder.getOwner().equals(owner)) && (!StringHelper.isNullOrEmpty(holder.getName()) && holder.getName().equals(name)) && (!StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc))) {
+                    flag_1 = holder.getOpcode() == opcode;
+                    flag_2 = !StringHelper.isNullOrEmpty(holder.getOwner()) && holder.getOwner().equals(owner);
+                    flag_3 = !StringHelper.isNullOrEmpty(holder.getName()) && holder.getName().equals(name);
+                    flag_4 = !StringHelper.isNullOrEmpty(holder.getDesc()) && holder.getDesc().equals(desc);
+                    if (flag_1 && flag_2 && flag_3 && flag_4) {
                         holders.add(types.get(type).get(holder));
                     }
                     break;
                 case FIELD:
                 case METHOD:
-                    if ((opcode == -1 || holder.getOpcode() == opcode) && (name == null || holder.getName().equals(name)) && holder.getDesc().equals(desc)) {
+                    flag_1 = opcode == -1 || holder.getOpcode() == opcode;
+                    flag_2 = name == null || holder.getName().equals(name);
+                    flag_3 = holder.getDesc().equals(desc);
+                    if (flag_1 && flag_2 && flag_3) {
                         holders.add(types.get(type).get(holder));
                     }
                     break;
                 case FIELD_INSN:
                 case METHOD_INSN:
-                        if ((holder.getOwner() == null || owner.equals(holder.getOwner())) && ((opcode == -1 || holder.getOpcode() == -1) || holder.getOpcode() == opcode) && ((name == null || holder.getName() == null) || name.equals(holder.getName())) && desc.equals(holder.getDesc())) {
-                            holders.add(types.get(type).get(holder));
-                        }
+                    flag_1 = holder.getOwner() == null || holder.getOwner().equals(owner);
+                    flag_2 = ((opcode == -1 || holder.getOpcode() == -1) || holder.getOpcode() == opcode);
+                    flag_3 = ((name == null || holder.getName() == null) || name.equals(holder.getName()));
+                    flag_4 = desc.equals(holder.getDesc());
+                    if (flag_1 && flag_2 && flag_3 && flag_4) {
+                        holders.add(types.get(type).get(holder));
+                    }
                     break;
             }
         }

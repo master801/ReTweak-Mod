@@ -32,7 +32,7 @@ public final class InterpreterTweak implements Tweak {
     }
 
     @Override
-    public void tweak(final ClassNode classNode) {
+    public void tweak(final ClassNode classNode, final GameVersion gameVersion) {
         if (gameVersion == null) return;
         if (classNode.fields != null) {
             for(FieldNode fieldNode : classNode.fields) field(fieldNode);

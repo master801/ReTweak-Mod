@@ -20,6 +20,15 @@
 -dontwarn
 
 
+-keep,allowshrinking,allowoptimization !interface public  org.slave.minecraft.retweak.loading.ReTweakLoader {
+    !private !protected !volatile !transient !synthetic public static final org.slave.minecraft.retweak.loading.ReTweakLoader INSTANCE;
+    !private !protected !static !synchronized !bridge !varargs !native !abstract !strictfp !synthetic public void loadMods();
+}
+
+-keep,allowshrinking,allowoptimization !@!interface public  org.slave.minecraft.retweak.loading.ReTweakStateHandler {
+    !private !protected !synchronized !bridge !varargs !native !abstract !strictfp !synthetic public static void step(cpw.mods.fml.common.LoadController,cpw.mods.fml.common.LoaderState,cpw.mods.fml.common.LoaderState);
+}
+
 -keep,allowshrinking,allowoptimization !@!interface public  org.slave.minecraft.retweak.client.config.elements.GuiScreenConfigReTweakConfig {
     !private !protected !static !synchronized !bridge !varargs !native !abstract !strictfp !synthetic public *** getConfigElements();
 }
