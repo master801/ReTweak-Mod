@@ -68,8 +68,8 @@ public final class ReTweakLoader {
     public void loadMods() {
         //<editor-fold desc="Find">
         if (!ReTweakResources.RETWEAK_MODS_DIRECTORY.exists()) {
-            ReTweakResources.RETWEAK_LOGGER.info(
-                    "ReTweak's mod directory does not exist... not loading mods."
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "ReTweak's mod directory does not exist... not finding mods."
             );
             FileHelper.createDirectory(ReTweakResources.RETWEAK_MODS_DIRECTORY);
             return;
@@ -131,7 +131,7 @@ public final class ReTweakLoader {
                                     resourceName
                             );
                             if (resourceFile.exists()) {
-                                if (ReTweakResources.DEBUG) {
+                                if (ReTweakResources.DEBUG_MESSAGES) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
                                             "Resource folder \"{}\" exists! Adding all \"*.ogg\" files to the class-loader...",
                                             resourceFile.getPath()
@@ -142,7 +142,7 @@ public final class ReTweakLoader {
                                     for(File subFile : subFiles) {
                                         if (ReTweakLoader.PATTERN_OGG.matcher(subFile.getName()).matches()) {
                                             ReTweakClassLoader.getClassLoader(gameVersion).addFile(subFile);
-                                            if (ReTweakResources.DEBUG) {
+                                            if (ReTweakResources.DEBUG_MESSAGES) {
                                                 ReTweakResources.RETWEAK_LOGGER.info(
                                                         "Added resource file \"{}\" to the class-loader",
                                                         subFile.getPath()
@@ -189,7 +189,7 @@ public final class ReTweakLoader {
 
         //<editor-fold desc="Load">
         for(GameVersion gameVersion : GameVersion.values()) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.debug(
                         "Found {} mods for version {}!",
                         reTweakModDiscoverer.getModCandidates(gameVersion).size(),

@@ -35,7 +35,7 @@ public abstract class Mapping {
 
     protected abstract boolean method(final String className, final MethodNode methodNode);
 
-    protected abstract void postMethodNode(final String className, final int index, final MethodNode methodNode);
+    protected abstract void postMethodNode(final ClassNode classNode, final int index, final MethodNode methodNode);
 
     protected abstract boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode);
 
@@ -56,12 +56,13 @@ public abstract class Mapping {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public final boolean remap(final String className, final Object node, final int index) {
-        if (StringHelper.isNullOrEmpty(className) || node == null) throw new NullPointerException();
+    public final boolean remap(final ClassNode classNode, final Object node, final int index) {
+        if (classNode == null || node == null) throw new NullPointerException();
         if (index < 0) throw new IndexOutOfBoundsException();
         if (node instanceof ClassNode || node instanceof MethodNode || node instanceof MethodInsnNode || node instanceof FieldNode || node instanceof FieldInsnNode || node instanceof IntInsnNode || node instanceof LdcInsnNode || node instanceof TypeInsnNode) {
+            String className = classNode.name;
             boolean remove = false;
-            if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
+            if (ReTweakResources.DEBUG_MESSAGES) ReTweakResources.RETWEAK_LOGGER.info("MAPPING START");
             if (node instanceof ClassNode) {
                 remove = _class(
                         className,
@@ -117,14 +118,14 @@ public abstract class Mapping {
                     );
                 } else if (node instanceof MethodNode) {
                     postMethodNode(
-                            className,
+                            classNode,
                             index,
                             (MethodNode)node
                     );
                 }
             }
 
-            if (ReTweakResources.DEBUG) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");
+            if (ReTweakResources.DEBUG_MESSAGES) ReTweakResources.RETWEAK_LOGGER.info("MAPPING END\n");
             return remove;
         }
         return false;
@@ -207,7 +208,7 @@ public abstract class Mapping {
             if (getType() == _Type.ANNOTATION && object instanceof AnnotationNode) {
                 AnnotationNode annotationNode = (AnnotationNode)object;
                 if (!StringHelper.isNullOrEmpty(getDesc())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set desc from {} to {}",
                                 getType().name(),
@@ -223,7 +224,7 @@ public abstract class Mapping {
             } else if (getType() == _Type.INNER_CLASS && object instanceof InnerClassNode) {
                 InnerClassNode innerClassNode = (InnerClassNode)object;
                 if (getOpcode() != -1) {//Access
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set access from {} to {}",
                                 getType().name(),
@@ -234,7 +235,7 @@ public abstract class Mapping {
                     innerClassNode.access = getOpcode();
                 }
                 if (!StringHelper.isNullOrEmpty(getName())) {//Name
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set name from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -245,7 +246,7 @@ public abstract class Mapping {
                     innerClassNode.name = getName();
                 }
                 if (!StringHelper.isNullOrEmpty(getOwner())) {//Outer-name
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set outer-name from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -256,7 +257,7 @@ public abstract class Mapping {
                     innerClassNode.outerName = getOwner();
                 }
                 if (!StringHelper.isNullOrEmpty(getDesc())) {//Inner-name
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set inner-name from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -275,7 +276,7 @@ public abstract class Mapping {
             } else if (getType() == _Type.FIELD_INSN && object instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode)object;
                 if (getOpcode() != -1) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set op code from {} to {}",
                                 getType().name(),
@@ -286,7 +287,7 @@ public abstract class Mapping {
                     fieldInsnNode.setOpcode(getOpcode());
                 }
                 if (!StringHelper.isNullOrEmpty(getOwner())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set owner from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -297,7 +298,7 @@ public abstract class Mapping {
                     fieldInsnNode.owner = getOwner();
                 }
                 if (!StringHelper.isNullOrEmpty(getName())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set name from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -308,7 +309,7 @@ public abstract class Mapping {
                     fieldInsnNode.name = getName();
                 }
                 if (!StringHelper.isNullOrEmpty(getDesc())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set desc from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -321,7 +322,7 @@ public abstract class Mapping {
             } else if (getType() == _Type.METHOD_INSN && object instanceof MethodInsnNode) {
                 MethodInsnNode methodInsnNode = (MethodInsnNode)object;
                 if (getOpcode() != -1) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set owner from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -332,7 +333,7 @@ public abstract class Mapping {
                     methodInsnNode.setOpcode(getOpcode());
                 }
                 if (!StringHelper.isNullOrEmpty(getOwner())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set owner from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -343,7 +344,7 @@ public abstract class Mapping {
                     methodInsnNode.owner = getOwner();
                 }
                 if (!StringHelper.isNullOrEmpty(getName())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set name from \"{}\" to \"{}\"",
                                 getType().name(),
@@ -354,7 +355,7 @@ public abstract class Mapping {
                     methodInsnNode.name = getName();
                 }
                 if (!StringHelper.isNullOrEmpty(getDesc())) {
-                    if (ReTweakResources.DEBUG) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Holder - {} -- Set desc from \"{}\" to \"{}\"",
                                 getType().name(),

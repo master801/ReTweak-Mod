@@ -91,26 +91,29 @@ public final class ReTweakStateHandler {
     }
 
     private static void constructing(LoadController loadController) {
-        FMLCommonHandler.instance().registerCrashCallable(new ICrashCallable() {
+        FMLCommonHandler.instance().registerCrashCallable(
+                new ICrashCallable() {
 
-            @Override
-            public String getLabel() {
-                return "ReTweak-Mod";
-            }
+                    @Override
+                    public String getLabel() {
+                        return "ReTweak-Mod";
+                    }
 
-            @Override
-            public String call() throws Exception {
-                return "ReTweak is loaded, this crash may have been caused by it.";
-            }
+                    @Override
+                    public String call() throws Exception {
+                        return "ReTweak is loaded, this crash may have been caused by it.";
+                    }
 
-        });
+                }
+        );
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakModContainer[] reTweakModContainers = ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion);
             for(ReTweakModContainer reTweakModContainer : reTweakModContainers) {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
-                            "Mod {} has been disabled, not loading..."
+                            "Mod \"{}\" has been disabled, not loading...",
+                            reTweakModContainer.getModid()
                     );
                     continue;
                 }

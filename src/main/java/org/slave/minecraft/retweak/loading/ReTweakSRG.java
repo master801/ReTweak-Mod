@@ -29,7 +29,7 @@ public final class ReTweakSRG {
     private final GameVersion gameVersion;
     private final Mapping mapping;
 
-    public ReTweakSRG(GameVersion gameVersion) {
+    public ReTweakSRG(final GameVersion gameVersion) {
         this.gameVersion = gameVersion;
         mapping = ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion);
     }
@@ -50,7 +50,7 @@ public final class ReTweakSRG {
     }
 
     private void name(ClassNode classNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "[SRG] NAME: {}",
                     classNode.name
@@ -61,7 +61,7 @@ public final class ReTweakSRG {
     private void superName(ClassNode classNode) {
         final String originalSuperName = classNode.superName;
 
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "[SRG] SUPER-NAME: {}",
                     classNode.superName
@@ -82,7 +82,7 @@ public final class ReTweakSRG {
                 classNode.superName = classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
                 set = true;
             }
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped super-class from \"{}\" to \"{}\"",
                         classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
@@ -99,7 +99,7 @@ public final class ReTweakSRG {
             classNode.superName = classMapping.getName().getName(
                     org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
             ).getString();
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped super-class from \"{}\" to \"{}\"",
                         originalSuperName,
@@ -113,7 +113,7 @@ public final class ReTweakSRG {
         if (classNode.interfaces == null) return;
         for(int i = 0; i < classNode.interfaces.size(); ++i) {
             final String _interface = classNode.interfaces.get(i);
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "[SRG] INTERFACE: {}",
                         _interface
@@ -129,7 +129,7 @@ public final class ReTweakSRG {
                         i,
                         classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
                 );
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped interface from \"{}\" to \"{}\", in class \"{}\"",
                             classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
@@ -144,7 +144,7 @@ public final class ReTweakSRG {
     private void fields(ClassNode classNode) {
         if (classNode.fields == null) return;
         for(FieldNode fieldNode : classNode.fields) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "[SRG] FIELD: \"{}\" \"{}\"",
                         fieldNode.name,
@@ -174,7 +174,7 @@ public final class ReTweakSRG {
                 fieldNode.name = fieldMapping.getName().getName(
                         org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                 ).getString();
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped field name from \"{}\" to \"{}\"",
                             originalName,
@@ -212,7 +212,7 @@ public final class ReTweakSRG {
                                 org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                         ) + ";"
                 );
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped field desc from \"{}\" to \"{}\"",
                             originalDesc,
@@ -231,7 +231,7 @@ public final class ReTweakSRG {
     private void methods(ClassNode classNode) {
         if (classNode.methods == null) return;
         for(MethodNode methodNode : classNode.methods) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "[SRG] METHOD: \"{}{}\"",
                         methodNode.name,
@@ -265,7 +265,7 @@ public final class ReTweakSRG {
             );
             if (methodMapping != null) {
                 methodNode.name = methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped method name from \"{}\" to \"{}\" in class \"{}\"",
                             methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
@@ -337,7 +337,7 @@ public final class ReTweakSRG {
                 fieldInsnNode.owner = classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
                 fieldInsnNode.name = fieldMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
 
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped field insn (at index {}) from \"{}\" to \"{}\", in method \"{}\" from class \"{}\"",
                             index,
@@ -407,7 +407,7 @@ public final class ReTweakSRG {
 
 
         if (!fieldInsnNode.owner.equals(originalOwner) || !fieldInsnNode.name.equals(originalName) || !fieldInsnNode.desc.equals(originalDesc)) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped field insn (at index {}) from \"{}\" to \"{}\", in method \"{}\" from class \"{}\"",
                         index,
@@ -466,7 +466,7 @@ public final class ReTweakSRG {
                         org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                 ).getString();
 
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped method insn (at index {}) from \"{}\" to \"{}\", in method \"{}\" from class \"{}\"",
                             index,
@@ -590,7 +590,7 @@ public final class ReTweakSRG {
                 newArgumentTypes
         );
 
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "Remapped method insn (at index {}) from \"{}\" to \"{}\", in method \"{}\" from class \"{}\"",
                     index,
@@ -640,7 +640,7 @@ public final class ReTweakSRG {
                                         org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                                 ).getString()
                         );
-                        if (ReTweakResources.DEBUG) {
+                        if (ReTweakResources.DEBUG_MESSAGES) {
                             ReTweakResources.RETWEAK_LOGGER.info(
                                     "Remapped frame \"{}\", from \"{}\" to \"{}\"",
                                     Kirai.from(
@@ -675,7 +675,7 @@ public final class ReTweakSRG {
             typeInsnNode.desc = classMapping.getName().getName(
                     org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
             ).getString();
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped type insn \"{}\", from \"{}\" to \"{}\"",
                         Kirai.from(
@@ -734,7 +734,7 @@ public final class ReTweakSRG {
                                 org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
                         ).getString() + ";"
                 );
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped local variable \"{}\", desc from \"{}\" to \"{}\"",
                             Kirai.from(

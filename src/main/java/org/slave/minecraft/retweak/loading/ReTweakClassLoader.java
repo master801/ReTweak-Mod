@@ -53,7 +53,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 new URL[0],
                 parent
         );
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         this.parent = parent;
         this.gameVersion = gameVersion;
@@ -83,7 +83,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     ).format().toString()
             );
         }
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "LOAD: {}",
                     name
@@ -228,7 +228,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "FIND: {}",
                     name
@@ -279,7 +279,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
      * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#call()}
      */
     private void loadSRG() {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         if (ReTweakConfig.INSTANCE.getCompilationMode() != CompilationMode.JIT) return;
         if (srg != null) {
@@ -317,6 +317,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
             }
         }
         return null;
+    }
+
+    ReTweakSRG getReTweakSRG() {
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        return srg;
     }
 
     @SuppressWarnings("FinalStaticMethod")

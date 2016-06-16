@@ -7,9 +7,11 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
+import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 import org.slave.tool.remapper.SRG;
+import org.slave.tool.remapper.SRG_Type;
 
 /**
  * Created by Master on 5/15/2016 at 8:27 AM.
@@ -50,12 +52,12 @@ public final class DeSeargeTweak implements Tweak {
                     if (abstractInsnNode instanceof FieldInsnNode) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                         if (fieldInsnNode.name.startsWith("field_")) {
-                            String[] entry = srg.getFieldEntry(
+                            String[] entry = getFieldEntry(
                                     fieldInsnNode.owner,
                                     fieldInsnNode.name
                             );
                             if (entry != null) {
-                                if (ReTweakResources.DEBUG) {
+                                if (ReTweakResources.DEBUG_MESSAGES) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
                                             "DeSearged name of field insn ( {} ) from method \"{}\", at index {}, from class \"{}\", from \"{}\" to \"{}\"",
                                             ASMHelper.toString(fieldInsnNode),
@@ -80,13 +82,13 @@ public final class DeSeargeTweak implements Tweak {
                     } else if (abstractInsnNode instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
                         if (methodInsnNode.name.startsWith("func_")) {
-                            String[] entry = srg.getMethodEntry(
+                            String[] entry = getMethodEntry(
                                     methodInsnNode.owner,
                                     methodInsnNode.name,
                                     methodInsnNode.desc
                             );
                             if (entry != null) {
-                                if (ReTweakResources.DEBUG) {
+                                if (ReTweakResources.DEBUG_MESSAGES) {
                                     ReTweakResources.RETWEAK_LOGGER.info(
                                             "DeSearged name of method insn ( {} ) at index {}, from method \"{}\", from class \"{}\", from \"{}\" to \"{}\"",
                                             ASMHelper.toString(methodInsnNode),
@@ -117,6 +119,43 @@ public final class DeSeargeTweak implements Tweak {
     @Override
     public int getWantedSortIndex() {
         return Integer.MAX_VALUE;//Last tweak
+    }
+
+    private String[] getFieldEntry(final String owner, final String name) {
+        if (StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name)) return null;
+
+        String[] entry = srg.getFieldEntry(
+                owner,
+                name
+        );
+        if (entry == null) {
+            for(String[] iteratingEntry : srg.getSRGEntries(SRG_Type.FD).getEntries()) {
+                if (iteratingEntry[1].equals(name)) {
+                    entry = iteratingEntry;
+                    break;
+                }
+            }
+        }
+        return entry;
+    }
+
+    private String[] getMethodEntry(final String owner, final String name, final String desc) {
+        if (StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name) || StringHelper.isNullOrEmpty(desc)) return null;
+
+        String[] entry = srg.getMethodEntry(
+                owner,
+                name,
+                desc
+        );
+        if (entry == null) {
+            for(String[] iteratingEntry : srg.getSRGEntries(SRG_Type.MD).getEntries()) {
+                if (iteratingEntry[1].equals(name) && iteratingEntry[2].equals(desc)) {
+                    entry = iteratingEntry;
+                    break;
+                }
+            }
+        }
+        return entry;
     }
 
     public static Tweak getInstance() {

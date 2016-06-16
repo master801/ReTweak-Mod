@@ -39,7 +39,6 @@ final class V_1_4_7_Mapping extends Mapping {
 
     V_1_4_7_Mapping() {
         super(GameVersion.V_1_4_7);
-
         //<editor-fold desc="Automation">
         for(_Type type : _Type.values()) {
             types.put(
@@ -634,7 +633,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean _class(final String className, final ClassNode classNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING CLASS: {} {}",
                     classNode.name,
@@ -656,7 +655,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     for(Holder holder : holders) {
                         if (holder == null) {//Remove annotation
                             annotationNodeIterator.remove();
-                            if (ReTweakResources.DEBUG) {
+                            if (ReTweakResources.DEBUG_MESSAGES) {
                                 ReTweakResources.RETWEAK_LOGGER.info(
                                         "Removed annotation \"{}\" from class {}",
                                         annotationNode.desc,
@@ -685,7 +684,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     for(Holder holder : holders) {
                         if (holder == null) {
                             innerClassNodeIterator.remove();
-                            if (ReTweakResources.DEBUG) {
+                            if (ReTweakResources.DEBUG_MESSAGES) {
                                 ReTweakResources.RETWEAK_LOGGER.info(
                                         "Removed inner-class \"{}\" from class {}",
                                         innerClassNode.name,
@@ -723,7 +722,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean field(final String className, final FieldNode fieldNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING FIELD: {} {}",
                     fieldNode.name,
@@ -746,7 +745,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     for(Holder holder : holders) {
                         if (holder == null) {//Remove annotation
                             annotationNodeIterator.remove();
-                            if (ReTweakResources.DEBUG) {
+                            if (ReTweakResources.DEBUG_MESSAGES) {
                                 ReTweakResources.RETWEAK_LOGGER.info(
                                         "Removed annotation \"{}\" from field {}",
                                         annotationNode.desc,
@@ -779,7 +778,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean method(final String className, final MethodNode methodNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING METHOD: {}{}",
                     methodNode.name,
@@ -802,7 +801,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     for(Holder holder : holders) {
                         if (holder == null) {
                             annotationNodeIterator.remove();
-                            if (ReTweakResources.DEBUG) {
+                            if (ReTweakResources.DEBUG_MESSAGES) {
                                 ReTweakResources.RETWEAK_LOGGER.info(
                                         "Removed annotation \"{}\" from method {}",
                                         annotationNode.desc,
@@ -834,7 +833,7 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     @Override
-    protected void postMethodNode(final String className, final int index, final MethodNode methodNode) {
+    protected void postMethodNode(final ClassNode classNode, final int index, final MethodNode methodNode) {
         if (methodNode.instructions != null) {
             Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
             int tickHandler = -1;
@@ -856,13 +855,15 @@ final class V_1_4_7_Mapping extends Mapping {
                                     break;
                             }
                             break;
-                    }
-                    switch(methodInsnNode.owner) {
-                        case "net/minecraftforge/common/Configuration":
-                            methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
-                            break;
-                        case "net/minecraftforge/common/Property":
-                            methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                        default:
+                            switch(methodInsnNode.owner) {
+                                case "net/minecraftforge/common/Configuration":
+                                    methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
+                                    break;
+                                case "net/minecraftforge/common/Property":
+                                    methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                                    break;
+                            }
                             break;
                     }
                 } else if (abstractInsnNode instanceof TypeInsnNode) {
@@ -901,11 +902,45 @@ final class V_1_4_7_Mapping extends Mapping {
                 }
             }
         }
+
+        if (classNode.superName.equals("net/minecraft/item/Item")) {
+            if (methodNode.name.equals("<init>") && methodNode.instructions != null) {
+                int methodInsnNodeIndex = -1;
+
+                for(int i = 0; i < methodNode.instructions.size(); ++i) {
+                    AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+                    if (abstractInsnNode instanceof MethodInsnNode) {
+                        methodInsnNodeIndex = i;
+                        break;
+                    }
+                }
+
+                if (methodInsnNodeIndex != -1) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode)methodNode.instructions.get(methodInsnNodeIndex);
+                    if (methodInsnNode != null && methodInsnNode.desc.equals("(I)V")) {
+                        final String originalDesc = methodInsnNode.desc;
+                        methodInsnNode.desc = "()V";
+                        methodNode.instructions.remove(methodInsnNode.getPrevious());
+                        if (ReTweakResources.DEBUG_MESSAGES) {
+                            ReTweakResources.RETWEAK_LOGGER.info(
+                                    "Remapped desc of super-constructor call (at index {}) from method \"{}{}\" in class \"{}\", from \"{}\" to \"{}\"",
+                                    methodInsnNodeIndex,
+                                    methodNode.name,
+                                    methodNode.desc,
+                                    classNode.name,
+                                    originalDesc,
+                                    methodInsnNode.desc
+                            );
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @Override
     protected boolean fieldInsn(final String className, final int index, final FieldInsnNode fieldInsnNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING FIELD INSN: {}/{} {}",
                     fieldInsnNode.owner,
@@ -938,7 +973,7 @@ final class V_1_4_7_Mapping extends Mapping {
             for(Holder holder : holders) holder.set(fieldInsnNode);
         }
         if (fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC && fieldInsnNode.owner.equals("net/minecraft/client/renderer/ChestItemRenderHelper") && fieldInsnNode.name.equals("field_78545_a") && fieldInsnNode.desc.equals("Lnet/minecraft/client/renderer/ChestItemRenderHelper;")) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Removed field insn node \"{}\" at index {} from class \"{}\"",
                         ASMHelper.toString(fieldInsnNode),
@@ -982,7 +1017,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     protected boolean methodInsn(final String className, final int index, final MethodInsnNode methodInsnNode) {
-        if (ReTweakResources.DEBUG) {
+        if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "MAPPING METHOD INSN: {}/{}{}",
                     methodInsnNode.owner,
@@ -1056,7 +1091,7 @@ final class V_1_4_7_Mapping extends Mapping {
                                             "(" +
                                                     ("L" + "net/minecraft/item/Item" + ";") +
                                                     "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG) {
+                                    if (ReTweakResources.DEBUG_MESSAGES) {
                                         ReTweakResources.RETWEAK_LOGGER.info(
                                                 "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
                                                 ASMHelper.toString(methodInsnNode),
@@ -1072,7 +1107,7 @@ final class V_1_4_7_Mapping extends Mapping {
                                             "(" +
                                                     ("L" + "net/minecraft/block/Block" + ";") +
                                                     "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG) {
+                                    if (ReTweakResources.DEBUG_MESSAGES) {
                                         ReTweakResources.RETWEAK_LOGGER.info(
                                                 "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
                                                 ASMHelper.toString(methodInsnNode),
@@ -1088,7 +1123,7 @@ final class V_1_4_7_Mapping extends Mapping {
                                             "(" +
                                                     ("L" + "net/minecraft/item/ItemStack" + ";") +
                                                     "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG) {
+                                    if (ReTweakResources.DEBUG_MESSAGES) {
                                         ReTweakResources.RETWEAK_LOGGER.info(
                                                 "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
                                                 ASMHelper.toString(methodInsnNode),
@@ -1114,6 +1149,13 @@ final class V_1_4_7_Mapping extends Mapping {
             methodInsnNode.desc = methodInsnNode.desc.replace(
                     "Lnet/minecraftforge/common/Property;",
                     "Lnet/minecraftforge/common/config/Property;"
+            );
+        }
+        if (methodInsnNode.desc.contains("Lnet/minecraft/entity/EntityLiving;")) {
+            //I don't even care right now
+            methodInsnNode.desc = methodInsnNode.desc.replace(
+                    "Lnet/minecraft/entity/EntityLiving;",
+                    "Lnet/minecraft/entity/EntityLivingBase;"
             );
         }
         return false;

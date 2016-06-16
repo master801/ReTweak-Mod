@@ -65,14 +65,14 @@ public final class ReTweakTweakHandler {
     public void tweak(ClassNode classNode, GameVersion gameVersion) throws TweakException {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Start Tweak \"{}\"",
                         tweak.getName()
                 );
             }
             tweak.tweak(classNode);
-            if (ReTweakResources.DEBUG) {
+            if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "End Tweak\n\n",
                         tweak.getName()
@@ -86,7 +86,7 @@ public final class ReTweakTweakHandler {
         static final Comparator<Tweak> INSTANCE = new TweakComparator();
 
         private TweakComparator() {
-            Object _INTERNAL_USAGE_ONLY_ = null;
+            final Object _INTERNAL_USAGE_ONLY_ = null;
         }
 
         @Override

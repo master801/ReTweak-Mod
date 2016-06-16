@@ -96,7 +96,7 @@ public final class ReTweakDeobfuscation {
             );
             if (srgMCP.isFile()) {
                 InputStream inputStream = new FileInputStream(srgMCP);
-                if (ReTweakResources.DEBUG) {
+                if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Found deobfuscation data for the current version ({}) of Minecraft! (Path: \"{}\")",
                             Loader.MC_VERSION,

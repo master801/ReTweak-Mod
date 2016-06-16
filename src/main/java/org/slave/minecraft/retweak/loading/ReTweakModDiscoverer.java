@@ -81,7 +81,7 @@ public final class ReTweakModDiscoverer {
                 if (ReTweakModDiscoverer.archivePattern != null) {
                     if (ReTweakModDiscoverer.archivePattern.matcher(file.getName()).matches()) {
                         ReTweakResources.RETWEAK_LOGGER.info(
-                                "Added archive \"{}\" as a candidate mod.",
+                                "Added file \"{}\" as a candidate mod.",
                                 file.getPath()
                         );
                         ReTweakModCandidate reTweakModCandidate = new ReTweakModCandidate(
@@ -90,7 +90,7 @@ public final class ReTweakModDiscoverer {
                         );
                         if (reTweakModCandidate.getASMTable().getClasses() == null) {
                             ReTweakResources.RETWEAK_LOGGER.warn(
-                                    "Found non-mod file \"{}\" that is marked as a mod candidate. Removing as candidate...",
+                                    "Found non-mod file \"{}\" that is marked as a mod candidate. Removing...",
                                     file.getPath()
                             );
                             continue;

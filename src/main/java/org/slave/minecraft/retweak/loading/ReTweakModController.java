@@ -25,7 +25,7 @@ public final class ReTweakModController {
     }
 
     static void preInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -52,7 +52,7 @@ public final class ReTweakModController {
     }
 
     static void initialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -79,7 +79,7 @@ public final class ReTweakModController {
     }
 
     static void postInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -106,7 +106,7 @@ public final class ReTweakModController {
     }
 
     static void serverAboutToStart() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -133,7 +133,7 @@ public final class ReTweakModController {
     }
 
     static void serverStarting() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -160,7 +160,7 @@ public final class ReTweakModController {
     }
 
     static void serverStarted() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -187,7 +187,7 @@ public final class ReTweakModController {
     }
 
     static void serverStopping() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -214,7 +214,7 @@ public final class ReTweakModController {
     }
 
     static void serverStopped() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
-        Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakResources.RETWEAK_LOGGER.debug(

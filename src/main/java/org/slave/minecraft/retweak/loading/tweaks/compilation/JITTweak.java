@@ -38,8 +38,8 @@ public final class JITTweak implements Tweak {
             int index = 0;
             while(fieldNodeIterator.hasNext()) {
                 FieldNode fieldNode = fieldNodeIterator.next();
-                if (remap(classNode.name, index, fieldNode)) {
-                    if (ReTweakResources.DEBUG) {
+                if (remap(classNode, index, fieldNode)) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing field \"{} {}\" from class \"{}\"",
                                 fieldNode.name,
@@ -57,8 +57,8 @@ public final class JITTweak implements Tweak {
             int index = 0;
             while(methodNodeIterator.hasNext()) {
                 MethodNode methodNode = methodNodeIterator.next();
-                if (remap(classNode.name, index, methodNode)) {
-                    if (ReTweakResources.DEBUG) {
+                if (remap(classNode, index, methodNode)) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing method \"{}{}\" from class \"{}\"",
                                 methodNode.name,
@@ -72,7 +72,7 @@ public final class JITTweak implements Tweak {
             }
         }
         remap(
-                classNode.name,
+                classNode,
                 0,
                 classNode
         );
@@ -83,7 +83,7 @@ public final class JITTweak implements Tweak {
         return 0;
     }
 
-    private boolean remap(final String className, final int index, final Object node) {
+    private boolean remap(final ClassNode classNode, final int index, final Object node) {
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -92,7 +92,7 @@ public final class JITTweak implements Tweak {
             );
             return false;
         }
-        if (mapping.remap(className, node, index)) return true;
+        if (mapping.remap(classNode, node, index)) return true;
 
         //Remap method instructions
         if (node instanceof MethodNode) {
@@ -102,15 +102,15 @@ public final class JITTweak implements Tweak {
             int _index = 0;
             while(abstractInsnNodeIterator.hasNext()) {
                 AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
-                if (mapping.remap(className, abstractInsnNode, index)) {
-                    if (ReTweakResources.DEBUG) {
+                if (mapping.remap(classNode, abstractInsnNode, index)) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
                         ReTweakResources.RETWEAK_LOGGER.info(
                                 "Removing abstract insn node \"{}\" at index {}, in method \"{}{}\", in class {}",
                                 abstractInsnNode,
                                 _index,
                                 methodNode.name,
                                 methodNode.desc,
-                                className
+                                classNode.name
                         );
                     }
                     abstractInsnNodeIterator.remove();

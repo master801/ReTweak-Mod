@@ -35,10 +35,19 @@ public final class ReTweakResources {
 
     public static final Logger RETWEAK_LOGGER = LoggerFactory.getLogger("ReTweak-Mod");
 
-    public static final Boolean DEBUG = Boolean.valueOf(System.getProperty(
-            "org.slave.minecraft.retweak.debug",
-            Boolean.FALSE.toString()
-    ));
+    public static final Boolean DEBUG = Boolean.valueOf(
+            System.getProperty(
+                    "org.slave.minecraft.retweak.debug",
+                    Boolean.FALSE.toString()
+            )
+    );
+
+    public static final Boolean DEBUG_MESSAGES = Boolean.valueOf(
+            System.getProperty(
+                    "org.slave.minecraft.retweak.debug_messages",
+                    Boolean.FALSE.toString()
+            )
+    );
 
     private ReTweakResources() {
         throw new IllegalStateException();
