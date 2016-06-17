@@ -374,14 +374,14 @@ final class V_1_4_7_Mapping extends Mapping {
         types.get(_Type.FIELD_INSN).put(
                 new Holder(
                         _Type.FIELD_INSN,
-                        -1,
-                        null,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/item/Item",
                         null,
                         "Lnet/minecraft/item/Item;"
                 ),
                 new Holder(
                         _Type.FIELD_INSN,
-                        -1,
+                        Opcodes.GETSTATIC,
                         "net/minecraft/init/Items",
                         null,
                         "Lnet/minecraft/item/Item;"
@@ -1007,38 +1007,75 @@ final class V_1_4_7_Mapping extends Mapping {
             }
         }
 
-        if (classNode.superName.equals("net/minecraft/item/Item")) {
-            if (methodNode.name.equals("<init>") && methodNode.instructions != null) {
-                int methodInsnNodeIndex = -1;
+        switch(classNode.superName) {
+            case "net/minecraft/item/Item":
+                if (methodNode.name.equals("<init>") && methodNode.instructions != null) {
+                    int methodInsnNodeIndex = -1;
 
-                for(int i = 0; i < methodNode.instructions.size(); ++i) {
-                    AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
-                    if (abstractInsnNode instanceof MethodInsnNode) {
-                        methodInsnNodeIndex = i;
-                        break;
+                    for(int i = 0; i < methodNode.instructions.size(); ++i) {
+                        AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+                        if (abstractInsnNode instanceof MethodInsnNode) {
+                            methodInsnNodeIndex = i;
+                            break;
+                        }
                     }
-                }
 
-                if (methodInsnNodeIndex != -1) {
-                    MethodInsnNode methodInsnNode = (MethodInsnNode)methodNode.instructions.get(methodInsnNodeIndex);
-                    if (methodInsnNode != null && methodInsnNode.desc.equals("(I)V")) {
-                        final String originalDesc = methodInsnNode.desc;
-                        methodInsnNode.desc = "()V";
-                        methodNode.instructions.remove(methodInsnNode.getPrevious());
-                        if (ReTweakResources.DEBUG_MESSAGES) {
-                            ReTweakResources.RETWEAK_LOGGER.info(
-                                    "Remapped desc of super-constructor call (at index {}) from method \"{}{}\" in class \"{}\", from \"{}\" to \"{}\"",
-                                    methodInsnNodeIndex,
-                                    methodNode.name,
-                                    methodNode.desc,
-                                    classNode.name,
-                                    originalDesc,
-                                    methodInsnNode.desc
-                            );
+                    if (methodInsnNodeIndex != -1) {
+                        MethodInsnNode methodInsnNode = (MethodInsnNode)methodNode.instructions.get(methodInsnNodeIndex);
+                        if (methodInsnNode != null && methodInsnNode.desc.equals("(I)V")) {
+                            final String originalDesc = methodInsnNode.desc;
+                            methodInsnNode.desc = "()V";
+                            methodNode.instructions.remove(methodInsnNode.getPrevious());
+                            if (ReTweakResources.DEBUG_MESSAGES) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Remapped desc of super-constructor call (at index {}) from method \"{}{}\" in class \"{}\", from \"{}\" to \"{}\"",
+                                        methodInsnNodeIndex,
+                                        methodNode.name,
+                                        methodNode.desc,
+                                        classNode.name,
+                                        originalDesc,
+                                        methodInsnNode.desc
+                                );
+                            }
                         }
                     }
                 }
-            }
+                break;
+            case "net/minecraft/item/ItemFood":
+                if (methodNode.name.equals("<init>") && methodNode.instructions != null) {
+                    int methodInsnNodeIndex = -1;
+
+                    for(int i = 0; i < methodNode.instructions.size(); ++i) {
+                        AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+                        if (abstractInsnNode instanceof MethodInsnNode) {
+                            methodInsnNodeIndex = i;
+                            break;
+                        }
+                    }
+
+                    if (methodInsnNodeIndex != -1) {
+                        MethodInsnNode methodInsnNode = (MethodInsnNode)methodNode.instructions.get(methodInsnNodeIndex);
+                        if (methodInsnNode != null && methodInsnNode.desc.equals("(IIZ)V")) {
+                            final String originalDesc = methodInsnNode.desc;
+                            methodInsnNode.desc = "(IZ)V";
+                            methodNode.instructions.remove(
+                                    methodInsnNode.getPrevious().getPrevious().getPrevious()//ILOAD 1
+                            );
+                            if (ReTweakResources.DEBUG_MESSAGES) {
+                                ReTweakResources.RETWEAK_LOGGER.info(
+                                        "Remapped desc of super-constructor call (at index {}) from method \"{}{}\" in class \"{}\", from \"{}\" to \"{}\"",
+                                        methodInsnNodeIndex,
+                                        methodNode.name,
+                                        methodNode.desc,
+                                        classNode.name,
+                                        originalDesc,
+                                        methodInsnNode.desc
+                                );
+                            }
+                        }
+                    }
+                }
+                break;
         }
     }
 
@@ -1192,71 +1229,96 @@ final class V_1_4_7_Mapping extends Mapping {
                 );
             }
         }
-        if (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC) {
-            switch(methodInsnNode.owner) {
-                case "cpw/mods/fml/common/registry/GameRegistry":
-                    if (methodInsnNode.name.equals("addSmelting") && methodInsnNode.desc.equals("(ILnet/minecraft/item/ItemStack;F)V")) {
-                        if (methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious() instanceof FieldInsnNode) {
-                            FieldInsnNode fieldInsnNode = (FieldInsnNode)methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious();
-                            switch(fieldInsnNode.desc) {
-                                case "L" + "net/minecraft/item/Item" + ";": {
-                                    final String originalDesc = methodInsnNode.desc;
-                                    methodInsnNode.desc =
-                                            "(" +
-                                                    ("L" + "net/minecraft/item/Item" + ";") +
-                                                    "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG_MESSAGES) {
-                                        ReTweakResources.RETWEAK_LOGGER.info(
-                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                                ASMHelper.toString(methodInsnNode),
-                                                originalDesc,
-                                                methodInsnNode.desc
-                                        );
+        switch(methodInsnNode.getOpcode()) {
+            case Opcodes.INVOKESTATIC:
+                switch(methodInsnNode.owner) {
+                    case "cpw/mods/fml/common/registry/GameRegistry":
+                        if (methodInsnNode.name.equals("addSmelting") && methodInsnNode.desc.equals("(ILnet/minecraft/item/ItemStack;F)V")) {
+                            if (methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious() instanceof FieldInsnNode) {
+                                FieldInsnNode fieldInsnNode = (FieldInsnNode)methodInsnNode.getPrevious().getPrevious().getPrevious().getPrevious();
+                                switch(fieldInsnNode.desc) {
+                                    case "L" + "net/minecraft/item/Item" + ";": {
+                                        final String originalDesc = methodInsnNode.desc;
+                                        methodInsnNode.desc =
+                                                "(" +
+                                                        ("L" + "net/minecraft/item/Item" + ";") +
+                                                        "Lnet/minecraft/item/ItemStack;F)V";
+                                        if (ReTweakResources.DEBUG_MESSAGES) {
+                                            ReTweakResources.RETWEAK_LOGGER.info(
+                                                    "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                    ASMHelper.toString(methodInsnNode),
+                                                    originalDesc,
+                                                    methodInsnNode.desc
+                                            );
+                                        }
+                                        break;
                                     }
-                                    break;
-                                }
-                                case "L" + "net/minecraft/block/Block" + ";": {
-                                    final String originalDesc = methodInsnNode.desc;
-                                    methodInsnNode.desc =
-                                            "(" +
-                                                    ("L" + "net/minecraft/block/Block" + ";") +
-                                                    "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG_MESSAGES) {
-                                        ReTweakResources.RETWEAK_LOGGER.info(
-                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                                ASMHelper.toString(methodInsnNode),
-                                                originalDesc,
-                                                methodInsnNode.desc
-                                        );
+                                    case "L" + "net/minecraft/block/Block" + ";": {
+                                        final String originalDesc = methodInsnNode.desc;
+                                        methodInsnNode.desc =
+                                                "(" +
+                                                        ("L" + "net/minecraft/block/Block" + ";") +
+                                                        "Lnet/minecraft/item/ItemStack;F)V";
+                                        if (ReTweakResources.DEBUG_MESSAGES) {
+                                            ReTweakResources.RETWEAK_LOGGER.info(
+                                                    "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                    ASMHelper.toString(methodInsnNode),
+                                                    originalDesc,
+                                                    methodInsnNode.desc
+                                            );
+                                        }
+                                        break;
                                     }
-                                    break;
-                                }
-                                case "L" + "net/minecraft/item/ItemStack" + ";": {
-                                    final String originalDesc = methodInsnNode.desc;
-                                    methodInsnNode.desc =
-                                            "(" +
-                                                    ("L" + "net/minecraft/item/ItemStack" + ";") +
-                                                    "Lnet/minecraft/item/ItemStack;F)V";
-                                    if (ReTweakResources.DEBUG_MESSAGES) {
-                                        ReTweakResources.RETWEAK_LOGGER.info(
-                                                "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
-                                                ASMHelper.toString(methodInsnNode),
-                                                originalDesc,
-                                                methodInsnNode.desc
-                                        );
+                                    case "L" + "net/minecraft/item/ItemStack" + ";": {
+                                        final String originalDesc = methodInsnNode.desc;
+                                        methodInsnNode.desc =
+                                                "(" +
+                                                        ("L" + "net/minecraft/item/ItemStack" + ";") +
+                                                        "Lnet/minecraft/item/ItemStack;F)V";
+                                        if (ReTweakResources.DEBUG_MESSAGES) {
+                                            ReTweakResources.RETWEAK_LOGGER.info(
+                                                    "Remapped desc of method insn \"{}\" from \"{}\" to \"{}\"",
+                                                    ASMHelper.toString(methodInsnNode),
+                                                    originalDesc,
+                                                    methodInsnNode.desc
+                                            );
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
                             }
                         }
-                    }
-                    break;
-                case "net/minecraftforge/client/MinecraftForgeClient":
-                    if (methodInsnNode.name.equals("preloadTexture") && methodInsnNode.desc.equals("(Ljava/lang/String;)V")) {
-                        return true;//Remove method insn call
-                    }
-                    break;
-            }
+                        break;
+                    case "net/minecraftforge/client/MinecraftForgeClient":
+                        if (methodInsnNode.name.equals("preloadTexture") && methodInsnNode.desc.equals("(Ljava/lang/String;)V")) {
+                            return true;//Remove method insn call
+                        }
+                        break;
+                }
+                break;
+            case Opcodes.INVOKEVIRTUAL:
+                switch(methodInsnNode.owner) {
+                    case "net/minecraft/item/Item":
+
+
+                        /*
+                        //TODO Should not be removing setIconIndex methods
+                        if (methodInsnNode.name.equals("func_77665_c") && methodInsnNode.desc.equals("(I)Lnet/minecraft/item/Item;")) {
+                            insnList.remove(methodInsnNode.getPrevious());
+                            return true;
+                        } else if (methodInsnNode.name.equals("func_77652_b") && methodInsnNode.desc.equals("(II)Lnet/minecraft/item/Item;")) {
+                            insnList.remove(methodInsnNode.getPrevious().getPrevious());
+                            insnList.remove(methodInsnNode.getPrevious());
+                            return true;
+                        }
+                        */
+
+
+                        break;
+                }
+                break;
+            default:
+                break;
         }
         if (methodInsnNode.desc.contains("Lnet/minecraftforge/common/Property;")) {
             //I don't even care right now

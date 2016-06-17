@@ -1,8 +1,7 @@
 package org.slave.retweak.test;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import org.slave.minecraft.retweak.handlers.TextureHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by Master on 6/14/2016 at 10:33 PM.
@@ -11,18 +10,26 @@ import org.slave.minecraft.retweak.handlers.TextureHandler;
  */
 public final class Test {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger("Test");
+
     private Test() {
         throw new IllegalStateException();
     }
 
-    public void itemTest() {
-        final Item webItem = Item.getItemFromBlock(
-                Blocks.web
-        );
+    public static void main(final String[] arguments) {
+        int input = 33;
+        int output;
 
-        TextureHandler.bindTexture(
-                this.getClass(),
-                "xx"
+        if (input > 16) {
+            output = input / 16;
+        } else {
+            output = input;
+        }
+
+        Test.LOGGER.info(
+                "{} {}",
+                input,
+                output
         );
     }
 
