@@ -75,18 +75,26 @@ public final class ReTweakSRG {
             boolean set = false;
 
             if (classMapping.getSuperClass() != null) {
-                classNode.superName = classMapping.getSuperClass().getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                classNode.superName = classMapping.getSuperClass().getName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString();
                 set = true;
             }
             if (!set && classMapping.getSuperName() != null) {
-                classNode.superName = classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                classNode.superName = classMapping.getSuperName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString();
                 set = true;
             }
             if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped super-class from \"{}\" to \"{}\"",
-                        classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
-                        classMapping.getSuperName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
+                        classMapping.getSuperName().getName(
+                                org.slave.tool.retweak.mapping.Type.OBFUSCATED
+                        ).getString(),
+                        classMapping.getSuperName().getName(
+                                org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                        ).getString()
                 );
             }
             return;
@@ -103,7 +111,9 @@ public final class ReTweakSRG {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Remapped super-class from \"{}\" to \"{}\"",
                         originalSuperName,
-                        classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
+                        classMapping.getName().getName(
+                                org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                        ).getString()
                 );
             }
         }
@@ -127,13 +137,19 @@ public final class ReTweakSRG {
             if (classMapping != null) {
                 classNode.interfaces.set(
                         i,
-                        classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString()
+                        classMapping.getName().getName(
+                                org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                        ).getString()
                 );
                 if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped interface from \"{}\" to \"{}\", in class \"{}\"",
-                            classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
-                            classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString(),
+                            classMapping.getName().getName(
+                                    org.slave.tool.retweak.mapping.Type.OBFUSCATED
+                            ).getString(),
+                            classMapping.getName().getName(
+                                    org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                            ).getString(),
                             classNode.name
                     );
                 }
@@ -264,12 +280,18 @@ public final class ReTweakSRG {
                     true
             );
             if (methodMapping != null) {
-                methodNode.name = methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                methodNode.name = methodMapping.getName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString();
                 if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Remapped method name from \"{}\" to \"{}\" in class \"{}\"",
-                            methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.OBFUSCATED).getString(),
-                            methodMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString(),
+                            methodMapping.getName().getName(
+                                    org.slave.tool.retweak.mapping.Type.OBFUSCATED
+                            ).getString(),
+                            methodMapping.getName().getName(
+                                    org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                            ).getString(),
                             classNode.name
                     );
                 }
@@ -334,8 +356,12 @@ public final class ReTweakSRG {
                     fieldInsnNode.name
             );
             if (fieldMapping != null) {
-                fieldInsnNode.owner = classMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
-                fieldInsnNode.name = fieldMapping.getName().getName(org.slave.tool.retweak.mapping.Type.DEOBFUSCATED).getString();
+                fieldInsnNode.owner = classMapping.getName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString();
+                fieldInsnNode.name = fieldMapping.getName().getName(
+                        org.slave.tool.retweak.mapping.Type.DEOBFUSCATED
+                ).getString();
 
                 if (ReTweakResources.DEBUG_MESSAGES) {
                     ReTweakResources.RETWEAK_LOGGER.info(

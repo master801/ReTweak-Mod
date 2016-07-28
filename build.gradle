@@ -1,5 +1,3 @@
-import scala.tools.nsc.io.Jar
-
 buildscript {
     repositories {
         mavenCentral()
@@ -55,11 +53,11 @@ dependencies {
 
     compile fileTree(
             dir: 'libs',
-            include: [
-                    '*.jar'
-            ],
             exclude: [
                     '*-src.jar'
+            ],
+            include: [
+                    '*.jar'
             ]
     )
 }

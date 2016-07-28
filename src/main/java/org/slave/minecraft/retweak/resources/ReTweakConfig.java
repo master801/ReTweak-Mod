@@ -34,7 +34,7 @@ public final class ReTweakConfig {
         config.put(
                 ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
                 ReTweakResources.DEBUG ? CompilationMode.JIT.name() : CompilationMode.INTERPRETER.name(),
-                "[" + Joiner.on(", ").join(CompilationMode.values()) + "]"
+                '[' + Joiner.on(", ").join(CompilationMode.values()) + ']'
         );
     }
 
@@ -45,7 +45,6 @@ public final class ReTweakConfig {
             fileInputStream.close();
         }
 
-        //TODO
         if (config.hasKey(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE)) {
             try {
                 compilationMode = CompilationMode.valueOf((String)config.get(ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE));

@@ -167,7 +167,9 @@ public final class ReTweakModContainer {
         final boolean overrideMetadata = info.containsKey("useMetadata") && !(boolean)info.get("useMetadata");
         if (overrideMetadata || !modMetadata.useDependencyInformation) {
             //TODO DEPENDENCY PARSING
-            ReTweakResources.RETWEAK_LOGGER.warn("Dependency parsing is not yet implemented!");
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Dependency parsing is not yet implemented!"
+            );
         }
         if (version == null && !StringHelper.isNullOrEmpty(modMetadata.version)) version = modMetadata.version;
         String mcVersion = (String)info.get("acceptedMinecraftVersions");

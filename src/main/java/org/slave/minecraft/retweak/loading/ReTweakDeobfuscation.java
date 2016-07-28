@@ -35,10 +35,11 @@ public final class ReTweakDeobfuscation {
     private ReTweakDeobfuscation() {
     }
 
-    public void loadSRGs(final File dir) throws IOException {
+    public void loadSRGs() throws IOException {
+        if (!ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) throw new FileNotFoundException();
         for(GameVersion gameVersion : GameVersion.values()) {
             File dataFile = new File(
-                    dir,
+                    ReTweakResources.RETWEAK_PLAY_DIRECTORY,
                     "deobfuscation_data-" + gameVersion.getVersion() + ".lzma"
             );
             if (dataFile.isFile()) {
@@ -117,13 +118,13 @@ public final class ReTweakDeobfuscation {
     }
 
     /**
-     * Must be called after {@link #loadSRGs(java.io.File)}.
+     * Must be called after {@link #loadSRGs()}.
      */
-    public void loadSupers(final File dir) throws IOException {
-        if (dir == null || !dir.isDirectory()) throw new FileNotFoundException();
+    public void loadSupers() throws IOException {
+        if (!ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) throw new FileNotFoundException();
         for(GameVersion gameVersion : GameVersion.values()) {
             File superFile = new File(
-                    dir,
+                    ReTweakResources.RETWEAK_PLAY_DIRECTORY,
                     "supers_" + gameVersion.getVersion() + ".super"
             );
             if (superFile.isFile()) {

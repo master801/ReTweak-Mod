@@ -1,7 +1,7 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.exceptions.InvalidSortException;
+import org.slave.lib.api.exceptions.InvalidSortException;
 import org.slave.minecraft.retweak.asm.ReTweakSetup;
 import org.slave.minecraft.retweak.loading.capsule.GameVersion;
 import org.slave.minecraft.retweak.loading.tweaks.DeSeargeTweak;

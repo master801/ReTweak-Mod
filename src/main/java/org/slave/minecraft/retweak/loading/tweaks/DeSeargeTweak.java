@@ -4,6 +4,7 @@ import com.github.pwittchen.kirai.library.Kirai;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.helpers.ASMHelper;
@@ -121,6 +122,53 @@ public final class DeSeargeTweak implements Tweak {
                                         classNode.name
                                 );
                             }
+                        }
+                    }
+                }
+
+                if (methodNode.name.startsWith("func_")) {
+                    if (mapping != null && mapping.ignoreMethod(methodNode.access, null, methodNode.name, methodNode.desc)) continue;
+
+                    String[] methodEntry = getMethodEntry(
+                            classNode.name,
+                            methodNode.name,
+                            methodNode.desc
+                    );
+                    if (methodEntry != null) {
+                        methodNode.name = methodEntry[4];
+                        methodNode.desc = methodEntry[5];
+                    } else {
+                        if (ReTweakResources.DEBUG_MESSAGES) {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "Found no entry for method \"{}\" from class \"{}\"!",
+                                    ASMHelper.toString(methodNode),
+                                    classNode.name
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        if (classNode.fields != null) {
+            for(FieldNode fieldNode : classNode.fields) {
+                if (fieldNode.name.startsWith("field_")) {
+                    if (mapping != null && mapping.ignoreMethod(fieldNode.access, null, fieldNode.name, fieldNode.desc)) continue;
+
+                    String[] fieldEntry = getFieldEntry(
+                            classNode.name,
+                            fieldNode.name
+                    );
+                    if (fieldEntry != null) {
+                        fieldNode.name = fieldEntry[4];
+                        fieldNode.desc = fieldEntry[5];
+                    } else {
+                        if (ReTweakResources.DEBUG_MESSAGES) {
+                            ReTweakResources.RETWEAK_LOGGER.warn(
+                                    "Found no entry for field \"{}\" from class \"{}\"!",
+                                    ASMHelper.toString(fieldNode),
+                                    classNode.name
+                            );
                         }
                     }
                 }

@@ -305,7 +305,40 @@ public abstract class Mapping {
                 //TODO
             } else if (getType() == _Type.METHOD && object instanceof MethodNode) {
                 MethodNode methodNode = (MethodNode)object;
-                //TODO
+
+                if (getOpcode() != -1) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set access from {} to {}",
+                                getType().name(),
+                                methodNode.access,
+                                getOpcode()
+                        );
+                    }
+                    methodNode.access = getOpcode();
+                }
+                if (!StringHelper.isNullOrEmpty(getName())) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set name from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodNode.name,
+                                getName()
+                        );
+                    }
+                    methodNode.name = getName();
+                }
+                if (!StringHelper.isNullOrEmpty(getDesc())) {
+                    if (ReTweakResources.DEBUG_MESSAGES) {
+                        ReTweakResources.RETWEAK_LOGGER.info(
+                                "Holder - {} -- Set desc from \"{}\" to \"{}\"",
+                                getType().name(),
+                                methodNode.desc,
+                                getDesc()
+                        );
+                    }
+                    methodNode.desc = getDesc();
+                }
             } else if (getType() == _Type.FIELD_INSN && object instanceof FieldInsnNode) {
                 FieldInsnNode fieldInsnNode = (FieldInsnNode)object;
 

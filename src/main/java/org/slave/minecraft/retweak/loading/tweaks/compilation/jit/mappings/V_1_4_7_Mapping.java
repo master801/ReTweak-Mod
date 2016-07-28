@@ -225,6 +225,134 @@ final class V_1_4_7_Mapping extends Mapping {
 
         //<editor-fold desc="METHOD">
         final HashMap<Holder, Holder> methodMap = types.get(_Type.METHOD);
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77041_b",
+                        "(Lnet/minecraft/entity/EntityLiving;F)V"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77041_b",
+                        "(Lnet/minecraft/entity/EntityLivingBase;F)V"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_77644_a",
+                        "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLiving;Lnet/minecraft/entity/EntityLiving;)Z"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_77644_a",
+                        "(Lnet/minecraft/item/ItemStack;Lnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/entity/EntityLivingBase;)Z"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77044_a",
+                        "(Lnet/minecraft/entity/EntityLiving;F)F"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77040_d",
+                        "(Lnet/minecraft/entity/EntityLivingBase;F)F"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_77031_a",
+                        "(Lnet/minecraft/entity/EntityLiving;DDDFF)V"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_76986_a",
+                        "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_78086_a",
+                        "(Lnet/minecraft/entity/EntityLiving;FFF)V"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_78086_a",
+                        "(Lnet/minecraft/entity/EntityLivingBase;FFF)V"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77037_a",
+                        "(Lnet/minecraft/entity/EntityLiving;)F"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PROTECTED,
+                        null,
+                        "func_77037_a",
+                        "(Lnet/minecraft/entity/EntityLivingBase;)F"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;I)Z"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;F)Z"
+                )
+        );
+        methodMap.put(
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_70667_aM",
+                        "()I"
+                ),
+                new Holder(
+                        _Type.METHOD,
+                        Opcodes.ACC_PUBLIC,
+                        null,
+                        "func_110138_aP",
+                        "()I"
+                )
+        );
         //</editor-fold>
 
         //<editor-fold desc="FIELD INSN">
@@ -547,6 +675,38 @@ final class V_1_4_7_Mapping extends Mapping {
                         "Lnet/minecraft/item/Item;"
                 )
         );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/item/Item",
+                        "field_77714_s",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151038_n",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/item/Item",
+                        "field_77754_aU",
+                        "Lnet/minecraft/item/Item;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        Opcodes.GETSTATIC,
+                        "net/minecraft/init/Items",
+                        "field_151115_aP",
+                        "Lnet/minecraft/item/Item;"
+                )
+        );
 
 
         /*
@@ -554,7 +714,7 @@ final class V_1_4_7_Mapping extends Mapping {
                 new Holder(
                         _Type.FIELD_INSN,
                         Opcodes.GETSTATIC,
-                        null,
+                        "net/minecraft/item/Item",
                         "",
                         "Lnet/minecraft/item/Item;"
                 ),
@@ -654,6 +814,38 @@ final class V_1_4_7_Mapping extends Mapping {
         );
         //</editor-fold>
 
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        -1,
+                        "net/minecraft/block/material/Material",
+                        "field_76244_g",
+                        "Lnet/minecraft/block/material/Material;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        -1,
+                        "net/minecraft/block/material/Material",
+                        "field_151586_h",
+                        "Lnet/minecraft/block/material/Material;"
+                )
+        );
+        fieldInsnMap.put(
+                new Holder(
+                        _Type.FIELD_INSN,
+                        -1,
+                        "net/minecraft/block/Block",
+                        "field_72018_cp",
+                        "Lnet/minecraft/block/material/Material;"
+                ),
+                new Holder(
+                        _Type.FIELD_INSN,
+                        -1,
+                        "net/minecraft/block/Block",
+                        "field_149764_J",
+                        "Lnet/minecraft/block/material/Material;"
+                )
+        );
         //</editor-fold>
 
         //<editor-fold desc="METHOD INSN">
@@ -704,6 +896,70 @@ final class V_1_4_7_Mapping extends Mapping {
                         "net/minecraft/client/renderer/entity/RenderLiving",
                         "func_76986_a",
                         "(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/EntityLiving",
+                        "func_71038_i",
+                        "()V"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/EntityLivingBase",
+                        "func_71038_i",
+                        "()V"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/Entity",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;I)Z"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/Entity",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;F)Z"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/player/EntityPlayer",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;I)Z"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKEVIRTUAL,
+                        "net/minecraft/entity/player/EntityPlayer",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;F)Z"
+                )
+        );
+        methodInsnMap.put(
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/entity/EntityLiving",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;I)Z"
+                ),
+                new Holder(
+                        _Type.METHOD_INSN,
+                        Opcodes.INVOKESPECIAL,
+                        "net/minecraft/entity/EntityLivingBase",
+                        "func_70097_a",
+                        "(Lnet/minecraft/util/DamageSource;F)Z"
                 )
         );
         //</editor-fold>
@@ -840,7 +1096,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
         Holder[] holders = getHolders(
                 _Type.FIELD,
-                -1,
+                fieldNode.access,
                 null,
                 fieldNode.name,
                 fieldNode.desc
@@ -896,7 +1152,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
         Holder[] holders = getHolders(
                 _Type.METHOD,
-                -1,
+                methodNode.access,
                 null,
                 methodNode.name,
                 methodNode.desc
@@ -924,27 +1180,37 @@ final class V_1_4_7_Mapping extends Mapping {
                     FieldInsnNode fieldInsnNode = (FieldInsnNode)abstractInsnNode;
                 } else if (abstractInsnNode instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
-                    switch(methodInsnNode.getOpcode()) {
-                        case Opcodes.INVOKESTATIC:
-                            switch(methodInsnNode.owner) {
-                                case "cpw/mods/fml/common/registry/TickRegistry":
+                    switch(methodInsnNode.owner) {
+                        case "cpw/mods/fml/common/registry/TickRegistry":
+                            switch(methodInsnNode.getOpcode()) {
+                                case Opcodes.INVOKESTATIC:
                                     if (methodInsnNode.name.equals("registerTickHandler") && methodInsnNode.desc.equals("(Lcpw/mods/fml/common/ITickHandler;Lcpw/mods/fml/relauncher/Side;)V") && tickHandler == -1) {
                                         tickHandler = i;
                                     }
                                     break;
                             }
                             break;
-                        default:
-                            switch(methodInsnNode.owner) {
-                                case "net/minecraftforge/common/Configuration":
-                                    methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
-                                    break;
-                                case "net/minecraftforge/common/Property":
-                                    methodInsnNode.owner = "net/minecraftforge/common/config/Property";
-                                    break;
-                                case "net/minecraft/client/renderer/entity/Render":
-                                    if (methodInsnNode.name.equals("func_76985_a") && methodInsnNode.desc.equals("(Ljava/lang/String;)V") && loadTexture_func_76985_a == -1) {
-                                        loadTexture_func_76985_a = i;
+                        case "net/minecraftforge/common/Configuration":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Configuration";
+                            break;
+                        case "net/minecraftforge/common/Property":
+                            methodInsnNode.owner = "net/minecraftforge/common/config/Property";
+                            break;
+                        case "net/minecraft/client/renderer/entity/Render":
+                            if (methodInsnNode.name.equals("func_76985_a") && methodInsnNode.desc.equals("(Ljava/lang/String;)V") && loadTexture_func_76985_a == -1) {
+                                loadTexture_func_76985_a = i;
+                            }
+                            break;
+                        case "net/minecraft/world/World":
+                            switch(methodInsnNode.getOpcode()) {
+                                case Opcodes.INVOKEVIRTUAL:
+                                    if (methodInsnNode.name.equals("func_72798_a") && methodInsnNode.desc.equals("(III)I")) {//getBlockId
+                                        AbstractInsnNode next = methodInsnNode.getNext();
+                                        if (next instanceof IntInsnNode && next.getOpcode() == Opcodes.ISTORE) {
+                                            //TODO Rename every reference of this insn node that uses an int, rename to use object
+                                            //Old desc = (III)I
+                                            //New desc = (III)Lnet/minecraft/block/Block;
+                                        }
                                     }
                                     break;
                             }
@@ -1301,7 +1567,6 @@ final class V_1_4_7_Mapping extends Mapping {
                     case "net/minecraft/item/Item":
 
 
-                        /*
                         //TODO Should not be removing setIconIndex methods
                         if (methodInsnNode.name.equals("func_77665_c") && methodInsnNode.desc.equals("(I)Lnet/minecraft/item/Item;")) {
                             insnList.remove(methodInsnNode.getPrevious());
@@ -1311,7 +1576,6 @@ final class V_1_4_7_Mapping extends Mapping {
                             insnList.remove(methodInsnNode.getPrevious());
                             return true;
                         }
-                        */
 
 
                         break;
@@ -1371,7 +1635,7 @@ final class V_1_4_7_Mapping extends Mapping {
 
     @Override
     public boolean ignoreField(final int opcode, final String owner, final String name, final String desc) {
-        if (opcode == -1 || StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name) || StringHelper.isNullOrEmpty(desc)) return false;
+        if (opcode < 0 || StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name) || StringHelper.isNullOrEmpty(desc)) return false;
         switch(owner) {
             default:
                 if (name.equals("field_40331_g") && desc.equals("F")) return true;
@@ -1433,8 +1697,8 @@ final class V_1_4_7_Mapping extends Mapping {
     }
 
     private Holder[] getHolders(final _Type type, final int opcode, final String owner, final String name, final String desc) {
-        if (type == null || (StringHelper.isNullOrEmpty(owner) && (type != _Type.CLASS && type != _Type.ANNOTATION)) || (StringHelper.isNullOrEmpty(desc) && (type != _Type.CLASS && type != _Type.ANNOTATION))) return null;
-        List<Holder> holders = new ArrayList<>();
+        if (type == null || (StringHelper.isNullOrEmpty(owner) && (type != _Type.CLASS && type != _Type.ANNOTATION && type != _Type.METHOD && type != _Type.FIELD)) || (StringHelper.isNullOrEmpty(desc) && (type != _Type.CLASS && type != _Type.ANNOTATION))) return null;
+        final List<Holder> holders = new ArrayList<>();
         for(Holder holder : types.get(type).keySet()) {
             boolean flag_1, flag_2, flag_3, flag_4;
             switch(type) {
@@ -1466,7 +1730,7 @@ final class V_1_4_7_Mapping extends Mapping {
                     break;
                 case FIELD:
                 case METHOD:
-                    flag_1 = opcode == -1 || holder.getOpcode() == opcode;
+                    flag_1 = (opcode == -1 && holder.getOpcode() == -1) || holder.getOpcode() == opcode;
                     flag_2 = name == null || holder.getName().equals(name);
                     flag_3 = holder.getDesc().equals(desc);
                     if (flag_1 && flag_2 && flag_3) {
