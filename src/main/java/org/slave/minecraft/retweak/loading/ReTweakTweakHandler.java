@@ -1,14 +1,13 @@
 package org.slave.minecraft.retweak.loading;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.api.exceptions.InvalidSortException;
+import org.slave.lib.exceptions.InvalidSortException;
 import org.slave.minecraft.retweak.asm.ReTweakSetup;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.tweaks.DeSeargeTweak;
-import org.slave.minecraft.retweak.loading.tweaks.Tweak;
-import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.InterpreterTweak;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.JITTweak;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.loading.tweak.DeSeargeTweak;
+import org.slave.minecraft.retweak.loading.tweak.Tweak;
+import org.slave.minecraft.retweak.loading.tweak.Tweak.TweakException;
+import org.slave.minecraft.retweak.loading.tweak.compilation.InterpreterTweak;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -38,9 +37,11 @@ public final class ReTweakTweakHandler {
         for(GameVersion gameVersion : GameVersion.values()) {
             List<Tweak> tweaks = new ArrayList<>();
             switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
+                /*
                 case JIT:
                     tweaks.add(new JITTweak(gameVersion));
                     break;
+                */
                 case INTERPRETER:
                     tweaks.add(new InterpreterTweak(gameVersion));
                     break;
@@ -62,9 +63,10 @@ public final class ReTweakTweakHandler {
         }
     }
 
-    public void tweak(ClassNode classNode, GameVersion gameVersion) throws TweakException {
+    public void tweak(final ClassNode classNode, final GameVersion gameVersion) throws TweakException {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
+            if (tweak == null) continue;
             if (ReTweakResources.DEBUG_MESSAGES) {
                 ReTweakResources.RETWEAK_LOGGER.info(
                         "Start Tweak \"{}\"",
@@ -94,10 +96,12 @@ public final class ReTweakTweakHandler {
 
         @Override
         public int compare(final Tweak o1, final Tweak o2) {
-            if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new InvalidSortException("Cannot have sort index less than zero!");
-            if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new InvalidSortException("Sort index of Tweak cannot be the same!");
-            if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
-            if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
+            if (o1 != null && o2 != null) {
+                if (o1.getWantedSortIndex() < 0 || o2.getWantedSortIndex() < 0) throw new InvalidSortException("Cannot have sort index less than zero!");
+                if (o1.getWantedSortIndex() == o2.getWantedSortIndex()) throw new InvalidSortException("Sort index of Tweak cannot be the same!");
+                if (o1.getWantedSortIndex() < o2.getWantedSortIndex()) return -1;
+                if (o1.getWantedSortIndex() > o2.getWantedSortIndex()) return 1;
+            }
             return 0;
         }
 

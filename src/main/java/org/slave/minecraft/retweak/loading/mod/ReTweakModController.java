@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -8,7 +8,7 @@ import cpw.mods.fml.common.event.FMLServerStartedEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import cpw.mods.fml.common.event.FMLServerStoppedEvent;
 import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.lang.reflect.InvocationTargetException;
@@ -37,7 +37,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"pre-initialization\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -64,7 +64,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"initialization\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -91,7 +91,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"post-initialization\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -118,7 +118,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"server about to start\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -145,7 +145,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"server starting\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -172,7 +172,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"server started\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -199,7 +199,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"server stopping\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
@@ -226,7 +226,7 @@ public final class ReTweakModController {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod {} has been disabled, not calling state \"server stopped\"",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }

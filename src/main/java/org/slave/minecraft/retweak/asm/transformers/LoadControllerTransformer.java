@@ -86,7 +86,7 @@ public final class LoadControllerTransformer extends BasicTransformer implements
                 instructionsToInject.add(
                         new MethodInsnNode(
                                 Opcodes.INVOKESTATIC,
-                                "org/slave/minecraft/retweak/loading/ReTweakStateHandler",
+                                "org/slave/minecraft/retweak/loading/mod/ReTweakStateHandler",
                                 "step",
                                 "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
                                 false

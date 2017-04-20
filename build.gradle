@@ -13,22 +13,21 @@ buildscript {
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
         classpath 'net.sf.proguard:proguard-gradle:5.2.1'
-
+        classpath group: 'io.franzbecker', name: 'gradle-lombok', version: '1.8'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'forge'
-apply plugin: 'com.github.johnrengelman.shadow'
-
-sourceCompatibility = JavaVersion.VERSION_1_7
-targetCompatibility = JavaVersion.VERSION_1_7
+apply plugin: 'io.franzbecker.gradle-lombok'
 
 version = project.properties['version']
 group = 'org.slave.minecraft'
 archivesBaseName = 'ReTweak-Mod'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
     version = project.properties['forge-version']
@@ -46,10 +45,8 @@ jar {
 }
 
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['sl4j-version']
+    compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['slf4j-version']
     compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
-    compile group: 'com.github.pwittchen.kirai', name: 'library', version: project.properties['kirari-version']
-    testCompile group: 'junit', name: 'junit', version: project.properties['junit-version']
 
     compile fileTree(
             dir: 'libs',

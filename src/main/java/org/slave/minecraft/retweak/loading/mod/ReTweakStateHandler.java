@@ -1,6 +1,5 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
-import com.github.pwittchen.kirai.library.Kirai;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 import cpw.mods.fml.common.LoadController;
@@ -14,7 +13,7 @@ import cpw.mods.fml.common.SidedProxy;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.IOException;
@@ -101,7 +100,7 @@ public final class ReTweakStateHandler {
 
                     @Override
                     public String call() throws Exception {
-                        return "ReTweak is loaded, this crash may have been caused by it.";
+                        return null;
                     }
 
                 }
@@ -113,16 +112,17 @@ public final class ReTweakStateHandler {
                 if (!reTweakModContainer.isEnabled()) {
                     ReTweakResources.RETWEAK_LOGGER.info(
                             "Mod \"{}\" has been disabled, not loading...",
-                            reTweakModContainer.getModid()
+                            reTweakModContainer.getModId()
                     );
                     continue;
                 }
-                final ReTweakClassLoader classLoader = ReTweakClassLoader.getClassLoader(gameVersion);
-                classLoader.addFile(reTweakModContainer.getReTweakModCandidate().getSource());
+                ReTweakClassLoader classLoader = ReTweakClassLoader.getClassLoader(gameVersion);
+                ReTweakModCandidate reTweakModCandidate = reTweakModContainer.getReTweakModCandidate();
+                classLoader.addFile(reTweakModCandidate.getSource());
 
                 //Find mcmod.info for mod
                 try {
-                    JarFile jarFile = classLoader.findJarFileForCandidate(reTweakModContainer.getReTweakModCandidate());
+                    JarFile jarFile = classLoader.findJarFileForCandidate(reTweakModCandidate);
                     ZipEntry entry = jarFile.getEntry("mcmod.info");
                     if (entry != null) {
                         InputStream is = jarFile.getInputStream(entry);
@@ -137,20 +137,15 @@ public final class ReTweakStateHandler {
                     jarFile.close();
                 } catch(IOException e) {
                     ReTweakResources.RETWEAK_LOGGER.warn(
-                            Kirai.from(
-                                    "Caught exception while getting \"{name}\" from file \"{file_path}\"!"
-                            ).put(
-                                    "name",
-                                    "mcmod.info"
-                            ).put(
-                                    "file_path",
-                                    reTweakModContainer.getReTweakModCandidate().getSource().getPath()
-                            ).format().toString(),
+                            "Caught exception while getting \"" + "mcmod.info" + "\" from file \"" + reTweakModCandidate.getSource().getPath() + "\"!",
                             e
                     );
                 }
 
-                for(TableClass tableClass : reTweakModContainer.getReTweakModCandidate().getModClasses()) {
+                String reTweakModClass = reTweakModContainer.getModClass();
+                Object reTweakModInstance = reTweakModContainer.getInstance();
+
+                for(TableClass tableClass : reTweakModCandidate.getModClasses()) {
                     try {
                         Class<?> modClass = Class.forName(
                                 tableClass.getName().replace(
@@ -172,7 +167,7 @@ public final class ReTweakStateHandler {
                                     } else {
                                         ReTweakResources.RETWEAK_LOGGER.warn(
                                                 "Instance factory method for mod \"{}\" is not static and/or may have parameters!",
-                                                reTweakModContainer.getModid()
+                                                reTweakModContainer.getModId()
                                         );
                                     }
                                 } else {
@@ -198,8 +193,8 @@ public final class ReTweakStateHandler {
                                 reTweakModContainer.setEnabled(false);
                                 ReTweakResources.RETWEAK_LOGGER.warn(
                                         "Mod \"{}\" has been disabled due to incorrectly creating a new instance of class \"{}\"",
-                                        reTweakModContainer.getModid(),
-                                        reTweakModContainer.getModClass()
+                                        reTweakModContainer.getModId(),
+                                        reTweakModClass
                                 );
                                 return;
                             }
@@ -207,8 +202,8 @@ public final class ReTweakStateHandler {
                         } else {
                             ReTweakResources.RETWEAK_LOGGER.warn(
                                     "Mod \"{}\" cannot load due to it not being an actual mod? File path: {}",
-                                    reTweakModContainer.getModid(),
-                                    reTweakModContainer.getReTweakModCandidate().getSource().getPath()
+                                    reTweakModContainer.getModId(),
+                                    reTweakModCandidate.getSource().getPath()
                             );
                             return;
                         }
@@ -222,12 +217,12 @@ public final class ReTweakStateHandler {
                                     ReTweakResources.RETWEAK_LOGGER.error(
                                             "Mod \"{}\" has been disabled due to the \"{}\" field not being static.",
                                             Instance.class.getCanonicalName(),
-                                            reTweakModContainer.getModClass()
+                                            reTweakModClass
                                     );
                                     return;
                                 }
                                 Instance instance = field.getAnnotation(Instance.class);
-                                if (!instance.value().equals(reTweakModContainer.getModid())) {
+                                if (!instance.value().equals(reTweakModContainer.getModId())) {
                                     throw new UnsupportedOperationException(
                                             "Instance annotation value must be the mod's modid! Injecting other mods' instances is not yet supported!"
                                     );
@@ -236,13 +231,13 @@ public final class ReTweakStateHandler {
                                     ReflectionHelper.setFieldValue(
                                             field,
                                             null,
-                                            reTweakModContainer.getInstance()
+                                            reTweakModInstance
                                     );
                                 } catch(IllegalAccessException e) {
                                     reTweakModContainer.setEnabled(false);
                                     ReTweakResources.RETWEAK_LOGGER.warn(
                                             "Mod \"{}\" has been disabled due to being unable to set the instance of the class, to the field with the \"{}\" annotation.",
-                                            reTweakModContainer.getModid(),
+                                            reTweakModContainer.getModId(),
                                             Instance.class.getCanonicalName()
                                     );
                                     return;
@@ -254,7 +249,7 @@ public final class ReTweakStateHandler {
                                     ReTweakResources.RETWEAK_LOGGER.error(
                                             "Mod \"{}\" has been disabled due to the \"{}\" field not being static.",
                                             SidedProxy.class.getCanonicalName(),
-                                            reTweakModContainer.getModClass()
+                                            reTweakModClass
                                     );
                                     return;
                                 }
@@ -287,7 +282,7 @@ public final class ReTweakStateHandler {
                                         reTweakModContainer.setEnabled(false);
                                         ReTweakResources.RETWEAK_LOGGER.warn(
                                                 "Mod \"{}\" has been disabled due to being unable to set the proxy instance to the \"{}\" field",
-                                                reTweakModContainer.getModid(),
+                                                reTweakModContainer.getModId(),
                                                 SidedProxy.class.getCanonicalName()
                                         );
                                         return;
@@ -296,7 +291,7 @@ public final class ReTweakStateHandler {
                                     reTweakModContainer.setEnabled(false);
                                     ReTweakResources.RETWEAK_LOGGER.error(
                                             "Mod \"{}\" has been disabled due to the proxy class \"{}\" being unable to be found.",
-                                            reTweakModContainer.getModClass(),
+                                            reTweakModClass,
                                             proxyClassName
                                     );
                                     return;

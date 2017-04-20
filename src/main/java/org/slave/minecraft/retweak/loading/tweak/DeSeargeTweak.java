@@ -1,21 +1,7 @@
-package org.slave.minecraft.retweak.loading.tweaks;
+package org.slave.minecraft.retweak.loading.tweak;
 
-import com.github.pwittchen.kirai.library.Kirai;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.slave.lib.helpers.ASMHelper;
-import org.slave.lib.helpers.StringHelper;
-import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mapping;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mappings;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.tool.remapper.SRG;
-import org.slave.tool.remapper.SRG_Type;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 /**
  * Created by Master on 5/15/2016 at 8:27 AM.
@@ -26,10 +12,15 @@ public final class DeSeargeTweak implements Tweak {
 
     private static DeSeargeTweak instance;
 
+    /*
     private final SRG srg;
 
     private DeSeargeTweak(final SRG srg) {
         this.srg = srg;
+    }
+    */
+
+    private DeSeargeTweak() {
     }
 
     @Override
@@ -39,14 +30,10 @@ public final class DeSeargeTweak implements Tweak {
 
     @Override
     public void tweak(final ClassNode classNode, final GameVersion gameVersion) throws TweakException {
+        /*
         if (srg == null) {
             throw new NullPointerException(
-                    Kirai.from(
-                            "SRG is null for DeSearge tweak! DeSearge: {to_string}"
-                    ).put(
-                            "to_string",
-                            toString()
-                    ).format().toString()
+                    "SRG is null for DeSearge tweak! DeSearge: " + toString()
             );
         }
 
@@ -174,6 +161,7 @@ public final class DeSeargeTweak implements Tweak {
                 }
             }
         }
+        */
     }
 
     @Override
@@ -181,6 +169,7 @@ public final class DeSeargeTweak implements Tweak {
         return Integer.MAX_VALUE;//Last tweak
     }
 
+    /*
     private String[] getFieldEntry(final String owner, final String name) {
         if (StringHelper.isNullOrEmpty(owner) || StringHelper.isNullOrEmpty(name)) return null;
 
@@ -217,9 +206,10 @@ public final class DeSeargeTweak implements Tweak {
         }
         return entry;
     }
+    */
 
     public static Tweak getInstance() {
-        if (DeSeargeTweak.instance == null) DeSeargeTweak.instance = new DeSeargeTweak(ReTweakDeobfuscation.INSTANCE.getLatestSRG());
+//        if (DeSeargeTweak.instance == null) DeSeargeTweak.instance = new DeSeargeTweak(ReTweakDeobfuscation.INSTANCE.getLatestSRG());
         return DeSeargeTweak.instance;
     }
 

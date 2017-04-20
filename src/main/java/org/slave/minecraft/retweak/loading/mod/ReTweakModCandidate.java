@@ -1,10 +1,10 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
 import org.slave.lib.helpers.IterableHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.capsule.Type;
 
 import java.io.File;
@@ -48,11 +48,11 @@ public final class ReTweakModCandidate {
     }
 
     public void find() {
-        for(TableClass tableClass : asmTable.getClasses()) classes.add(tableClass.getName());
+        for(TableClass tableClass : asmTable.getTableClasses()) classes.add(tableClass.getName());
     }
 
     private void findModClasses() {
-        for(TableClass tableClass : asmTable.getClasses()) {
+        for(TableClass tableClass : asmTable.getTableClasses()) {
             Entry<Type, String> entry = gameVersion.getModType();
             switch(entry.getKey()) {
                 case EXTENDS:
@@ -81,7 +81,7 @@ public final class ReTweakModCandidate {
     public String[] getModIds() {
         if (modids == null && !modClasses.isEmpty()) {
             ArrayList<String> modids = new ArrayList<>();
-            for(TableClass tableClass : asmTable.getClasses()) {
+            for(TableClass tableClass : asmTable.getTableClasses()) {
                 Entry<Type, String> entry = gameVersion.getModType();
                 switch(entry.getKey()) {
                     case EXTENDS:
@@ -92,7 +92,11 @@ public final class ReTweakModCandidate {
                     case ANNOTATION:
                         if (tableClass.getAnnotations() != null) {
                             for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
-                                if (asmAnnotation.getDesc().equals(entry.getValue())) modids.add((String)asmAnnotation.get().get("modid"));
+                                if (asmAnnotation.getDesc().equals(entry.getValue())) {
+                                    modids.add(
+                                            (String)asmAnnotation.getValues().get("modid")
+                                    );
+                                }
                             }
                         }
                         break;

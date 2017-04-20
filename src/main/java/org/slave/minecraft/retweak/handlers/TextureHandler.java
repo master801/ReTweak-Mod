@@ -23,12 +23,15 @@ import java.util.Map;
 @SideOnly(Side.CLIENT)
 public final class TextureHandler {
 
+    @SideOnly(Side.CLIENT)
     private static final Map<String, AbstractTexture> TEXTURE_CACHE = new HashMap<>();
 
     private TextureHandler() {
+        final Object _INTERNAL_USAGE_ONLY_ = null;
         throw new IllegalStateException();
     }
 
+    @SideOnly(Side.CLIENT)
     public static AbstractTexture getTextureOnClassPath(final String texturePath, final Class<?> clazzPath) {
         if (StringHelper.isNullOrEmpty(texturePath)) return null;
         if (TextureHandler.TEXTURE_CACHE.containsKey(texturePath)) return TextureHandler.TEXTURE_CACHE.get(texturePath);
@@ -64,6 +67,7 @@ public final class TextureHandler {
         return abstractTexture;
     }
 
+    @SideOnly(Side.CLIENT)
     public static void bindTexture(final Class<?> clazz, final String texturePath) {
         TextureHelper.bindTexture(
                 TextureHandler.getTextureOnClassPath(

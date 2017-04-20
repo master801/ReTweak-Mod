@@ -55,7 +55,7 @@ public final class ReTweakMetadata implements Metadata {
         return Joiner.on("\n\n").join(new String[] {
                 "Loads [some] Forge mods from [some] previous versions of Minecraft.",
                 ChatHelper.formatString(
-                        "Uses trickery and may cause crashes, use at your own risk.",
+                        "Uses trickery and may cause crashes. Use at your own risk.",
                         EnumChatFormatting.DARK_RED
                 )
         });

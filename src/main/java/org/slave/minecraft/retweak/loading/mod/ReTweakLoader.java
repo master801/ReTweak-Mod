@@ -1,15 +1,13 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
-import com.github.pwittchen.kirai.library.Kirai;
 import com.google.common.base.Joiner;
 import org.slave.lib.helpers.FileHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.capsule.Type;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.tool.retweak.mapping.Mapping;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
-import java.util.zip.ZipFile;
 
 /**
  * <p>
@@ -57,7 +54,7 @@ public final class ReTweakLoader {
         for(GameVersion gameVersion : GameVersion.values()) {
             mods.put(
                     gameVersion,
-                    new ArrayList<ReTweakModContainer>()
+                    new ArrayList<>()
             );
         }
     }
@@ -81,14 +78,14 @@ public final class ReTweakLoader {
             );
             if (!gameVersionDir.exists()) {
                 ReTweakResources.RETWEAK_LOGGER.info(
-                        "ReTweak's game version dir \"%s\" does not exist... not searching for mods for that version.",
+                        "ReTweak's game version dir \"{}\" does not exist... not searching for mods for that version.",
                         gameVersionDir.getPath()
                 );
                 FileHelper.createDirectory(gameVersionDir);
                 continue;
             } else if (!gameVersionDir.isDirectory()) {
                 ReTweakResources.RETWEAK_LOGGER.warn(
-                        "ReTweak's game version dir \"%s\" is not a directory!",
+                        "ReTweak's game version dir \"{}\" is not a directory!",
                         gameVersionDir.getPath()
                 );
                 continue;
@@ -100,12 +97,7 @@ public final class ReTweakLoader {
                 );
             } catch(FileNotFoundException e) {
                 ReTweakResources.RETWEAK_LOGGER.error(
-                        Kirai.from(
-                                "Failed to discover mods for version \"{version}\"!"
-                        ).put(
-                                "version",
-                                gameVersion.getVersion()
-                        ).format().toString(),
+                        "Failed to discover mods for version \"" + gameVersion.getVersion() + "\"!",
                         e
                 );
             }
@@ -240,7 +232,7 @@ public final class ReTweakLoader {
                             for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
                                 if (asmAnnotation.getDesc().equals(entry.getValue())) {
                                     modClass = tableClass.getName();
-                                    info.putAll(asmAnnotation.get());
+                                    info.putAll(asmAnnotation.getValues());
                                     break;
                                 }
                             }
@@ -248,6 +240,7 @@ public final class ReTweakLoader {
                     }
                 }
 
+                /*
                 try {
                     ZipFile zipFile = new ZipFile(reTweakModCandidate.getSource());
                     Mapping mapping = ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion);
@@ -259,6 +252,7 @@ public final class ReTweakLoader {
                             reTweakModCandidate.getSource().getPath()
                     );
                 }
+                */
 
                 if (modClass != null) {
                     mods.get(gameVersion).add(
@@ -287,9 +281,11 @@ public final class ReTweakLoader {
         //</editor-fold>
 
         //<editor-fold desc="Sort">
+        /*
         for(final GameVersion gameVersion : GameVersion.values()) {
             ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion).sort();
         }
+        */
         //TODO
         //</editor-fold>
     }
@@ -297,7 +293,7 @@ public final class ReTweakLoader {
     public ReTweakModContainer getReTweakModContainer(final GameVersion gameVersion, final String modid) {
         if (gameVersion == null || StringHelper.isNullOrEmpty(modid)) return null;
         for(ReTweakModContainer reTweakModContainer : mods.get(gameVersion)) {
-            if (reTweakModContainer.getModid().equals(modid)) return reTweakModContainer;
+            if (reTweakModContainer.getModId().equals(modid)) return reTweakModContainer;
         }
         return null;
     }

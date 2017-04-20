@@ -30,11 +30,24 @@ public final class ReTweakConfig {
 
     private CompilationMode compilationMode = null;
 
+    @SuppressWarnings("StringBufferReplaceableByString")
     private ReTweakConfig() {
         config.put(
                 ReTweakStrings.RETWEAK_CONFIG_KEY_COMPILATION_MODE,
-                ReTweakResources.DEBUG ? CompilationMode.JIT.name() : CompilationMode.INTERPRETER.name(),
-                '[' + Joiner.on(", ").join(CompilationMode.values()) + ']'
+//                ReTweakResources.DEBUG ? CompilationMode.JIT.name() : CompilationMode.INTERPRETER.name(),
+                CompilationMode.INTERPRETER.name(),
+                new StringBuilder(
+                ).append(
+                        '['
+                ).append(
+                        Joiner.on(
+                                ", "
+                        ).join(
+                                CompilationMode.values()
+                        )
+                ).append(
+                        ']'
+                ).toString()
         );
     }
 

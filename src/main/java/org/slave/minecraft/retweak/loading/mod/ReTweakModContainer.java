@@ -1,6 +1,5 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
-import com.github.pwittchen.kirai.library.Kirai;
 import com.google.common.base.Strings;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ILanguageAdapter;
@@ -53,7 +52,7 @@ public final class ReTweakModContainer {
 
 
 
-        //STOLEN CODE FROM FML
+        //START -- CODE FROM FML
         if (info.containsKey("modLanguage")) {
             modLanguage = (String)info.get("modLanguage");
         } else {
@@ -98,9 +97,10 @@ public final class ReTweakModContainer {
             );
             languageAdapter = new ILanguageAdapter.JavaAdapter();
         }
+        //END -- CODE FROM FML
     }
 
-    public String getModid() {
+    public String getModId() {
         return (String)info.get("modid");
     }
 
@@ -151,7 +151,7 @@ public final class ReTweakModContainer {
         if (metadataCollection == null) throw new NullPointerException();
         try {
             this.modMetadata = metadataCollection.getMetadataForId(
-                    getModid(),
+                    getModId(),
                     info
             );
         } catch(NullPointerException e) {
@@ -159,7 +159,7 @@ public final class ReTweakModContainer {
             ReTweakResources.RETWEAK_LOGGER.warn(
                     "File \"{}\" does not contain modid \"{}\"!",
                     "mcmod.info",
-                    getModid()
+                    getModId()
             );
             return;
         }
@@ -183,19 +183,14 @@ public final class ReTweakModContainer {
     public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (instance == null) {
             throw new NullPointerException(
-                    Kirai.from(
-                            "Instance for mod \"{modid}\" is null!"
-                    ).put(
-                            "modid",
-                            getModid()
-                    ).format().toString()
+                    "Instance for mod \"" + getModId() + "\" is null!"
             );
         }
 
         ReTweakResources.RETWEAK_LOGGER.debug(
                 "Calling state \"{}\" for mod \"{}\"",
                 fmlStateEventClass.getSimpleName(),
-                getModid()
+                getModId()
         );
         if (!isEnabled()) {
             ReTweakResources.RETWEAK_LOGGER.error(
@@ -270,19 +265,14 @@ public final class ReTweakModContainer {
                         fmlStateEvent,
                         new File(
                                 ReTweakResources.RETWEAK_CONFIG_DIRECTORY,
-                                getModid() + ".cfg"
+                                getModId() + ".cfg"
                         )
                 );
             }
             return fmlStateEvent;
         } catch(Exception e) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    Kirai.from(
-                            "Failed to create new instance of state event \"{state_event}\"!"
-                    ).put(
-                            "state_event",
-                            fmlStateEventClass.getCanonicalName()
-                    ).format().toString(),
+                    "Failed to create new instance of state event \"" + fmlStateEventClass.getCanonicalName() + "\"!",
                     e
             );
         }

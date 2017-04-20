@@ -7,7 +7,7 @@ package org.slave.minecraft.retweak.loading.capsule;
  */
 public enum CompilationMode {
 
-    JIT,
+//    JIT,
 
     INTERPRETER;
 

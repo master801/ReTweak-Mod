@@ -1,7 +1,7 @@
-package org.slave.minecraft.retweak.loading.tweaks;
+package org.slave.minecraft.retweak.loading.tweak;
 
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 /**
  * Created by Master on 4/27/2016 at 7:21 AM.

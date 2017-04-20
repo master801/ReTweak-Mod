@@ -1,17 +1,8 @@
-package org.slave.minecraft.retweak.loading.tweaks.compilation;
+package org.slave.minecraft.retweak.loading.tweak.compilation;
 
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.tweaks.Tweak;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mapping;
-import org.slave.minecraft.retweak.loading.tweaks.compilation.jit.mappings.Mappings;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
-
-import java.util.Iterator;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.loading.tweak.Tweak;
 
 /**
  * Created by Master on 4/27/2016 at 7:26 AM.
@@ -33,6 +24,7 @@ public final class JITTweak implements Tweak {
 
     @Override
     public void tweak(final ClassNode classNode, final GameVersion gameVersion) {
+        /*
         if (gameVersion == null) return;
         if (classNode.fields != null) {
             Iterator<FieldNode> fieldNodeIterator = classNode.fields.iterator();
@@ -78,6 +70,7 @@ public final class JITTweak implements Tweak {
                 null,
                 classNode
         );
+        */
     }
 
     @Override
@@ -85,6 +78,7 @@ public final class JITTweak implements Tweak {
         return 0;
     }
 
+    /*
     private boolean remap(final ClassNode classNode, final int index, final InsnList insnList, final Object node) {
         Mapping mapping = Mappings.INSTANCE.getMapping(gameVersion);
         if (mapping == null) {
@@ -122,5 +116,6 @@ public final class JITTweak implements Tweak {
         }
         return false;
     }
+    */
 
 }

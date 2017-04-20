@@ -1,6 +1,5 @@
-package org.slave.minecraft.retweak.loading;
+package org.slave.minecraft.retweak.loading.mod;
 
-import com.github.pwittchen.kirai.library.Kirai;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -8,9 +7,10 @@ import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.helpers.FileHelper;
 import org.slave.lib.helpers.IOHelper;
 import org.slave.minecraft.retweak.asm.ReTweakSetup;
+import org.slave.minecraft.retweak.loading.ReTweakTweakHandler;
 import org.slave.minecraft.retweak.loading.capsule.CompilationMode;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
-import org.slave.minecraft.retweak.loading.tweaks.Tweak.TweakException;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.loading.tweak.Tweak.TweakException;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -45,7 +45,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private static final HashMap<GameVersion, ReTweakClassLoader> CLASS_LOADERS = new HashMap<>();
 
     private final LaunchClassLoader parent;
-    private ReTweakSRG srg;
+//    private ReTweakSRG srg;
     private final GameVersion gameVersion;
 
     private ReTweakClassLoader(final LaunchClassLoader parent, final GameVersion gameVersion) {
@@ -60,12 +60,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
         if (this.parent == null || super.getParent() == null) {
             throw new NullPointerException(
-                    Kirai.from(
-                            "Parent class loader \"{parent_class_loader}\" is null!"
-                    ).put(
-                            "parent_class_loader",
-                            LaunchClassLoader.class.getSimpleName()
-                    ).format().toString()
+                    "Parent class loader \"" + LaunchClassLoader.class.getSimpleName() + "\" is null!"
             );
         }
     }
@@ -73,16 +68,13 @@ public final class ReTweakClassLoader extends URLClassLoader {
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
         CompilationMode x = ReTweakConfig.INSTANCE.getCompilationMode();
+        /*
         if (srg == null && x == CompilationMode.JIT) {
             throw new NullPointerException(
-                    Kirai.from(
-                            "Method \"{name}\" was not invoked!"
-                    ).put(
-                            "name",
-                            "loadSRG"
-                    ).format().toString()
+                            "Method \"loadSRG\" was not invoked!"
             );
         }
+        */
         if (ReTweakResources.DEBUG_MESSAGES) {
             ReTweakResources.RETWEAK_LOGGER.info(
                     "LOAD: {}",
@@ -92,12 +84,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (name.startsWith("net.minecraft.")) {
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER) {
                 throw new IllegalStateException(
-                        Kirai.from(
-                                "Tried to access class \"{name}\"! Cannot directly access \"net.minecraft.*\" classes!"
-                        ).put(
-                                "name",
-                                name
-                        ).format().toString()
+                        "Tried to access class \"" + name + "\"! Cannot directly access \"net.minecraft.*\" classes!"
                 );
             }
             if (!ReTweakSetup.isDeobfuscatedEnvironment()) {
@@ -127,10 +114,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 throw new IOException();//Jump out of try-catch block statement
             }
 
-            final String resourceName = name.replace(
-                    '.',
-                    '/'
-            ) + ".class";
+            final String resourceName = name.replace('.', '/') + ".class";
             InputStream inputStream = super.getResourceAsStream(resourceName);
             ClassReader classReader = new ClassReader(
                     IOHelper.toByteArray(inputStream)
@@ -143,6 +127,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
             );
 
             //Enable SRG for only JIT
+            /*
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.JIT) {
                 if (srg != null) {
                     srg.srg(classNode);
@@ -152,6 +137,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     );
                 }
             }
+            */
 
             try {
                 ReTweakTweakHandler.INSTANCE.tweak(
@@ -160,12 +146,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 );
             } catch(TweakException e) {
                 ReTweakResources.RETWEAK_LOGGER.error(
-                        Kirai.from(
-                                "Disabled ReTweak mod candidate \"{file_path}\" because an exception was caught while tweaking!"
-                        ).put(
-                                "file_path",
-                                reTweakModCandidate.getSource().getPath()
-                        ).format().toString(),
+                        "Disabled ReTweak mod candidate \"" + reTweakModCandidate.getSource().getPath() + "\" because an exception was caught while tweaking!",
                         e
                 );
                 reTweakModCandidate.setEnabled(false);
@@ -208,13 +189,19 @@ public final class ReTweakClassLoader extends URLClassLoader {
             //Ignore
         }
 
-        //Load only when in interpreter mode
         if (returnClass == null) {
+            //Override classes only when in interpreter mode
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER && gameVersion.getClasses().contains(name)) {
+                Class<?> interpreterClass = gameVersion.getOverrideClass(name);
+                if (interpreterClass != null) {
+                    returnClass = interpreterClass;
+                }
+                /*
                 returnClass = super.loadClass(
                         gameVersion.getInterpreterPackagePrefix() + name,
                         true
                 );
+                */
             }
         }
         if (returnClass == null) {
@@ -244,12 +231,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
             );
         } catch(MalformedURLException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    Kirai.from(
-                            "Failed to add file \"{file_path}\" to the class loader!"
-                    ).put(
-                            "file_path",
-                            file.getPath()
-                    ).format().toString(),
+                    "Failed to add file \"" + file.getPath() + "\" to the class loader!",
                     e
             );
         }
@@ -278,6 +260,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     /**
      * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#call()}
      */
+    /*
     private void loadSRG() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
@@ -290,6 +273,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         }
         srg = new ReTweakSRG(gameVersion);
     }
+    */
 
     private ReTweakModCandidate findCandidate(final String name) throws IOException {
         URL url = super.findResource(
@@ -319,10 +303,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
         return null;
     }
 
+    /*
     ReTweakSRG getReTweakSRG() {
-        final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
         return srg;
     }
+    */
 
     @SuppressWarnings("FinalStaticMethod")
     public static final void createClassLoaders(final LaunchClassLoader launchClassLoader) {

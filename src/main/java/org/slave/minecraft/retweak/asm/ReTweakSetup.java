@@ -2,13 +2,8 @@ package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import org.slave.lib.helpers.ReflectionHelper;
-import org.slave.minecraft.retweak.loading.ReTweakClassLoader;
-import org.slave.minecraft.retweak.loading.ReTweakDeobfuscation;
-import org.slave.minecraft.retweak.loading.capsule.CompilationMode;
-import org.slave.minecraft.retweak.loading.capsule.GameVersion;
+import org.slave.minecraft.retweak.loading.mod.ReTweakClassLoader;
 import org.slave.minecraft.retweak.resources.ReTweakConfig;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.util.Map;
 
@@ -32,6 +27,7 @@ public final class ReTweakSetup implements IFMLCallHook {
         ReTweakConfig.INSTANCE.update(true);
 
 
+        /*
         if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.JIT) {
             if (ReTweakResources.RETWEAK_PLAY_DIRECTORY.isDirectory()) {
                 ReTweakDeobfuscation.INSTANCE.loadSRGs();
@@ -61,6 +57,7 @@ public final class ReTweakSetup implements IFMLCallHook {
                     new Object[0]
             );
         }
+        */
         return null;
     }
 

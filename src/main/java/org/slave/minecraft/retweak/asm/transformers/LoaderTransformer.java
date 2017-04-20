@@ -51,15 +51,15 @@ public final class LoaderTransformer extends BasicTransformer implements IClassT
                         injectionInstructions.add(
                                 new FieldInsnNode(
                                         Opcodes.GETSTATIC,
-                                        "org/slave/minecraft/retweak/loading/ReTweakLoader",
+                                        "org/slave/minecraft/retweak/loading/mod/ReTweakLoader",
                                         "INSTANCE",
-                                        "Lorg/slave/minecraft/retweak/loading/ReTweakLoader;"
+                                        "Lorg/slave/minecraft/retweak/loading/mod/ReTweakLoader;"
                                 )
                         );
                         injectionInstructions.add(
                                 new MethodInsnNode(
                                         Opcodes.INVOKEVIRTUAL,
-                                        "org/slave/minecraft/retweak/loading/ReTweakLoader",
+                                        "org/slave/minecraft/retweak/loading/mod/ReTweakLoader",
                                         "loadMods",
                                         "()V",
                                         false
