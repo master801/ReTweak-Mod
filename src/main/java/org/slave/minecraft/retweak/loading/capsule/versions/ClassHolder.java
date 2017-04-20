@@ -11,14 +11,14 @@ import java.util.List;
 final class ClassHolder {
 
     private final List<String> classes;
-    private final List<Class<?>> interpreterClasses;
+    private final List<Class<?>> overrideClassList;
 
-    ClassHolder(final List<String> classes, final List<Class<?>> interpreterClasses) {
+    ClassHolder(final List<String> classes, final List<Class<?>> overrideClassList) {
         this.classes = Collections.unmodifiableList(
                 classes
         );
-        this.interpreterClasses = Collections.unmodifiableList(
-                interpreterClasses
+        this.overrideClassList = Collections.unmodifiableList(
+                overrideClassList
         );
     }
 
@@ -26,8 +26,8 @@ final class ClassHolder {
         return classes;
     }
 
-    public List<Class<?>> getInterpreterClasses() {
-        return interpreterClasses;
+    public List<Class<?>> getOverrideClassList() {
+        return overrideClassList;
     }
 
 }

@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.DeobfuscatedName;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.Interfaces;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.ObfuscatedName;
 
 /**
@@ -9,6 +10,11 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.Obfusca
  * @author Master
  */
 @ObfuscatedName("amw")
-@DeobfuscatedName("")//TODO
-public class amw {
+@DeobfuscatedName("net.minecraft.block.BlockContainer")
+@Interfaces(
+        {
+                aoe.class
+        }
+)
+public class amw extends aqz {
 }

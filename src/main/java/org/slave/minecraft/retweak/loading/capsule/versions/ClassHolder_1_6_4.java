@@ -1,7 +1,23 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aah;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.amw;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aoe;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aqz;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ark;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.bje;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ms;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.net.minecraftforge.common.Configuration;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ni;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wh;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wp;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ww;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xo;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xv;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xx;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yc;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ye;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yp;
 
 import java.util.Arrays;
 
@@ -14,7 +30,7 @@ final class ClassHolder_1_6_4 {
 
     static final ClassHolder CLASS_HOLDER_1_6_4 = new ClassHolder(
             Arrays.asList(
-                    //Start Minecraft classes
+                    //<editor-fold desc="Start Minecraft classes">
                     "a",
                     "aa",
                     "aaa",
@@ -1586,14 +1602,37 @@ final class ClassHolder_1_6_4 {
                     "zw",
                     "zx",
                     "zy",
-                    "zz"
-                    //End Minecraft classes
+                    "zz",
+                    //</editor-fold>
+
+                    //<editor-fold desc="Start override classes">
+                    "net.minecraftforge.common.Configuration"
+                    //</editor-fold>
             ),
             Arrays.asList(
-                    new Class<?>[] {
-                            amw.class,
-                            aqz.class
-                    }
+                    //<editor-fold desc="Start Minecraft classes">
+                    aah.class,
+                    ark.class,
+                    amw.class,
+                    aoe.class,
+                    aqz.class,
+                    bje.class,
+                    ms.class,
+                    ni.class,
+                    wp.class,
+                    ww.class,
+                    wh.class,
+                    ye.class,
+                    yc.class,
+                    yp.class,
+                    xo.class,
+                    xv.class,
+                    xx.class,
+                    //</editor-fold>
+
+                    //<editor-fold desc="Start override classes">
+                    Configuration.class
+                    //</editor-fold>
             )
     );
 

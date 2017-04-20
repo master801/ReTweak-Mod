@@ -147,14 +147,20 @@ public final class ReTweakStateHandler {
 
                 for(TableClass tableClass : reTweakModCandidate.getModClasses()) {
                     try {
-                        Class<?> modClass = Class.forName(
-                                tableClass.getName().replace(
-                                        '/',
-                                        '.'
-                                ),
-                                true,
-                                classLoader
-                        );
+                        Class<?> modClass;
+                        try {
+                            modClass = Class.forName(
+                                    tableClass.getName().replace(
+                                            '/',
+                                            '.'
+                                    ),
+                                    true,
+                                    classLoader
+                            );
+                        } catch(NoClassDefFoundError e) {
+                            e.printStackTrace();
+                            modClass = null;
+                        }
 
                         //Somewhat stolen from FML
                         Method factoryMethod = null;

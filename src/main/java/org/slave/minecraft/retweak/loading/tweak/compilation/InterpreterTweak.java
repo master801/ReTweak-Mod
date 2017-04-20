@@ -1,10 +1,13 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation;
 
+import com.google.common.base.Joiner;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
@@ -12,7 +15,9 @@ import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.tweak.Tweak;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by Master on 4/27/2016 at 7:26 AM.
@@ -95,6 +100,7 @@ public final class InterpreterTweak implements Tweak {
     }
 
     private void classInterfaces(final ClassNode classNode) {
+        //TODO
     }
 
     private void field(final String className, final FieldNode fieldNode) {
@@ -104,39 +110,17 @@ public final class InterpreterTweak implements Tweak {
                 fieldNode
         );
         //</editor-fold?
-        //TODO
     }
 
     private void fieldDesc(final String className, final FieldNode fieldNode) {
         Type originalType = Type.getType(fieldNode.desc);
-        Type modifyType;
-        Type finalType;
-        switch(originalType.getSort()) {
-            case Type.ARRAY:
-                modifyType = originalType.getElementType();
-                break;
-            case Type.OBJECT:
-            default:
-                modifyType = originalType;
-                break;
-        }
+        Type finalType = originalType;
 
         Class<?> overrideClass = gameVersion.getOverrideClass(originalType.getClassName());
         if (overrideClass != null) {
-            modifyType = Type.getType(
+            finalType = Type.getType(
                     overrideClass
             );
-        }
-
-        switch(originalType.getSort()) {
-            case Type.ARRAY:
-                finalType = Type.getObjectType(
-                        "[" + modifyType.getDescriptor()
-                );
-                break;
-            default:
-                finalType = modifyType;
-                break;
         }
 
         if (fieldNode.desc.equals(finalType.getDescriptor())) return;
@@ -152,7 +136,13 @@ public final class InterpreterTweak implements Tweak {
     }
 
     private void method(final String className, final MethodNode methodNode) {
-        int i = 0;
+        //<editor-fold desc="Desc">
+        methodDesc(
+                className,
+                methodNode
+        );
+        //</editor-fold>
+        //<editor-fold desc="Instructions">
         Iterator<AbstractInsnNode> abstractInsnNodeIterator = methodNode.instructions.iterator();
         while(abstractInsnNodeIterator.hasNext()) {
             AbstractInsnNode abstractInsnNode = abstractInsnNodeIterator.next();
@@ -168,15 +158,100 @@ public final class InterpreterTweak implements Tweak {
             } else if (abstractInsnNode instanceof MethodInsnNode) {
                 remove = methodInsn(
                         className,
+                        methodNode.name,
+                        methodNode.desc,
                         (MethodInsnNode)abstractInsnNode
                 );
             } else if (abstractInsnNode instanceof TypeInsnNode) {
                 remove = typeInsnNode(
+                        className,
+                        methodNode.name,
+                        methodNode.desc,
                         (TypeInsnNode)abstractInsnNode
+                );
+            } else if (abstractInsnNode instanceof FrameNode) {
+                remove = frameNode(
+                        className,
+                        methodNode.name,
+                        methodNode.desc,
+                        (FrameNode)abstractInsnNode
                 );
             }
             if (remove) abstractInsnNodeIterator.remove();
-            i++;
+        }
+        //</editor-fold>
+        //<editor-fold desc="Local variables">
+        if (methodNode.localVariables != null) {
+            Iterator<LocalVariableNode> localVariableNodeIterator = methodNode.localVariables.iterator();
+            while(localVariableNodeIterator.hasNext()) {
+                LocalVariableNode localVariableNode = localVariableNodeIterator.next();
+
+                boolean remove = localVariableNode(
+                        className,
+                        methodNode.name,
+                        methodNode.desc,
+                        localVariableNode
+                );
+                if (remove) localVariableNodeIterator.remove();
+            }
+        }
+        //</editor-fold>
+    }
+
+    private void methodDesc(final String className, final MethodNode methodNode) {
+        String originalDesc = methodNode.desc;
+        String finalDesc;
+
+        //<editor-fold desc="Return type">
+        Type originalReturnType = Type.getReturnType(methodNode.desc);
+        Type finalReturnType = originalReturnType;
+
+        Class<?> returnTypeOverrideClass = gameVersion.getOverrideClass(originalReturnType.getClassName());
+        if (returnTypeOverrideClass != null) {
+            finalReturnType = Type.getType(returnTypeOverrideClass);
+        }
+        //</editor-fold>
+        //<editor-fold desc="Argument types">
+        Type[] originalArgumentTypes = Type.getArgumentTypes(methodNode.desc);
+        Type[] finalArgumentTypes = new Type[originalArgumentTypes.length];
+        System.arraycopy(
+                originalArgumentTypes,
+                0,
+                finalArgumentTypes,
+                0,
+                originalArgumentTypes.length
+        );
+
+        for(int i = 0; i < finalArgumentTypes.length; ++i) {
+            Type originalArgumentType = originalArgumentTypes[i];
+            Type finalArgumentType = null;
+
+            Class<?> argumentTypeOverrideClass = gameVersion.getOverrideClass(originalArgumentType.getClassName());
+            if (argumentTypeOverrideClass != null) {
+                finalArgumentType = Type.getType(argumentTypeOverrideClass);
+            }
+
+            if (finalArgumentType != null) {
+                finalArgumentTypes[i] = finalArgumentType;
+            }
+        }
+        //</editor-fold>
+
+        finalDesc = Type.getMethodDescriptor(
+                finalReturnType,
+                finalArgumentTypes
+        );
+
+        if (!finalDesc.equals(originalDesc)) {
+            methodNode.desc = finalDesc;
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Tweaked method desc in class \"{}/{}\" from \"{}\" to \"{}\"",
+                    className,
+                    methodNode.name,
+
+                    originalDesc,
+                    finalDesc
+            );
         }
     }
 
@@ -234,13 +309,11 @@ public final class InterpreterTweak implements Tweak {
                 break;
         }
 
-        if (gameVersion.getClasses().contains(originalType.getClassName())) {
-            Class<?> overrideClass = gameVersion.getOverrideClass(originalType.getClassName());
-            if (overrideClass != null) {
-                modifyType = Type.getType(
-                        overrideClass
-                );
-            }
+        Class<?> overrideClass = gameVersion.getOverrideClass(originalType.getClassName());
+        if (overrideClass != null) {
+            modifyType = Type.getType(
+                    overrideClass
+            );
         }
 
         switch(originalType.getSort()) {
@@ -268,7 +341,7 @@ public final class InterpreterTweak implements Tweak {
         );
     }
 
-    private boolean methodInsn(final String className, final MethodInsnNode methodInsnNode) {
+    private boolean methodInsn(final String className, final String methodName, final String methodDesc, final MethodInsnNode methodInsnNode) {
         //<editor-fold desc="Owner">
         methodInsnOwner(
                 className,
@@ -285,7 +358,6 @@ public final class InterpreterTweak implements Tweak {
                 methodInsnNode
         );
         //</editor-fold>
-        //TODO
         return false;
     }
 
@@ -294,11 +366,10 @@ public final class InterpreterTweak implements Tweak {
         String finalOwner = null;
 
         Class<?> overrideClass = gameVersion.getOverrideClass(originalOwner);
-        if (overrideClass != null) {
-            finalOwner = Type.getInternalName(overrideClass);
-        }
+        if (overrideClass != null) finalOwner = Type.getInternalName(overrideClass);
 
         if (finalOwner != null) {
+            methodInsnNode.owner = finalOwner;
             ReTweakResources.RETWEAK_LOGGER.debug(
                     "Tweaked owner in method insn \"{}/{}{}\" from \"{}\" to \"{}\"",
                     className,
@@ -370,7 +441,141 @@ public final class InterpreterTweak implements Tweak {
         }
     }
 
-    private boolean typeInsnNode(TypeInsnNode typeInsnNode) {
+    private boolean typeInsnNode(final String className, final String methodName, final String methodDesc, final TypeInsnNode typeInsnNode) {
+        String originalDesc = typeInsnNode.desc;
+        String finalDesc = null;
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(originalDesc);
+        if (overrideClass != null) finalDesc = Type.getInternalName(overrideClass);
+
+        if (finalDesc != null) {
+            typeInsnNode.desc = finalDesc;
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Tweaked type from method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                    className,
+                    methodName,
+                    methodDesc,
+                    originalDesc,
+                    finalDesc
+            );
+        }
+        return false;
+    }
+
+    private boolean frameNode(final String className, final String methodName, final String methodDesc, final FrameNode frameNode) {
+        //<editor-fold desc="Local">
+        frameNodeLocal(
+                className,
+                methodName,
+                methodDesc,
+                frameNode
+        );
+        //</editor-fold>
+
+        //<editor-fold desc="Stack">
+        frameNodeStack(
+                className,
+                methodName,
+                methodDesc,
+                frameNode
+        );
+        //</editor-fold>
+        return false;
+    }
+
+    private void frameNodeLocal(final String className, final String methodName, final String methodDesc, final FrameNode frameNode) {
+        List<Object> originalLocalList = frameNode.local;
+        List<Object> finalLocalList = new ArrayList<>();
+
+        if (originalLocalList != null) {
+            finalLocalList.addAll(originalLocalList);
+
+            for(int i = 0; i < originalLocalList.size(); ++i) {
+                Object originalLocal = originalLocalList.get(i);
+                Object finalLocal = null;
+
+                if (originalLocal instanceof String) {
+                    Class<?> overrideClass = gameVersion.getOverrideClass((String)originalLocal);
+                    if (overrideClass != null) finalLocal = Type.getInternalName(overrideClass);
+                }
+
+                if (finalLocal != null) finalLocalList.set(i, finalLocal);
+            }
+
+            if (!originalLocalList.equals(finalLocalList)) {
+                frameNode.local = finalLocalList;
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Tweaked frame-node local method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                        className,
+                        methodName,
+                        methodDesc,
+
+                        "[" + Joiner.on(", ").join(originalLocalList) + "]",
+                        "[" + Joiner.on(", ").join(finalLocalList) + "]"
+                );
+            }
+        }
+    }
+
+    private void frameNodeStack(final String className, final String methodName, final String methodDesc, final FrameNode frameNode) {
+        List<Object> originalStackList = frameNode.stack;
+        List<Object> finalStackList = new ArrayList<>();
+
+        if (originalStackList != null) {
+            finalStackList.addAll(originalStackList);
+
+            for(int i = 0; i < originalStackList.size(); ++i) {
+                Object originalStack = originalStackList.get(i);
+                Object finalStack = null;
+
+                if (originalStack instanceof String) {
+                    Class<?> overrideClass = gameVersion.getOverrideClass((String)originalStack);
+                    if (overrideClass != null) finalStack = Type.getInternalName(overrideClass);
+                }
+
+                if (finalStack != null) finalStackList.set(i, finalStack);
+            }
+
+            if (!originalStackList.equals(finalStackList)) {
+                frameNode.stack = finalStackList;
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Tweaked frame-node stack in method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                        className,
+                        methodName,
+                        methodDesc,
+
+                        "[" + Joiner.on(", ").join(originalStackList) + "]",
+                        "[" + Joiner.on(", ").join(finalStackList) + "]"
+                );
+            }
+        }
+    }
+
+    private boolean localVariableNode(final String className, final String methodName, final String methodDesc, final LocalVariableNode localVariableNode) {
+        String originalDesc = localVariableNode.desc;
+        String finalDesc = null;
+
+        Type originalType = Type.getType(originalDesc);
+        Type finalType = originalType;
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(
+                originalType.getClassName()
+        );
+        if (overrideClass != null) finalType = Type.getType(overrideClass);
+        if (!finalType.equals(originalType)) finalDesc = finalType.getDescriptor();
+
+        if (finalDesc != null) {
+            localVariableNode.desc = finalDesc;
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Tweaked local variable in method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                    className,
+                    methodName,
+                    methodDesc,
+
+                    originalDesc,
+                    localVariableNode.desc
+            );
+        }
         //TODO
         return false;
     }

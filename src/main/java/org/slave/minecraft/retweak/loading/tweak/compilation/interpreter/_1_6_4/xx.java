@@ -4,11 +4,11 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.Deobfus
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.ObfuscatedName;
 
 /**
- * Created by Master on 4/19/2017 at 7:56 PM.
+ * Created by Master on 4/20/2017 at 7:44 AM.
  *
  * @author Master
  */
-@ObfuscatedName("aqz")
-@DeobfuscatedName("net.minecraft.block.Block")
-public class aqz {
+@ObfuscatedName("xx")
+@DeobfuscatedName("net.minecraft.item.ItemFood")
+public class xx extends yc {
 }

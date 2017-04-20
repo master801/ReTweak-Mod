@@ -208,13 +208,20 @@ public final class ReTweakModContainer {
         for(Method method : _modClass.getDeclaredMethods()) {
             final Class<?>[] parameterTypes = method.getParameterTypes();
             if ((parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass) && method.isAnnotationPresent(EventHandler.class)) {
-                ReflectionHelper.invokeMethod(
-                        method,
-                        instance,
-                        new Object[] {
-                                createStateEvent(fmlStateEventClass)
-                        }
-                );
+                try {
+                    ReflectionHelper.invokeMethod(
+                            method,
+                            instance,
+                            new Object[] {
+                                    createStateEvent(fmlStateEventClass)
+                            }
+                    );
+                } catch(InvocationTargetException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                            "Caught an exception while creating state event \"" + fmlStateEventClass.getSimpleName() + "\"!",
+                            e
+                    );
+                }
                 break;
             }
         }

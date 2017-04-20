@@ -68,7 +68,7 @@ public enum GameVersion {
     }
 
     public List<Class<?>> getOverrideClassList() {
-        return classHolder.getInterpreterClasses();
+        return classHolder.getOverrideClassList();
     }
 
     public Class<?> getOverrideClass(final String className) {
@@ -79,7 +79,7 @@ public enum GameVersion {
                     interpreterPackagePrefix.length(),
                     name.length()
             );
-            if (name.equals(className)) return interpreterClass;
+            if (name.equals(className.replace('/', '.'))) return interpreterClass;
         }
         return null;
     }
