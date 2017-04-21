@@ -7,10 +7,12 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.FrameNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.tweak.Tweak;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
@@ -169,6 +171,13 @@ public final class InterpreterTweak implements Tweak {
                         methodNode.desc,
                         (TypeInsnNode)abstractInsnNode
                 );
+            } else if (abstractInsnNode instanceof LdcInsnNode) {
+                remove = ldcInsnNode(
+                        className,
+                        methodNode.name,
+                        methodNode.desc,
+                        (LdcInsnNode)abstractInsnNode
+                );
             } else if (abstractInsnNode instanceof FrameNode) {
                 remove = frameNode(
                         className,
@@ -203,13 +212,61 @@ public final class InterpreterTweak implements Tweak {
         String finalDesc;
 
         //<editor-fold desc="Return type">
+        /*
         Type originalReturnType = Type.getReturnType(methodNode.desc);
+        Type modifyReturnType;
         Type finalReturnType = originalReturnType;
 
         Class<?> returnTypeOverrideClass = gameVersion.getOverrideClass(originalReturnType.getClassName());
         if (returnTypeOverrideClass != null) {
-            finalReturnType = Type.getType(returnTypeOverrideClass);
+            modifyReturnType = Type.getType(returnTypeOverrideClass);
+
+            if (originalReturnType.getSort() == Type.ARRAY) {
+                String desc = modifyReturnType.getDescriptor();
+
+                for(int i = 0; i < originalReturnType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+
+                modifyReturnType = Type.getType(desc);
+            }
+
+            finalReturnType = modifyReturnType;
         }
+        */
+
+        Type originalReturnType = Type.getReturnType(methodNode.desc);
+        Type modifyReturnType = originalReturnType;
+        Type finalReturnType;
+
+        Class<?> returnTypeOverrideClass;
+
+        if (originalReturnType.getSort() == Type.ARRAY) modifyReturnType = originalReturnType.getElementType();
+
+        returnTypeOverrideClass = gameVersion.getOverrideClass(modifyReturnType.getClassName());
+
+        if (returnTypeOverrideClass != null) {
+            modifyReturnType = Type.getType(returnTypeOverrideClass);
+            //<editor-fold desc="Array">
+            if (originalReturnType.getSort() == Type.ARRAY) {
+                String desc = modifyReturnType.getDescriptor();
+                for(int i = 0; i < originalReturnType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+                modifyReturnType = Type.getType(desc);
+            }
+            //</editor-fold>
+        }
+
+        finalReturnType = modifyReturnType;
         //</editor-fold>
         //<editor-fold desc="Argument types">
         Type[] originalArgumentTypes = Type.getArgumentTypes(methodNode.desc);
@@ -224,16 +281,63 @@ public final class InterpreterTweak implements Tweak {
 
         for(int i = 0; i < finalArgumentTypes.length; ++i) {
             Type originalArgumentType = originalArgumentTypes[i];
+            Type modifyArgumentType = originalArgumentType;
+            Type finalArgumentType;
+
+            Class<?> argumentTypeOverrideClass;
+
+            if (originalArgumentType.getSort() == Type.ARRAY) modifyArgumentType = originalArgumentType.getElementType();
+
+            argumentTypeOverrideClass = gameVersion.getOverrideClass(modifyArgumentType.getClassName());
+
+            if (argumentTypeOverrideClass != null) {
+                //<editor-fold desc="Array">
+                if (originalArgumentType.getSort() == Type.ARRAY) {
+                    String desc = modifyArgumentType.getDescriptor();
+                    for(int j = 0; j < originalArgumentType.getDimensions(); ++j) {
+                        desc = StringHelper.insert(
+                                desc,
+                                "[",
+                                0
+                        );
+                    }
+                    modifyArgumentType = Type.getType(desc);
+                }
+                //</editor-fold>
+            }
+
+            finalArgumentType = modifyArgumentType;
+
+            finalArgumentTypes[i] = finalArgumentType;
+
+            /*
+            Type originalArgumentType = originalArgumentTypes[i];
+            Type modifyArgumentType;
             Type finalArgumentType = null;
 
             Class<?> argumentTypeOverrideClass = gameVersion.getOverrideClass(originalArgumentType.getClassName());
             if (argumentTypeOverrideClass != null) {
-                finalArgumentType = Type.getType(argumentTypeOverrideClass);
+                modifyArgumentType = Type.getType(argumentTypeOverrideClass);
+
+                if (originalArgumentType.getSort() == Type.ARRAY) {
+                    String desc = modifyArgumentType.getDescriptor();
+
+                    for(int j = 0; j < originalArgumentType.getSort(); ++j) {
+                        desc = StringHelper.insert(
+                                desc,
+                                "[",
+                                0
+                        );
+                    }
+
+                    modifyArgumentType = Type.getType(desc);
+                }
+
+                finalArgumentType = modifyArgumentType;
             }
 
-            if (finalArgumentType != null) {
-                finalArgumentTypes[i] = finalArgumentType;
-            }
+            if (finalArgumentType != null) finalArgumentTypes[i] = finalArgumentType;
+            */
         }
         //</editor-fold>
 
@@ -297,37 +401,72 @@ public final class InterpreterTweak implements Tweak {
 
     private void fieldInsnDesc(final String className, final String methodName, final String methodDesc, final FieldInsnNode fieldInsnNode) {
         Type originalType = Type.getType(fieldInsnNode.desc);
-        Type modifyType;
+        Type modifyType = originalType;
         Type finalType;
-        switch(originalType.getSort()) {
-            case Type.ARRAY:
-                modifyType = originalType.getElementType();
-                break;
-            case Type.OBJECT:
-            default:
-                modifyType = originalType;
-                break;
+
+        Class<?> overrideClass;
+
+        if (originalType.getSort() == Type.ARRAY) modifyType = originalType.getElementType();
+
+        overrideClass = gameVersion.getOverrideClass(modifyType.getClassName());
+
+        if (overrideClass != null) {
+            modifyType = Type.getType(overrideClass);
+            //<editor-fold desc="Array">
+            if (originalType.getSort() == Type.ARRAY) {
+                String desc = modifyType.getDescriptor();
+                for(int i = 0; i < originalType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+                modifyType = Type.getType(desc);
+            }
+            //</editor-fold>
         }
+
+        finalType = modifyType;
+
+        if (!finalType.equals(originalType)) {
+            fieldInsnNode.desc = finalType.getDescriptor();
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Tweaked field insn desc in method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                    className,
+                    methodName,
+                    methodDesc,
+                    originalType.getDescriptor(),
+                    finalType.getDescriptor()
+            );
+        }
+
+        /*
+        Type originalType = Type.getType(fieldInsnNode.desc);
+        Type modifyType;
+        Type finalType = originalType;
 
         Class<?> overrideClass = gameVersion.getOverrideClass(originalType.getClassName());
         if (overrideClass != null) {
             modifyType = Type.getType(
                     overrideClass
             );
-        }
 
-        switch(originalType.getSort()) {
-            case Type.ARRAY:
-                finalType = Type.getObjectType(
-                        "[" + modifyType.getDescriptor()
-                );
-                break;
-            default:
-                finalType = modifyType;
-                break;
-        }
+            String desc = modifyType.getDescriptor();
+            //<editor-fold desc="Array">
+            if (originalType.getSort() == Type.ARRAY) {
+                for(int i = 0; i < originalType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+            }
+            //</editor-fold>
 
-        if (fieldInsnNode.desc.equals(finalType.getDescriptor())) return;
+            finalType = Type.getType(desc);
+        }
 
         fieldInsnNode.desc = finalType.getDescriptor();
 
@@ -339,22 +478,23 @@ public final class InterpreterTweak implements Tweak {
                 originalType.getDescriptor(),
                 finalType.getDescriptor()
         );
+        */
     }
 
     private boolean methodInsn(final String className, final String methodName, final String methodDesc, final MethodInsnNode methodInsnNode) {
         //<editor-fold desc="Owner">
         methodInsnOwner(
                 className,
-                methodInsnNode.name,
-                methodInsnNode.desc,
+                methodName,
+                methodDesc,
                 methodInsnNode
         );
         //</editor-fold>
         //<editor-fold desc="Desc">
         methodInsnDesc(
                 className,
-                methodInsnNode.name,
-                methodInsnNode.desc,
+                methodName,
+                methodDesc,
                 methodInsnNode
         );
         //</editor-fold>
@@ -388,12 +528,57 @@ public final class InterpreterTweak implements Tweak {
 
         //<editor-fold desc="Return type">
         Type originalReturnType = Type.getReturnType(methodInsnNode.desc);
+        Type modifyReturnType = originalReturnType;
+        Type finalReturnType;
+
+        Class<?> returnTypeOverrideClass;
+
+        if (originalReturnType.getSort() == Type.ARRAY) modifyReturnType = originalReturnType.getElementType();
+
+        returnTypeOverrideClass = gameVersion.getOverrideClass(modifyReturnType.getClassName());
+
+        if (returnTypeOverrideClass != null) {
+            modifyReturnType = Type.getType(returnTypeOverrideClass);
+            if (originalReturnType.getSort() == Type.ARRAY) {
+                String desc = modifyReturnType.getDescriptor();
+                for(int i = 0; i < modifyReturnType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+                modifyReturnType = Type.getType(desc);
+            }
+        }
+
+        finalReturnType = modifyReturnType;
+
+        /*
+        Type originalReturnType = Type.getReturnType(methodInsnNode.desc);
+        Type modifyReturnType;
         Type finalReturnType = originalReturnType;
 
         Class<?> returnTypeOverrideClass = gameVersion.getOverrideClass(originalReturnType.getClassName());
         if (returnTypeOverrideClass != null) {
-            finalReturnType = Type.getType(returnTypeOverrideClass);
+            modifyReturnType = Type.getType(returnTypeOverrideClass);
+
+            String desc = modifyReturnType.getDescriptor();
+            //<editor-fold desc="Array">
+            if (modifyReturnType.getSort() == Type.ARRAY) {
+                for(int i = 0; i < originalReturnType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+            }
+            //</editor-fold>
+
+            finalReturnType = Type.getType(desc);
         }
+            */
         //</editor-fold>
 
         //<editor-fold desc="Argument types">
@@ -409,16 +594,63 @@ public final class InterpreterTweak implements Tweak {
 
         for(int i = 0; i < finalArgumentTypes.length; ++i) {
             Type originalArgumentType = originalArgumentTypes[i];
+            Type modifyArgumentType = originalArgumentType;
+            Type finalArgumentType;
+
+            Class<?> argumentTypeOverrideClass;
+
+            if (originalArgumentType.getSort() == Type.ARRAY) modifyArgumentType = originalArgumentType.getElementType();
+
+            argumentTypeOverrideClass = gameVersion.getOverrideClass(modifyArgumentType.getClassName());
+
+            if (argumentTypeOverrideClass != null) {
+                modifyArgumentType = Type.getType(argumentTypeOverrideClass);
+                //<editor-fold desc="Array">
+                if (originalArgumentType.getSort() == Type.ARRAY) {
+                    String desc = modifyArgumentType.getDescriptor();
+                    for(int j = 0; j < originalArgumentType.getDimensions(); ++j) {
+                        desc = StringHelper.insert(
+                                desc,
+                                "[",
+                                0
+                        );
+                    }
+                    modifyArgumentType = Type.getType(desc);
+                }
+                //</editor-fold>
+            }
+
+            finalArgumentType = modifyArgumentType;
+
+            finalArgumentTypes[i] = finalArgumentType;
+
+            /*
+            Type originalArgumentType = originalArgumentTypes[i];
+            Type modifyArgumentType;
             Type finalArgumentType = null;
 
             Class<?> argumentTypeOverrideClass = gameVersion.getOverrideClass(originalArgumentType.getClassName());
             if (argumentTypeOverrideClass != null) {
-                finalArgumentType = Type.getType(argumentTypeOverrideClass);
+                modifyArgumentType = Type.getType(argumentTypeOverrideClass);
+
+                String desc = modifyArgumentType.getDescriptor();
+                //<editor-fold desc="Array">
+                if (modifyArgumentType.getSort() == Type.ARRAY) {
+                    for(int a = 0; a < originalArgumentType.getDimensions(); ++a) {
+                        desc = StringHelper.insert(
+                                desc,
+                                "[",
+                                0
+                        );
+                    }
+                }
+                //</editor-fold>
+
+                finalArgumentType = Type.getType(desc);
             }
 
-            if (finalArgumentType != null) {
-                finalArgumentTypes[i] = finalArgumentType;
-            }
+            if (finalArgumentType != null) finalArgumentTypes[i] = finalArgumentType;
+            */
         }
         //</editor-fold>
 
@@ -451,13 +683,60 @@ public final class InterpreterTweak implements Tweak {
         if (finalDesc != null) {
             typeInsnNode.desc = finalDesc;
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Tweaked type from method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                    "Tweaked type insn from method \"{}/{}{}\" from \"{}\" to \"{}\"",
                     className,
                     methodName,
                     methodDesc,
                     originalDesc,
                     finalDesc
             );
+        }
+        return false;
+    }
+
+    private boolean ldcInsnNode(final String className, final String methodName, final String methodDesc, final LdcInsnNode ldcInsnNode) {
+        if (ldcInsnNode.cst instanceof Type) {
+            Type originalType = (Type)ldcInsnNode.cst;
+            Type modifyType = originalType;
+            Type finalType;
+
+            Class<?> overrideClass;
+
+            if (originalType.getSort() == Type.ARRAY) modifyType = originalType.getElementType();
+
+            overrideClass = gameVersion.getOverrideClass(modifyType.getClassName());
+
+            if (overrideClass != null) {
+                modifyType = Type.getType(overrideClass);
+                //<editor-fold desc="Array">
+                if (originalType.getSort() == Type.ARRAY) {
+                    String desc = modifyType.getDescriptor();
+                    for(int i = 0; i < originalType.getDimensions(); ++i) {
+                        desc = StringHelper.insert(
+                                desc,
+                                "[",
+                                0
+                        );
+                    }
+                    modifyType = Type.getType(desc);
+                }
+                //</editor-fold>
+            }
+
+            finalType = modifyType;
+
+            if (!finalType.equals(originalType)) {
+                ldcInsnNode.cst = finalType;
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                        "Tweaked ldc insn in method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                        className,
+                        methodName,
+                        methodDesc,
+
+                        originalType.toString(),
+                        ldcInsnNode.cst.toString()
+                );
+            }
         }
         return false;
     }
@@ -495,8 +774,16 @@ public final class InterpreterTweak implements Tweak {
                 Object finalLocal = null;
 
                 if (originalLocal instanceof String) {
+                    String stringLocal = (String)originalLocal;
+
+                    //TODO Support types (with arrays)
+
+                    /*
                     Class<?> overrideClass = gameVersion.getOverrideClass((String)originalLocal);
                     if (overrideClass != null) finalLocal = Type.getInternalName(overrideClass);
+                    */
+
+                    //TODO
                 }
 
                 if (finalLocal != null) finalLocalList.set(i, finalLocal);
@@ -553,16 +840,36 @@ public final class InterpreterTweak implements Tweak {
 
     private boolean localVariableNode(final String className, final String methodName, final String methodDesc, final LocalVariableNode localVariableNode) {
         String originalDesc = localVariableNode.desc;
-        String finalDesc = null;
+        String finalDesc;
 
         Type originalType = Type.getType(originalDesc);
-        Type finalType = originalType;
+        Type modifyType = originalType;
+        Type finalType;
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(
-                originalType.getClassName()
-        );
-        if (overrideClass != null) finalType = Type.getType(overrideClass);
-        if (!finalType.equals(originalType)) finalDesc = finalType.getDescriptor();
+        Class<?> overrideClass;
+
+        if (originalType.getSort() == Type.ARRAY) modifyType = originalType.getElementType();
+
+        overrideClass = gameVersion.getOverrideClass(modifyType.getClassName());
+
+        if (overrideClass != null) {
+            modifyType = Type.getType(overrideClass);
+            if (originalType.getSort() == Type.ARRAY) {
+                String desc = modifyType.getDescriptor();
+                for(int i = 0; i < originalType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+                modifyType = Type.getType(desc);
+            }
+        }
+
+        finalType = modifyType;
+
+        finalDesc = finalType.getDescriptor();
 
         if (finalDesc != null) {
             localVariableNode.desc = finalDesc;
@@ -576,7 +883,49 @@ public final class InterpreterTweak implements Tweak {
                     localVariableNode.desc
             );
         }
-        //TODO
+
+        /*
+        Type originalType = Type.getType(originalDesc);
+        Type modifyType;
+        Type finalType = originalType;
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(
+                originalType.getClassName()
+        );
+        if (overrideClass != null) {
+            modifyType = Type.getType(overrideClass);
+            //<editor-fold desc="Array">
+            if (originalType.getSort() == Type.ARRAY) {
+                String desc = modifyType.getDescriptor();
+
+                for(int i = 0; i < originalType.getDimensions(); ++i) {
+                    desc = StringHelper.insert(
+                            desc,
+                            "[",
+                            0
+                    );
+                }
+
+                modifyType = Type.getType(desc);
+            }
+            //</editor-fold>
+            finalType = modifyType;
+        }
+        finalDesc = finalType.getDescriptor();
+
+        if (finalDesc != null) {
+            localVariableNode.desc = finalDesc;
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Tweaked local variable in method \"{}/{}{}\" from \"{}\" to \"{}\"",
+                    className,
+                    methodName,
+                    methodDesc,
+
+                    originalDesc,
+                    localVariableNode.desc
+            );
+        }
+        */
         return false;
     }
 
