@@ -123,23 +123,19 @@ public final class ReTweakLoader {
                                     resourceName
                             );
                             if (resourceFile.exists()) {
-                                if (ReTweakResources.DEBUG_MESSAGES) {
-                                    ReTweakResources.RETWEAK_LOGGER.info(
-                                            "Resource folder \"{}\" exists! Adding all \"*.ogg\" files to the class-loader...",
-                                            resourceFile.getPath()
-                                    );
-                                }
+                                ReTweakResources.RETWEAK_LOGGER.debug(
+                                        "Resource folder \"{}\" exists! Adding all \"*.ogg\" files to the class-loader...",
+                                        resourceFile.getPath()
+                                );
                                 File[] subFiles = resourceFile.listFiles();
                                 if (subFiles != null && subFiles.length > 0) {
                                     for(File subFile : subFiles) {
                                         if (ReTweakLoader.PATTERN_OGG.matcher(subFile.getName()).matches()) {
                                             ReTweakClassLoader.getClassLoader(gameVersion).addFile(subFile);
-                                            if (ReTweakResources.DEBUG_MESSAGES) {
-                                                ReTweakResources.RETWEAK_LOGGER.info(
-                                                        "Added resource file \"{}\" to the class-loader",
-                                                        subFile.getPath()
-                                                );
-                                            }
+                                            ReTweakResources.RETWEAK_LOGGER.debug(
+                                                    "Added resource file \"{}\" to the class-loader",
+                                                    subFile.getPath()
+                                            );
                                         }
                                     }
                                 }
@@ -181,22 +177,20 @@ public final class ReTweakLoader {
 
         //<editor-fold desc="Load">
         for(GameVersion gameVersion : GameVersion.values()) {
-            if (ReTweakResources.DEBUG_MESSAGES) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Found {} mods for version {}!",
+                    reTweakModDiscoverer.getModCandidates(gameVersion).size(),
+                    gameVersion.getVersion()
+            );
+            for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
                 ReTweakResources.RETWEAK_LOGGER.debug(
-                        "Found {} mods for version {}!",
-                        reTweakModDiscoverer.getModCandidates(gameVersion).size(),
-                        gameVersion.getVersion()
+                        "Found {} mod classes! Classes: \"{}\"",
+                        reTweakModCandidate.getModClasses().size(),
+                        Joiner.on(", ").join(reTweakModCandidate.getModClasses())
                 );
-                for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) {
-                    ReTweakResources.RETWEAK_LOGGER.debug(
-                            "Found {} mod classes! Classes: \"{}\"",
-                            reTweakModCandidate.getModClasses().size(),
-                            Joiner.on(", ").join(reTweakModCandidate.getModClasses())
-                    );
-                }
             }
             Iterator<ReTweakModCandidate> iterator = reTweakModDiscoverer.getModCandidates(gameVersion).iterator();
-            while(iterator.hasNext()) {
+            while (iterator.hasNext()) {
                 final ReTweakModCandidate reTweakModCandidate = iterator.next();
                 String modClass = null;
                 final Map<String, Object> info = new HashMap<>();

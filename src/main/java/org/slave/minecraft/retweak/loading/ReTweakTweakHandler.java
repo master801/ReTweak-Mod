@@ -67,22 +67,18 @@ public final class ReTweakTweakHandler {
         List<Tweak> tweakList = tweaks.get(gameVersion);
         for(Tweak tweak : tweakList) {
             if (tweak == null) continue;
-            if (ReTweakResources.DEBUG_MESSAGES) {
-                ReTweakResources.RETWEAK_LOGGER.info(
-                        "Start Tweak \"{}\"",
-                        tweak.getName()
-                );
-            }
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Start Tweak \"{}\"",
+                    tweak.getName()
+            );
             tweak.tweak(
                     classNode,
                     gameVersion
             );
-            if (ReTweakResources.DEBUG_MESSAGES) {
-                ReTweakResources.RETWEAK_LOGGER.info(
-                        "End Tweak\n\n",
-                        tweak.getName()
-                );
-            }
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                    "End Tweak\n\n",
+                    tweak.getName()
+            );
         }
     }
 

@@ -75,12 +75,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
             );
         }
         */
-        if (ReTweakResources.DEBUG_MESSAGES) {
-            ReTweakResources.RETWEAK_LOGGER.info(
-                    "LOAD: {}",
-                    name
-            );
-        }
+        ReTweakResources.RETWEAK_LOGGER.debug(
+                "LOAD: {}",
+                name
+        );
         if (name.startsWith("net.minecraft.")) {
             if (ReTweakConfig.INSTANCE.getCompilationMode() == CompilationMode.INTERPRETER) {
                 throw new IllegalStateException(
@@ -215,12 +213,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG_MESSAGES) {
-            ReTweakResources.RETWEAK_LOGGER.info(
-                    "FIND: {}",
-                    name
-            );
-        }
+        ReTweakResources.RETWEAK_LOGGER.debug(
+                "FIND: {}",
+                name
+        );
         return super.findClass(name);
     }
 
