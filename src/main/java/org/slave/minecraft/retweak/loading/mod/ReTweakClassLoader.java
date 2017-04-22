@@ -123,7 +123,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
             classReader.accept(
                     classNode,
-                    0
+                    ClassReader.EXPAND_FRAMES
             );
 
             //Enable SRG for only JIT
@@ -152,7 +152,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 reTweakModCandidate.setEnabled(false);
             }
 
-            ClassWriter classWriter = new ClassWriter(0);
+            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
             classNode.accept(classWriter);
             inputStream.close();
 
