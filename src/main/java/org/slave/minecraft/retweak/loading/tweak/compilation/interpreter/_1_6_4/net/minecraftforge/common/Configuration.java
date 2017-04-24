@@ -7,9 +7,36 @@ import java.io.File;
  *
  * @author Master
  */
-public class Configuration {
+public class Configuration extends net.minecraftforge.common.config.Configuration {
 
-    public Configuration(File par1) {
+    public Configuration() {
+        super();
+    }
+
+    public Configuration(final File file) {
+        super(file);
+    }
+
+    public Configuration(final File file, final String configVersion) {
+        super(
+                file,
+                configVersion
+        );
+    }
+
+    public Configuration(final File file, final String configVersion, final boolean caseSensitiveCustomCategories) {
+        super(
+                file,
+                configVersion,
+                caseSensitiveCustomCategories
+        );
+    }
+
+    public Configuration(final File file, final boolean caseSensitiveCustomCategories) {
+        super(
+                file,
+                caseSensitiveCustomCategories
+        );
     }
 
 }

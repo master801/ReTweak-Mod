@@ -1,6 +1,5 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import com.google.common.base.Strings;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.Loader;
@@ -24,7 +23,8 @@ import java.util.Map;
 
 /**
  * <p>
- *     Mostly stolen (or re-implemented) from FML code
+ *     Mostly stolen (or re-implemented) from FML<br/>
+ *     {@link cpw.mods.fml.common.ModContainer}
  * </p>
  *
  * Created by Master on 5/7/2016 at 6:36 PM.
@@ -32,6 +32,14 @@ import java.util.Map;
  * @author Master
  */
 public final class ReTweakModContainer {
+
+    private static final String INFO_MODID = "modid";
+    private static final String INFO_NAME = "name";
+    private static final String INFO_USE_METADATA = "useMetadata";
+    private static final String INFO_ACCEPTED_MINECRAFT_VERSIONS = "acceptedMinecraftVersions";
+
+    private static final String MOD_LANGUAGE_JAVA = "java";
+    private static final String MOD_LANGUAGE_SCALA = "scala";
 
     private final String modClass;
     private String version;
@@ -50,62 +58,26 @@ public final class ReTweakModContainer {
         this.reTweakModCandidate = reTweakModCandidate;
         this.info = info;
 
+        String modLanguage = (String)info.get("modLanguage");
+        String modLanguageAdapter = (String)info.get("modLanguageAdapter");
 
-
-        //START -- CODE FROM FML
-        if (info.containsKey("modLanguage")) {
-            modLanguage = (String)info.get("modLanguage");
+        languageAdapter = ReTweakModContainer.createLanguageAdapter(
+                modLanguage,
+                modLanguageAdapter
+        );
+        if (modLanguage == null) {
+            this.modLanguage = ReTweakModContainer.MOD_LANGUAGE_JAVA;
         } else {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "Found no mod language for \"{}\"! Defaulting to \"{}\"...",
-                    modClass,
-                    modLanguage = "java"
-            );
+            this.modLanguage = modLanguage;
         }
-
-        final String languageAdapterType = (String)info.get("modLanguageAdapter");
-        if (Strings.isNullOrEmpty(languageAdapterType)) {
-            if (modLanguage != null && modLanguage.equals("scala")) {
-                languageAdapter = new ILanguageAdapter.ScalaAdapter();
-            } else {
-                languageAdapter = new ILanguageAdapter.JavaAdapter();
-            }
-        } else {
-            try {
-                languageAdapter = (ILanguageAdapter)ReflectionHelper.createFromConstructor(
-                        ReflectionHelper.getConstructor(
-                                Class.forName(
-                                        languageAdapterType,
-                                        true,
-                                        Loader.instance().getModClassLoader()
-                                ),
-                                new Class[0]
-                        ),
-                        new Object[0]
-                );
-            } catch(IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                        "Caught an exception while creating new language adapter!",
-                        e
-                );
-            }
-        }
-        if (languageAdapter == null) {
-            ReTweakResources.RETWEAK_LOGGER.warn(
-                    "Found no language adapter? Defaulting to \"{}\"...",
-                    "java"
-            );
-            languageAdapter = new ILanguageAdapter.JavaAdapter();
-        }
-        //END -- CODE FROM FML
     }
 
     public String getModId() {
-        return (String)info.get("modid");
+        return (String)info.get(ReTweakModContainer.INFO_MODID);
     }
 
     public String getName() {
-        return (String)info.get("name");
+        return (String)info.get(ReTweakModContainer.INFO_NAME);
     }
 
     public String getVersion() {
@@ -164,7 +136,7 @@ public final class ReTweakModContainer {
             return;
         }
 
-        final boolean overrideMetadata = info.containsKey("useMetadata") && !(boolean)info.get("useMetadata");
+        boolean overrideMetadata = info.containsKey(ReTweakModContainer.INFO_USE_METADATA) && !(boolean)info.get(ReTweakModContainer.INFO_USE_METADATA);
         if (overrideMetadata || !modMetadata.useDependencyInformation) {
             //TODO DEPENDENCY PARSING
             ReTweakResources.RETWEAK_LOGGER.warn(
@@ -172,7 +144,7 @@ public final class ReTweakModContainer {
             );
         }
         if (version == null && !StringHelper.isNullOrEmpty(modMetadata.version)) version = modMetadata.version;
-        String mcVersion = (String)info.get("acceptedMinecraftVersions");
+        String mcVersion = (String)info.get(ReTweakModContainer.INFO_ACCEPTED_MINECRAFT_VERSIONS);
         if (!StringHelper.isNullOrEmpty(mcVersion)) {
             minecraftAccepted = VersionParser.parseRange(mcVersion);
         } else {
@@ -180,11 +152,18 @@ public final class ReTweakModContainer {
         }
     }
 
-    public void callState(Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    public void callState(final Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (instance == null) {
             throw new NullPointerException(
                     "Instance for mod \"" + getModId() + "\" is null!"
             );
+        }
+        if (fmlStateEventClass == null) {
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Tried to call a null state for mod \"{}\"!",
+                    getModId()
+            );
+            return;
         }
 
         ReTweakResources.RETWEAK_LOGGER.debug(
@@ -206,7 +185,7 @@ public final class ReTweakModContainer {
         );
 
         for(Method method : _modClass.getDeclaredMethods()) {
-            final Class<?>[] parameterTypes = method.getParameterTypes();
+            Class<?>[] parameterTypes = method.getParameterTypes();
             if ((parameterTypes != null && parameterTypes.length == 1 && parameterTypes[0] == fmlStateEventClass) && method.isAnnotationPresent(EventHandler.class)) {
                 try {
                     ReflectionHelper.invokeMethod(
@@ -227,7 +206,7 @@ public final class ReTweakModContainer {
         }
     }
 
-    private FMLStateEvent createStateEvent(Class<? extends FMLStateEvent> fmlStateEventClass) {
+    private FMLStateEvent createStateEvent(final Class<? extends FMLStateEvent> fmlStateEventClass) {
         Object[] parameters;
         if (fmlStateEventClass == FMLPreInitializationEvent.class) {
             parameters = new Object[] {
@@ -284,6 +263,41 @@ public final class ReTweakModContainer {
             );
         }
         return null;
+    }
+
+    private static ILanguageAdapter createLanguageAdapter(final String name, final String customLanguageAdapter) {
+        ILanguageAdapter languageAdapter = null;
+        if (name != null) {
+            switch(name.toLowerCase()) {
+                case ReTweakModContainer.MOD_LANGUAGE_JAVA:
+                    languageAdapter = new ILanguageAdapter.JavaAdapter();
+                    break;
+                case ReTweakModContainer.MOD_LANGUAGE_SCALA:
+                    languageAdapter = new ILanguageAdapter.ScalaAdapter();
+                    break;
+            }
+        } else if (customLanguageAdapter != null) {
+            try {
+                languageAdapter = (ILanguageAdapter)ReflectionHelper.createFromConstructor(
+                        ReflectionHelper.getConstructor(
+                                Class.forName(
+                                        customLanguageAdapter,
+                                        true,
+                                        Loader.instance().getModClassLoader()//We may need to use "our" classloader to create the custom language adapter...
+                                ),
+                                new Class[0]
+                        ),
+                        new Object[0]
+                );
+            } catch (IllegalAccessException | ClassNotFoundException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
+                ReTweakResources.RETWEAK_LOGGER.error(
+                        "Caught an exception while creating a new language adapter!",
+                        e
+                );
+            }
+        }
+        if (languageAdapter == null) languageAdapter = new ILanguageAdapter.JavaAdapter();
+        return languageAdapter;
     }
 
 }

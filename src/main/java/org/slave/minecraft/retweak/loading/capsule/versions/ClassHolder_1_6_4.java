@@ -1,23 +1,7 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aah;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.amw;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aoe;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aqz;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ark;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.bje;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ms;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.*;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.net.minecraftforge.common.Configuration;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ni;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wh;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wp;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ww;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xo;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xv;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.xx;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yc;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ye;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yp;
 
 import java.util.Arrays;
 
@@ -1617,6 +1601,7 @@ final class ClassHolder_1_6_4 {
                     aoe.class,
                     aqz.class,
                     bje.class,
+                    by.class,
                     ms.class,
                     ni.class,
                     wp.class,

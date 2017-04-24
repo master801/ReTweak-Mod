@@ -5,6 +5,7 @@ import org.slave.lib.util.Bulk;
 import org.slave.minecraft.retweak.loading.capsule.Type;
 
 import java.util.List;
+import java.util.Map.*;
 
 /**
  * Created by Master on 4/26/2016 at 3:28 PM.
@@ -49,7 +50,7 @@ public enum GameVersion {
     private final ClassHolder classHolder;
     private final String interpreterPackagePrefix;
     private final boolean hasResources;
-    private final Bulk<Type, String> modType;
+    private final Entry<Type, String> modType;
 
     GameVersion(final String version, final ClassHolder classHolder, final boolean hasResources, final Bulk<Type, String> modType) {
         this.version = version;
@@ -92,7 +93,7 @@ public enum GameVersion {
         return hasResources;
     }
 
-    public Bulk<Type, String> getModType() {
+    public Entry<Type, String> getModType() {
         return modType;
     }
 

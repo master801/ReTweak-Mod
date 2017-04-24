@@ -8,6 +8,7 @@ package org.slave.minecraft.retweak.resources;
 public final class ReTweakStrings {
 
     private ReTweakStrings() {
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
         throw new IllegalStateException();
     }
 
@@ -32,13 +33,11 @@ public final class ReTweakStrings {
     public static final String RETWEAK_CONFIG_CATEGORY_PREFIX = ReTweakStrings.RETWEAK_CONFIG_PREFIX + "category" + '/';
     public static final String RETWEAK_CONFIG_ELEMENT_PREFIX = ReTweakStrings.RETWEAK_CONFIG_PREFIX + "element" + '/';
     //Categories
-    public static final String RETWEAK_CONFIG_CATEGORY_CONFIG = RETWEAK_CONFIG_CATEGORY_PREFIX + "config";
-    public static final String RETWEAK_CONFIG_CATEGORY_MOD_CONFIG = RETWEAK_CONFIG_CATEGORY_PREFIX + "mod_config";
-    public static final String RETWEAK_CONFIG_ELEMENT_COMPILATION_MODE = ReTweakStrings.RETWEAK_CONFIG_ELEMENT_PREFIX + "compilation_mode";
+    //TODO
 
     //Config
     //-----------------------------------
     //Keys
-    public static final String RETWEAK_CONFIG_KEY_COMPILATION_MODE = "retweak.config.compilation_mode";
+    //TODO
 
 }

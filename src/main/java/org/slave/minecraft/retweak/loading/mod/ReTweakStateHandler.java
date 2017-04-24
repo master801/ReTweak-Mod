@@ -42,7 +42,7 @@ public final class ReTweakStateHandler {
      *
      * @param currentState Such a fragile existence...
      */
-    public static void step(LoadController loadController, LoaderState currentState, LoaderState wantedState) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    public static void step(final LoadController loadController, final LoaderState currentState, final LoaderState wantedState) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (loadController == null || currentState == null || wantedState == null) {
             ReTweakResources.RETWEAK_LOGGER.warn(
                     "An error occurred while stepping (variables for {} are null)! The ASM hacks may have failed?",
@@ -89,7 +89,7 @@ public final class ReTweakStateHandler {
         }
     }
 
-    private static void constructing(LoadController loadController) {
+    private static void constructing(final LoadController loadController) {
         FMLCommonHandler.instance().registerCrashCallable(
                 new ICrashCallable() {
 
@@ -271,6 +271,8 @@ public final class ReTweakStateHandler {
                                             true,
                                             classLoader
                                     );
+
+                                    //FIXME Set proxy using ILanguageAdapter
 
                                     try {
                                         ReflectionHelper.setFieldValue(

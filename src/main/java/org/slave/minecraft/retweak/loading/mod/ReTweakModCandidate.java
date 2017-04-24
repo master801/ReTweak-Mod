@@ -1,11 +1,11 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import org.slave.lib.helpers.IterableHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.ASMTable.TableClass;
-import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.capsule.Type;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.resources.ReTweakResources;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,8 +26,8 @@ public final class ReTweakModCandidate {
 
     private ASMTable asmTable;
 
-    private final ArrayList<String> classes = new ArrayList<>();
-    private final ArrayList<TableClass> modClasses = new ArrayList<>();
+    private final List<String> classes = new ArrayList<>();
+    private final List<TableClass> modClasses = new ArrayList<>();
 
     private String[] modids;
     private boolean enabled = true;
@@ -41,7 +41,10 @@ public final class ReTweakModCandidate {
             asmTable.load(zipFile);
             zipFile.close();
         } catch(IOException e) {
-            e.printStackTrace();
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Caught IO Exception while reading ASM Table!",
+                    e
+            );
         }
 
         if (asmTable == null) throw new NullPointerException("Read ASM Table incorrectly?");
@@ -80,7 +83,7 @@ public final class ReTweakModCandidate {
 
     public String[] getModIds() {
         if (modids == null && !modClasses.isEmpty()) {
-            ArrayList<String> modids = new ArrayList<>();
+            List<String> modids = new ArrayList<>();
             for(TableClass tableClass : asmTable.getTableClasses()) {
                 Entry<Type, String> entry = gameVersion.getModType();
                 switch(entry.getKey()) {
@@ -101,7 +104,7 @@ public final class ReTweakModCandidate {
                         }
                         break;
                 }
-                if (!IterableHelper.isNullOrEmpty(modids)) this.modids = modids.toArray(new String[modids.size()]);
+                this.modids = modids.toArray(new String[modids.size()]);
             }
         }
         return modids;

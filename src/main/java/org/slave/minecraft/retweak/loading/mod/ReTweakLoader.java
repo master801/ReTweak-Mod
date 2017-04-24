@@ -40,7 +40,7 @@ public final class ReTweakLoader {
             "sound",
             "streaming"
     };
-    private static final Pattern PATTERN_OGG = Pattern.compile(
+    private static final Pattern PATTERN_MATCH_OGG = Pattern.compile(
             "(.+)(\\.ogg$)",
             Pattern.MULTILINE
     );
@@ -63,7 +63,7 @@ public final class ReTweakLoader {
      * {@link org.slave.minecraft.retweak.asm.transformers.LoaderTransformer}
      */
     public void loadMods() {
-        //<editor-fold desc="Find">
+        //<editor-fold desc="Find mods">
         if (!ReTweakResources.RETWEAK_MODS_DIRECTORY.exists()) {
             ReTweakResources.RETWEAK_LOGGER.warn(
                     "ReTweak's mod directory does not exist... not finding mods."
@@ -130,7 +130,7 @@ public final class ReTweakLoader {
                                 File[] subFiles = resourceFile.listFiles();
                                 if (subFiles != null && subFiles.length > 0) {
                                     for(File subFile : subFiles) {
-                                        if (ReTweakLoader.PATTERN_OGG.matcher(subFile.getName()).matches()) {
+                                        if (ReTweakLoader.PATTERN_MATCH_OGG.matcher(subFile.getName()).matches()) {
                                             ReTweakClassLoader.getClassLoader(gameVersion).addFile(subFile);
                                             ReTweakResources.RETWEAK_LOGGER.debug(
                                                     "Added resource file \"{}\" to the class-loader",
@@ -147,7 +147,7 @@ public final class ReTweakLoader {
         }
         //</editor-fold>
 
-        //<editor-fold desc="Find">
+        //<editor-fold desc="Find classes">
         for(GameVersion gameVersion : GameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : reTweakModDiscoverer.getModCandidates(gameVersion)) reTweakModCandidate.find();
         }
@@ -191,9 +191,9 @@ public final class ReTweakLoader {
             }
             Iterator<ReTweakModCandidate> iterator = reTweakModDiscoverer.getModCandidates(gameVersion).iterator();
             while (iterator.hasNext()) {
-                final ReTweakModCandidate reTweakModCandidate = iterator.next();
+                ReTweakModCandidate reTweakModCandidate = iterator.next();
                 String modClass = null;
-                final Map<String, Object> info = new HashMap<>();
+                Map<String, Object> info = new HashMap<>();
 
                 if (reTweakModCandidate.getModClasses().isEmpty()) {
                     ReTweakResources.RETWEAK_LOGGER.warn(
@@ -249,7 +249,8 @@ public final class ReTweakLoader {
                 */
 
                 if (modClass != null) {
-                    mods.get(gameVersion).add(
+                    List<ReTweakModContainer> reTweakModContainerList = mods.get(gameVersion);
+                    reTweakModContainerList.add(
                             new ReTweakModContainer(
                                     modClass.replace(
                                             '/',
@@ -275,6 +276,10 @@ public final class ReTweakLoader {
         //</editor-fold>
 
         //<editor-fold desc="Sort">
+        for(GameVersion gameVersion : GameVersion.values()) {
+            List<ReTweakModContainer> reTweakModContainerList = mods.get(gameVersion);
+            //TODO
+        }
         /*
         for(final GameVersion gameVersion : GameVersion.values()) {
             ReTweakDeobfuscation.INSTANCE.getSuperMappings(gameVersion).sort();

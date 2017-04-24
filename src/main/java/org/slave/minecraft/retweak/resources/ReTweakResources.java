@@ -43,6 +43,7 @@ public final class ReTweakResources {
     );
 
     private ReTweakResources() {
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
         throw new IllegalStateException();
     }
 

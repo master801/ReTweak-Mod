@@ -3,6 +3,9 @@ buildscript {
         mavenCentral()
         jcenter()
         maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+        maven {
             name = 'forge'
             url = 'http://files.minecraftforge.net/maven'
         }
@@ -14,13 +17,13 @@ buildscript {
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
         classpath 'net.sf.proguard:proguard-gradle:5.2.1'
-        //classpath group: 'io.franzbecker', name: 'gradle-lombok', version: '1.8'
+        classpath group: 'io.franzbecker', name: 'gradle-lombok', version: '1.8'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'forge'
-//apply plugin: 'io.franzbecker.gradle-lombok'
+apply plugin: 'io.franzbecker.gradle-lombok'
 
 version = project.properties['version']
 group = 'org.slave.minecraft'

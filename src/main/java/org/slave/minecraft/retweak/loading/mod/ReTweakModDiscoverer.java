@@ -1,8 +1,6 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import cpw.mods.fml.common.discovery.ModDiscoverer;
 import org.slave.lib.helpers.ArrayHelper;
-import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.resources.ReTweakResources;
 
@@ -11,6 +9,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -22,9 +21,12 @@ import java.util.regex.Pattern;
  */
 public final class ReTweakModDiscoverer {
 
-    private static Pattern archivePattern;
+    private static final Pattern PATTERN_ZIP_JAR_MATCHER = Pattern.compile(
+            ".+(\\.zip|\\.jar)$",
+            Pattern.MULTILINE
+    );
 
-    private final HashMap<GameVersion, List<ReTweakModCandidate>> modCandidates = new HashMap<>();
+    private final Map<GameVersion, List<ReTweakModCandidate>> modCandidates = new HashMap<>();
 
     ReTweakModDiscoverer() {
         for(GameVersion gameVersion : GameVersion.values()) {
@@ -52,8 +54,8 @@ public final class ReTweakModDiscoverer {
         if (!ArrayHelper.isNullOrEmpty(files)) {
             for(File file : files) {
                 if (!file.isFile()) continue;
-                if (ReTweakModDiscoverer.archivePattern != null && ReTweakModDiscoverer.archivePattern.matcher(file.getName()).matches()) {
-                    ReTweakResources.RETWEAK_LOGGER.info(
+                if (ReTweakModDiscoverer.PATTERN_ZIP_JAR_MATCHER.matcher(file.getName()).matches()) {
+                    ReTweakResources.RETWEAK_LOGGER.debug(
                             "Added file \"{}\" as a candidate mod.",
                             file.getPath()
                     );
@@ -69,8 +71,10 @@ public final class ReTweakModDiscoverer {
                         continue;
                     }
                     modCandidates.get(gameVersion).add(reTweakModCandidate);
+                    //FIXME?
+                    /*
                 } else {
-                    ReTweakResources.RETWEAK_LOGGER.warn(
+                    ReTweakResources.RETWEAK_LOGGER.debug(
                             "Added file \"{}\" as a candidate mod. This may or may not be an actual mod.",
                             file.getPath()
                     );
@@ -80,6 +84,7 @@ public final class ReTweakModDiscoverer {
                                     file
                             )
                     );
+                    */
                 }
             }
         }
@@ -88,23 +93,6 @@ public final class ReTweakModDiscoverer {
     public List<ReTweakModCandidate> getModCandidates(GameVersion gameVersion) {
         if (gameVersion == null || !modCandidates.containsKey(gameVersion)) return null;
         return modCandidates.get(gameVersion);
-    }
-
-    static {
-        try {
-            ReTweakModDiscoverer.archivePattern = ReflectionHelper.getFieldValue(
-                    ReflectionHelper.getField(
-                            ModDiscoverer.class,
-                            "zipJar"
-                    ),
-                    null
-            );
-        } catch(NoSuchFieldException | IllegalAccessException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to reflectively get archivePattern for mod discoverer? Things are not going to work well!",
-                    e
-            );
-        }
     }
 
 }

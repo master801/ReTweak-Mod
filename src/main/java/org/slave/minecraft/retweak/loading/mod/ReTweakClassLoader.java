@@ -22,7 +22,7 @@ import java.net.JarURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.HashMap;
+import java.util.*;
 import java.util.jar.JarFile;
 
 /**
@@ -42,7 +42,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
             ReTweakResources.RETWEAK_DIRECTORY,
             "asm"
     );
-    private static final HashMap<GameVersion, ReTweakClassLoader> CLASS_LOADERS = new HashMap<>();
+    private static final Map<GameVersion, ReTweakClassLoader> CLASS_LOADERS = new HashMap<>();
+    private static final Map<GameVersion, File> ASM_DIRECTORIES = new HashMap<>();
 
     private final LaunchClassLoader parent;
 //    private ReTweakSRG srg;
@@ -54,13 +55,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 parent
         );
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
-
         this.parent = parent;
         this.gameVersion = gameVersion;
-
         if (this.parent == null || super.getParent() == null) {
             throw new NullPointerException(
-                    "Parent class loader \"" + LaunchClassLoader.class.getSimpleName() + "\" is null!"
+                    "Parent class loader is null!"
             );
         }
     }
@@ -148,9 +147,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
                         e
                 );
                 reTweakModCandidate.setEnabled(false);
+                throw new IOException();//Jump out of try-catch-block
             }
 
-            ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+            ClassWriter classWriter = new ClassWriter(0);
             classNode.accept(classWriter);
             inputStream.close();
 
@@ -158,11 +158,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
             if (ReTweakClassLoader.OUTPUT_CLASS) {
                 try {
                     File file = new File(
-                            ReTweakClassLoader.ASM_CLASSES_DIRECTORY,
-                            name.replace(
-                                    '.',
-                                    '/'
-                            ) + ".class"
+                            ReTweakClassLoader.ASM_DIRECTORIES.get(gameVersion),
+                            name.replace('.', '/') + ".class"
                     );
                     if (!file.getParentFile().exists()) FileHelper.createDirectory(file.getParentFile());
                     FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -173,7 +170,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     );
                     fileOutputStream.flush();
                     fileOutputStream.close();
-                } catch(Exception e) {
+                } catch(IOException e) {
                     //Ignore
                 }
             }
@@ -183,7 +180,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     0,
                     classData.length
             );
-        } catch(IOException ee) {
+        } catch(IOException e) {
             //Ignore
         }
 
@@ -220,7 +217,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         return super.findClass(name);
     }
 
-    public void addFile(File file) {
+    void addFile(File file) {
         try {
             super.addURL(
                     file.toURI().toURL()
@@ -284,10 +281,9 @@ public final class ReTweakClassLoader extends URLClassLoader {
         for(GameVersion gameVersion : GameVersion.values()) {
             for(ReTweakModCandidate reTweakModCandidate : ReTweakLoader.INSTANCE.getReTweakModDiscoverer().getModCandidates(gameVersion)) {
                 int index;
-                index = jarFile.getName().lastIndexOf('\\');
 
-                //Get index of slash instead of back-slash (for unix systems)
-                if (index == -1) index = jarFile.getName().lastIndexOf('/');
+                index = jarFile.getName().lastIndexOf('\\');
+                if (index == -1) index = jarFile.getName().lastIndexOf('/');//Get index of slash instead of back-slash (for unix systems) if index is not originally found
                 if (index != -1) index++;
 
                 if (reTweakModCandidate.getSource().getName().equals(jarFile.getName().substring(index))) {
@@ -319,8 +315,20 @@ public final class ReTweakClassLoader extends URLClassLoader {
         }
     }
 
-    public static ReTweakClassLoader getClassLoader(final GameVersion gameVersion) {
+    static ReTweakClassLoader getClassLoader(final GameVersion gameVersion) {
         return ReTweakClassLoader.CLASS_LOADERS.get(gameVersion);
+    }
+
+    static {
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakClassLoader.ASM_DIRECTORIES.put(
+                    gameVersion,
+                    new File(
+                            ReTweakClassLoader.ASM_CLASSES_DIRECTORY,
+                            gameVersion.getVersion()
+                    )
+            );
+        }
     }
 
 }

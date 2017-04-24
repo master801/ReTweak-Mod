@@ -90,6 +90,11 @@ public final class InterpreterTweak implements Tweak {
                 classNode
         );
         //</editor-fold>
+        //<editor-fold desc="Signature">
+        classSignature(
+                classNode
+        );
+        //</editor-fold>
     }
 
     private void classSuperName(final ClassNode classNode) {
@@ -137,6 +142,10 @@ public final class InterpreterTweak implements Tweak {
         }
     }
 
+    private void classSignature(final ClassNode classNode) {
+        //TODO
+    }
+
     private void field(final String className, final FieldNode fieldNode, final int index) {
         //<editor-fold desc="Annotations">
         fieldAnnotations(
@@ -152,6 +161,13 @@ public final class InterpreterTweak implements Tweak {
                 index
         );
         //</editor-fold?
+        //<editor-fold desc="Signature">
+        fieldSignature(
+                className,
+                fieldNode,
+                index
+        );
+        //</editor-fold>
     }
 
     private void fieldAnnotations(final String className, final FieldNode fieldNode, final int methodIndex) {
@@ -181,6 +197,10 @@ public final class InterpreterTweak implements Tweak {
         );
     }
 
+    private void fieldSignature(final String className, final FieldNode fieldNode, final int index) {
+        //TODO
+    }
+
     private void method(final String className, final MethodNode methodNode, final int index) {
         //<editor-fold desc="Annotations">
         methodAnnotations(
@@ -191,6 +211,13 @@ public final class InterpreterTweak implements Tweak {
         //</editor-fold>
         //<editor-fold desc="Desc">
         methodDesc(
+                className,
+                methodNode,
+                index
+        );
+        //</editor-fold>
+        //<editor-fold desc="Signature">
+        methodSignature(
                 className,
                 methodNode,
                 index
@@ -277,12 +304,16 @@ public final class InterpreterTweak implements Tweak {
 
         //<editor-fold desc="Return type">
         Type originalReturnType = Type.getReturnType(methodNode.desc);
-        Type modifyReturnType = originalReturnType;
+        Type modifyReturnType;
         Type finalReturnType;
 
         Class<?> returnTypeOverrideClass;
 
-        if (originalReturnType.getSort() == Type.ARRAY) modifyReturnType = originalReturnType.getElementType();
+        if (originalReturnType.getSort() == Type.ARRAY) {
+            modifyReturnType = originalReturnType.getElementType();
+        } else {
+            modifyReturnType = originalReturnType;
+        }
 
         returnTypeOverrideClass = gameVersion.getOverrideClass(modifyReturnType.getClassName());
 
@@ -302,6 +333,8 @@ public final class InterpreterTweak implements Tweak {
                 modifyReturnType = Type.getType(returnTypeOverrideClass);
             }
             //</editor-fold>
+        } else {
+            modifyReturnType = originalReturnType;
         }
 
         finalReturnType = modifyReturnType;
@@ -319,12 +352,16 @@ public final class InterpreterTweak implements Tweak {
 
         for(int i = 0; i < finalArgumentTypes.length; ++i) {
             Type originalArgumentType = originalArgumentTypes[i];
-            Type modifyArgumentType = originalArgumentType;
+            Type modifyArgumentType;
             Type finalArgumentType;
 
             Class<?> argumentTypeOverrideClass;
 
-            if (originalArgumentType.getSort() == Type.ARRAY) modifyArgumentType = originalArgumentType.getElementType();
+            if (originalArgumentType.getSort() == Type.ARRAY) {
+                modifyArgumentType = originalArgumentType.getElementType();
+            } else {
+                modifyArgumentType = originalArgumentType;
+            }
 
             argumentTypeOverrideClass = gameVersion.getOverrideClass(modifyArgumentType.getClassName());
 
@@ -344,6 +381,8 @@ public final class InterpreterTweak implements Tweak {
                 } else {
                     modifyArgumentType = Type.getType(argumentTypeOverrideClass);
                 }
+            } else {
+                modifyArgumentType = originalArgumentType;
             }
 
             finalArgumentType = modifyArgumentType;
@@ -369,6 +408,10 @@ public final class InterpreterTweak implements Tweak {
         }
     }
 
+    private void methodSignature(final String className, final MethodNode methodNode, final int index) {
+        //TODO
+    }
+
     private boolean fieldInsn(final String className, final String methodName, final String methodDesc, final int index, final FieldInsnNode fieldInsnNode) {
         //<editor-fold desc="Owner">
         fieldInsnOwner(
@@ -381,6 +424,15 @@ public final class InterpreterTweak implements Tweak {
         //</editor-fold>
         //<editor-fold desc="Name">
         fieldInsnDesc(
+                className,
+                methodName,
+                methodDesc,
+                index,
+                fieldInsnNode
+        );
+        //</editor-fold>
+        //<editor-fold desc="Signature">
+        fieldInsnSignature(
                 className,
                 methodName,
                 methodDesc,
@@ -441,6 +493,8 @@ public final class InterpreterTweak implements Tweak {
             } else {
                 modifyType = Type.getType(overrideClass);
             }
+        } else {
+            modifyType = originalType;
         }
 
         finalType = modifyType;
@@ -461,6 +515,10 @@ public final class InterpreterTweak implements Tweak {
         }
     }
 
+    private void fieldInsnSignature(final String className, final String methodName, final String methodDesc, final int index, final FieldInsnNode fieldInsnNode) {
+        //TODO
+    }
+
     private boolean methodInsn(final String className, final String methodName, final String methodDesc, final int index, final MethodInsnNode methodInsnNode) {
         //<editor-fold desc="Owner">
         methodInsnOwner(
@@ -473,6 +531,15 @@ public final class InterpreterTweak implements Tweak {
         //</editor-fold>
         //<editor-fold desc="Desc">
         methodInsnDesc(
+                className,
+                methodName,
+                methodDesc,
+                index,
+                methodInsnNode
+        );
+        //</editor-fold>
+        //<editor-fold desc="Signature">
+        methodInsnSignature(
                 className,
                 methodName,
                 methodDesc,
@@ -512,12 +579,16 @@ public final class InterpreterTweak implements Tweak {
 
         //<editor-fold desc="Return type">
         Type originalReturnType = Type.getReturnType(methodInsnNode.desc);
-        Type modifyReturnType = originalReturnType;
+        Type modifyReturnType;
         Type finalReturnType;
 
         Class<?> returnTypeOverrideClass;
 
-        if (originalReturnType.getSort() == Type.ARRAY) modifyReturnType = originalReturnType.getElementType();
+        if (originalReturnType.getSort() == Type.ARRAY) {
+            modifyReturnType = originalReturnType.getElementType();
+        } else {
+            modifyReturnType = originalReturnType;
+        }
 
         returnTypeOverrideClass = gameVersion.getOverrideClass(modifyReturnType.getClassName());
 
@@ -537,8 +608,9 @@ public final class InterpreterTweak implements Tweak {
             } else {
                 modifyReturnType = Type.getType(returnTypeOverrideClass);
             }
+        } else {
+            modifyReturnType = originalReturnType;
         }
-
         finalReturnType = modifyReturnType;
         //</editor-fold>
         //<editor-fold desc="Argument types">
@@ -579,6 +651,8 @@ public final class InterpreterTweak implements Tweak {
                     modifyArgumentType = Type.getType(argumentTypeOverrideClass);
                 }
                 //</editor-fold>
+            } else {
+                modifyArgumentType = originalArgumentType;
             }
 
             finalArgumentType = modifyArgumentType;
@@ -594,28 +668,39 @@ public final class InterpreterTweak implements Tweak {
         if (!finalDesc.equals(originalDesc)) {
             methodInsnNode.desc = finalDesc;
             ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Tweaked desc in method insn \"{}/{}{}\" from \"{}\" to \"{}\" at index",
+                    "Tweaked desc in method insn \"{}/{}{}\" from \"{}\" to \"{}\" at index {}",
                     className,
                     methodName,
                     methodDesc,
 
                     originalDesc,
-                    finalDesc,
+                    methodInsnNode.desc,
 
                     index
             );
         }
     }
 
+    private void methodInsnSignature(final String className, final String methodName, final String methodDesc, final int index, final MethodInsnNode methodInsnNode) {
+        //TODO
+    }
+
     private boolean typeInsnNode(final String className, final String methodName, final String methodDesc, final int index, final TypeInsnNode typeInsnNode) {
         String originalDesc = typeInsnNode.desc;
-        String finalDesc = null;
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(originalDesc);
-        if (overrideClass != null) finalDesc = Type.getInternalName(overrideClass);
+        Type originalType = Type.getObjectType(originalDesc);
+        Type finalType;
 
-        if (finalDesc != null) {
-            typeInsnNode.desc = finalDesc;
+        Class<?> overrideClass = gameVersion.getOverrideClass(originalType.getClassName());
+
+        if (overrideClass != null) {
+            finalType = Type.getType(overrideClass);
+        } else {
+            finalType = originalType;
+        }
+
+        if (finalType != null) {
+            typeInsnNode.desc = finalType.getInternalName();
             ReTweakResources.RETWEAK_LOGGER.debug(
                     "Tweaked type insn from method \"{}/{}{}\" from \"{}\" to \"{}\" at index {}",
                     className,
@@ -659,6 +744,8 @@ public final class InterpreterTweak implements Tweak {
                 } else {
                     modifyType = Type.getType(overrideClass);
                 }
+            } else {
+                modifyType = originalType;
             }
 
             finalType = modifyType;
@@ -713,7 +800,6 @@ public final class InterpreterTweak implements Tweak {
             for(int i = 0; i < originalLocalList.size(); ++i) {
                 Object originalLocal = originalLocalList.get(i);
                 Object finalLocal = null;
-
                 //<editor-fold desc="String">
                 if (originalLocal instanceof String) {
                     String stringLocal = (String)originalLocal;
@@ -758,10 +844,11 @@ public final class InterpreterTweak implements Tweak {
                         } else {
                             finalLocal = Type.getInternalName(overrideClass);
                         }
+                    } else {
+                        finalLocal = originalLocal;
                     }
                 }
                 //</editor-fold>
-
                 if (finalLocal != null) finalLocalList.set(i, finalLocal);
             }
 
@@ -792,7 +879,6 @@ public final class InterpreterTweak implements Tweak {
             for(int i = 0; i < originalStackList.size(); ++i) {
                 Object originalStack = originalStackList.get(i);
                 Object finalStack = null;
-
                 //<editor-fold desc="String">
                 if (originalStack instanceof String) {
                     String stringStack = (String)originalStack;
@@ -837,10 +923,11 @@ public final class InterpreterTweak implements Tweak {
                         } else {
                             finalStack = Type.getInternalName(overrideClass);
                         }
+                    } else {
+                        finalStack = originalStack;
                     }
                 }
                 //</editor-fold>
-
                 if (finalStack != null) finalStackList.set(i, finalStack);
             }
 
@@ -863,15 +950,19 @@ public final class InterpreterTweak implements Tweak {
 
     private boolean localVariableNode(final String className, final String methodName, final String methodDesc, final LocalVariableNode localVariableNode, final int methodIndex) {
         String originalDesc = localVariableNode.desc;
-        String finalDesc;
+        String finalDesc = null;
 
         Type originalType = Type.getType(originalDesc);
-        Type modifyType = originalType;
+        Type modifyType;
         Type finalType;
 
         Class<?> overrideClass;
 
-        if (originalType.getSort() == Type.ARRAY) modifyType = originalType.getElementType();
+        if (originalType.getSort() == Type.ARRAY) {
+            modifyType = originalType.getElementType();
+        } else {
+            modifyType = originalType;
+        }
 
         overrideClass = gameVersion.getOverrideClass(modifyType.getClassName());
 
@@ -891,10 +982,15 @@ public final class InterpreterTweak implements Tweak {
             } else {
                 modifyType = Type.getType(overrideClass);
             }
+        } else {
+            modifyType = null;
         }
 
-        finalType = modifyType;
-        finalDesc = finalType.getDescriptor();
+        if (modifyType != null) {
+            finalType = modifyType;
+            finalDesc = finalType.getDescriptor();
+        }
+
 
         if (finalDesc != null) {
             localVariableNode.desc = finalDesc;
