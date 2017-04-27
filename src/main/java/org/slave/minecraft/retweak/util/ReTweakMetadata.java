@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.resources;
+package org.slave.minecraft.retweak.util;
 
 import com.google.common.base.Joiner;
 import cpw.mods.fml.common.ModContainer;
@@ -42,23 +42,31 @@ public final class ReTweakMetadata implements Metadata {
 
     @Override
     public String getCredits() {
-        return Joiner.on(System.lineSeparator()).join(new String[] {
-                ChatHelper.formatString(
-                        "FyberOptic - Intermediary",
-                        EnumChatFormatting.DARK_GREEN
-                )
-        });
+        return Joiner.on(
+                '\n'
+        ).join(
+                new String[]{
+                        ChatHelper.formatString(
+                                "FyberOptic - Intermediary",
+                                EnumChatFormatting.DARK_GREEN
+                        )
+                }
+        );
     }
 
     @Override
     public String getDescription() {
-        return Joiner.on("\n\n").join(new String[] {
-                "Loads [some] Forge mods from [some] previous versions of Minecraft.",
-                ChatHelper.formatString(
-                        "Uses trickery and may cause crashes. Use at your own risk.",
-                        EnumChatFormatting.DARK_RED
-                )
-        });
+        return Joiner.on(
+                "\n\n"
+        ).join(
+                new String[]{
+                        "Loads [some] Forge mods from [some] previous versions of Minecraft.",
+                        ChatHelper.formatString(
+                                "Uses trickery and may cause crashes. Use at your own risk.",
+                                EnumChatFormatting.DARK_RED
+                        )
+                }
+        );
     }
 
     @Override

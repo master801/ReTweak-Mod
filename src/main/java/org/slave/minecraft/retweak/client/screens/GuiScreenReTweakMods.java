@@ -8,7 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
-import org.slave.minecraft.retweak.resources.ReTweakStrings;
+import org.slave.minecraft.retweak.util.ReTweakStrings;
 
 /**
  * Created by Master on 5/15/2016 at 10:05 AM.

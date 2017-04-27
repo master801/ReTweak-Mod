@@ -1,4 +1,6 @@
-package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter;
+package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation;
+
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -18,8 +20,10 @@ import java.lang.annotation.Target;
         }
 )
 @Retention(RetentionPolicy.SOURCE)
-public @interface ObfuscatedName {
+public @interface Deobfuscated {
 
-    String value();
+    Package[] _package() default {};
+
+    String name();
 
 }

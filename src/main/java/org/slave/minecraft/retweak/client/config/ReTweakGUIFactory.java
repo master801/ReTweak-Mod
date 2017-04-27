@@ -9,7 +9,7 @@ import java.util.Set;
 /**
  * <p>
  *     {@link org.slave.minecraft.retweak.ReTweakMod}
- *     {@link org.slave.minecraft.retweak.resources.ReTweakStrings#RETWEAK_GUI_FACTORY}
+ *     {@link org.slave.minecraft.retweak.util.ReTweakStrings#RETWEAK_GUI_FACTORY}
  * </p>
  *
  * Created by Master801 on 3/21/2016 at 9:23 AM.

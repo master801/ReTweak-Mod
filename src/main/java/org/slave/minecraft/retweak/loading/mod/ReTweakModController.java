@@ -1,8 +1,14 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import cpw.mods.fml.common.event.*;
-import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
+import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
+import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
+import cpw.mods.fml.common.event.FMLServerStartedEvent;
+import cpw.mods.fml.common.event.FMLServerStartingEvent;
+import cpw.mods.fml.common.event.FMLServerStoppedEvent;
+import cpw.mods.fml.common.event.FMLServerStoppingEvent;
+import cpw.mods.fml.common.event.FMLStateEvent;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -93,30 +99,7 @@ public final class ReTweakModController {
 
     private static void callState(final String stateName, final Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
-        for(GameVersion gameVersion : GameVersion.values()) {
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Starting state \"{}\" for game version {}",
-                    stateName,
-                    gameVersion.getVersion()
-            );
-
-            for(ReTweakModContainer reTweakModContainer : ReTweakLoader.INSTANCE.getReTweakModContainers(gameVersion)) {
-                if (reTweakModContainer.isEnabled()) {
-                    reTweakModContainer.callState(fmlStateEventClass);
-                } else {
-                    ReTweakResources.RETWEAK_LOGGER.info(
-                            "Mod {} has been disabled, not calling state \"server stopped\"",
-                            reTweakModContainer.getModId()
-                    );
-                }
-            }
-
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Ending state \"{}\" for game version {}",
-                    stateName,
-                    gameVersion.getVersion()
-            );
-        }
+        //TODO
     }
 
 }

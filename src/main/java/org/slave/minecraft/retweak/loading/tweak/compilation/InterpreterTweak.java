@@ -16,7 +16,7 @@ import org.slave.lib.helpers.ASMHelper;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.tweak.Tweak;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
+import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.util.ArrayList;
 import java.util.Iterator;

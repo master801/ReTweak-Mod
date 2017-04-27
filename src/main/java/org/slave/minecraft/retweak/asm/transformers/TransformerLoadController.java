@@ -13,16 +13,16 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.slave.lib.asm.transformers.MethodTransformer;
 import org.slave.lib.resources.MethodStub;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
+import org.slave.minecraft.retweak.util.ReTweakResources;
 
 /**
  * Created by Master801 on 4/10/2016 at 9:30 PM.
  *
  * @author Master801
  */
-public final class LoadControllerTransformer extends MethodTransformer implements IClassTransformer {
+public final class TransformerLoadController extends MethodTransformer implements IClassTransformer {
 
-    public LoadControllerTransformer() {
+    public TransformerLoadController() {
         super(ReTweakResources.RETWEAK_LOGGER);
     }
 

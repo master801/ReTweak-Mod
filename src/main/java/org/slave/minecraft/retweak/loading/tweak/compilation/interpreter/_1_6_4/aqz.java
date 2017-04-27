@@ -1,14 +1,21 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.DeobfuscatedName;
-import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.ObfuscatedName;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
 
 /**
  * Created by Master on 4/19/2017 at 7:56 PM.
  *
  * @author Master
  */
-@ObfuscatedName("aqz")
-@DeobfuscatedName("net.minecraft.block.Block")
+@Obfuscated(
+        name = "aqz",
+        _package = @Package("")
+)
+@Deobfuscated(
+        name = "Block",
+        _package = @Package("net.minecraft.block")
+)
 public class aqz {
 }

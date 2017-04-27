@@ -17,17 +17,12 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.MinecraftForge;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.client.screens.GuiScreenReTweakMods;
-import org.slave.minecraft.retweak.resources.ReTweakConfig;
-import org.slave.minecraft.retweak.resources.ReTweakMetadata;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
-import org.slave.minecraft.retweak.resources.ReTweakStrings;
+import org.slave.minecraft.retweak.util.ReTweakMetadata;
+import org.slave.minecraft.retweak.util.ReTweakStrings;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,7 +45,7 @@ public final class ReTweakMod {
     public static ModMetadata modMetadata;
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+    public void preInit(final FMLPreInitializationEvent event) {
         ModHelper.injectMetadata(
                 ReTweakMod.modMetadata,
                 ReTweakMetadata.INSTANCE
@@ -58,34 +53,26 @@ public final class ReTweakMod {
     }
 
     @EventHandler
-    public void init(FMLInitializationEvent event) {
+    public void init(final FMLInitializationEvent event) {
         FMLCommonHandler.instance().bus().register(this);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
+    public void postInit(final FMLPostInitializationEvent event) {
     }
 
     @SubscribeEvent
     public void onConfigChanged(OnConfigChangedEvent event) {
         if (event.modID.equals(ReTweakStrings.RETWEAK_MOD) && event.configID.equals(ReTweakStrings.RETWEAK_GUI_CONFIG_ID)) {
             //TODO
-            try {
-                ReTweakConfig.INSTANCE.update(false);
-            } catch(IOException e) {
-                ReTweakResources.RETWEAK_LOGGER.warn(
-                        "Caught an IO exception while updating the config file!",
-                        e
-                );
-            }
         }
     }
 
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onGuiInitPost(InitGuiEvent.Post event) {
+    public void onGuiInitPost(final InitGuiEvent.Post event) {
         if (event.gui instanceof GuiMainMenu) {
             GuiButton multiPlayerButton = null;
 
@@ -120,7 +107,7 @@ public final class ReTweakMod {
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
-    public void onGuiButtonClicked(ActionPerformedEvent event) {
+    public void onGuiButtonClicked(final ActionPerformedEvent event) {
         if (event.gui instanceof GuiMainMenu) {
             switch(event.button.id) {
                 case 13:

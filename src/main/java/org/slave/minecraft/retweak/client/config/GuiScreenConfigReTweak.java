@@ -3,8 +3,7 @@ package org.slave.minecraft.retweak.client.config;
 import cpw.mods.fml.client.config.GuiConfig;
 import cpw.mods.fml.client.config.IConfigElement;
 import net.minecraft.client.gui.GuiScreen;
-import org.slave.minecraft.retweak.client.config.elements.GuiScreenConfigReTweakConfig;
-import org.slave.minecraft.retweak.resources.ReTweakStrings;
+import org.slave.minecraft.retweak.util.ReTweakStrings;
 
 import java.util.Arrays;
 
@@ -21,7 +20,7 @@ public final class GuiScreenConfigReTweak extends GuiConfig {
                 parentScreen,
                 Arrays.asList(
                         new IConfigElement[] {
-                                new GuiScreenConfigReTweakConfig()
+                                //TODO
                         }
                 ),
                 ReTweakStrings.RETWEAK_MOD,

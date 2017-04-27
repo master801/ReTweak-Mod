@@ -1,21 +1,9 @@
 package org.slave.minecraft.retweak.loading;
 
-import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.exceptions.InvalidSortException;
-import org.slave.minecraft.retweak.asm.ReTweakSetup;
-import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
-import org.slave.minecraft.retweak.loading.tweak.DeSeargeTweak;
 import org.slave.minecraft.retweak.loading.tweak.Tweak;
-import org.slave.minecraft.retweak.loading.tweak.Tweak.TweakException;
-import org.slave.minecraft.retweak.loading.tweak.compilation.InterpreterTweak;
-import org.slave.minecraft.retweak.resources.ReTweakConfig;
-import org.slave.minecraft.retweak.resources.ReTweakResources;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.List;
 
 /**
  * Created by Master on 4/27/2016 at 7:19 AM.
@@ -26,61 +14,11 @@ public final class ReTweakTweakHandler {
 
     public static final ReTweakTweakHandler INSTANCE = new ReTweakTweakHandler();
 
-    private final EnumMap<GameVersion, List<Tweak>> tweaks = new EnumMap<>(GameVersion.class);
-
     private ReTweakTweakHandler() {
-        addTweaks();
-        sortTweaks();
+        final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
     }
 
-    private void addTweaks() {
-        for(GameVersion gameVersion : GameVersion.values()) {
-            List<Tweak> tweaks = new ArrayList<>();
-            switch(ReTweakConfig.INSTANCE.getCompilationMode()) {
-                /*
-                case JIT:
-                    tweaks.add(new JITTweak(gameVersion));
-                    break;
-                */
-                case INTERPRETER:
-                    tweaks.add(new InterpreterTweak(gameVersion));
-                    break;
-            }
-            if (ReTweakSetup.isDeobfuscatedEnvironment()) tweaks.add(DeSeargeTweak.getInstance());
-            this.tweaks.put(
-                    gameVersion,
-                    tweaks
-            );
-        }
-    }
-
-    private void sortTweaks() {
-        for(List<Tweak> list : tweaks.values()) {
-            Collections.sort(
-                    list,
-                    TweakComparator.INSTANCE
-            );
-        }
-    }
-
-    public void tweak(final ClassNode classNode, final GameVersion gameVersion) throws TweakException {
-        List<Tweak> tweakList = tweaks.get(gameVersion);
-        for(Tweak tweak : tweakList) {
-            if (tweak == null) continue;
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                    "Start Tweak \"{}\"",
-                    tweak.getName()
-            );
-            tweak.tweak(
-                    classNode,
-                    gameVersion
-            );
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                    "End Tweak\n\n",
-                    tweak.getName()
-            );
-        }
-    }
+    //TODO
 
     private static final class TweakComparator implements Comparator<Tweak> {
 
