@@ -278,18 +278,13 @@ public final class ReTweakConfig {
                     };
 
                     public static final Category BOOLEAN = new Category(
-                            "boolean",
-                            new Value[] {
-                                    Value.ENABLE_GAME_VERSION
-                            }
+                            "boolean"
                     );
 
                     private final String name;
-                    private final Value[] values;
 
-                    private Category(final String name, final Value[] values) {
+                    private Category(final String name) {
                         this.name = name;
-                        this.values = values;
                     }
 
                     public static Category getFromName(final String name) {

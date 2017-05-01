@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.loading.mod;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
@@ -8,6 +9,8 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Created by Master on 4/26/2016 at 8:27 PM.
@@ -15,6 +18,8 @@ import java.net.URLClassLoader;
  * @author Master
  */
 public final class ReTweakClassLoader extends URLClassLoader {
+
+    private static Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap;
 
     private final LaunchClassLoader parent;
     private final GameVersion gameVersion;
@@ -58,7 +63,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         return super.findClass(name);
     }
 
-    void addFile(File file) {
+    void addFile(final File file) {
         try {
             super.addURL(
                     file.toURI().toURL()
@@ -69,6 +74,38 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     e
             );
         }
+    }
+
+    static ReTweakClassLoader getReTweakClassLoader(final GameVersion gameVersion) {
+        return reTweakClassLoaderMap.get(gameVersion);
+    }
+
+    /**
+     * {@link org.slave.minecraft.retweak.asm.ReTweakSetup#initReTweakClassLoader(net.minecraft.launchwrapper.LaunchClassLoader)}
+     */
+    private static void init(final LaunchClassLoader launchClassLoader) {
+        if (ReTweakClassLoader.reTweakClassLoaderMap != null) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                    "Already init class loader? This should not happen!"
+            );
+            return;
+        }
+
+
+        Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap = new EnumMap<>(GameVersion.class);
+        for(GameVersion gameVersion : GameVersion.values()) {
+            reTweakClassLoaderMap.put(
+                    gameVersion,
+                    new ReTweakClassLoader(
+                            launchClassLoader,
+                            gameVersion
+                    )
+            );
+        }
+
+        ReTweakClassLoader.reTweakClassLoaderMap = ImmutableMap.copyOf(
+                reTweakClassLoaderMap
+        );
     }
 
 }
