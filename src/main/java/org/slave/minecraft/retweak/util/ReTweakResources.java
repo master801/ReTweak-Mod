@@ -1,12 +1,10 @@
 package org.slave.minecraft.retweak.util;
 
-import org.slave.minecraft.library.resources.LibraryResources;
+import org.slave.minecraft.library.util.LibraryResources;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by Master801 on 3/18/2016 at 9:11 PM.
@@ -43,15 +41,6 @@ public final class ReTweakResources {
                     Boolean.FALSE.toString()
             )
     );
-
-    /**
-     * {@link org.slave.minecraft.retweak.asm.transformers.TransformerGuiMainMenu}
-     */
-    public static final List<String> RETWEAK_SPLASH_TEXT = Arrays.asList(
-            "Don't count on it!",
-            "Tweak all you want, you'll crash anyway!",
-            "Bugs? Who said games didn't have any bugs?",
-            "Crash-crash, go-away, I don't like you, so please don't stay.");
 
     private ReTweakResources() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;

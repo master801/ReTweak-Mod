@@ -45,7 +45,7 @@ public final class ReTweakMetadata implements Metadata {
         return Joiner.on(
                 '\n'
         ).join(
-                new String[]{
+                new String[] {
                         ChatHelper.formatString(
                                 "FyberOptic - Intermediary",
                                 EnumChatFormatting.DARK_GREEN
@@ -59,7 +59,7 @@ public final class ReTweakMetadata implements Metadata {
         return Joiner.on(
                 "\n\n"
         ).join(
-                new String[]{
+                new String[] {
                         "Loads [some] Forge mods from [some] previous versions of Minecraft.",
                         ChatHelper.formatString(
                                 "Uses trickery and may cause crashes. Use at your own risk.",
