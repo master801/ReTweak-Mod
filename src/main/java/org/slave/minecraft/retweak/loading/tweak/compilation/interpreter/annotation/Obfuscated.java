@@ -13,11 +13,11 @@ import java.lang.annotation.Target;
  * @author Master
  */
 @Target(
-        {
-                ElementType.TYPE,
-                ElementType.METHOD,
-                ElementType.FIELD
-        }
+    {
+        ElementType.TYPE,
+        ElementType.METHOD,
+        ElementType.FIELD
+    }
 )
 @Retention(RetentionPolicy.SOURCE)
 public @interface Obfuscated {

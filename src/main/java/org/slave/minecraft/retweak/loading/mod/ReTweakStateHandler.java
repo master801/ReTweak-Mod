@@ -40,28 +40,28 @@ public final class ReTweakStateHandler {
                 ReTweakStateHandler.constructing(loadController);
                 break;
             case PREINITIALIZATION:
-                ReTweakModController.preInitialization();
+                ReTweakModStateHandler.preInitialization();
                 break;
             case INITIALIZATION:
-                ReTweakModController.initialization();
+                ReTweakModStateHandler.initialization();
                 break;
             case POSTINITIALIZATION:
-                ReTweakModController.postInitialization();
+                ReTweakModStateHandler.postInitialization();
                 break;
             case SERVER_ABOUT_TO_START:
-                ReTweakModController.serverAboutToStart();
+                ReTweakModStateHandler.serverAboutToStart();
                 break;
             case SERVER_STARTING:
-                ReTweakModController.serverStarting();
+                ReTweakModStateHandler.serverStarting();
                 break;
             case SERVER_STARTED:
-                ReTweakModController.serverStarted();
+                ReTweakModStateHandler.serverStarted();
                 break;
             case SERVER_STOPPING:
-                ReTweakModController.serverStopping();
+                ReTweakModStateHandler.serverStopping();
                 break;
             case SERVER_STOPPED:
-                ReTweakModController.serverStopped();
+                ReTweakModStateHandler.serverStopped();
                 break;
             case AVAILABLE:
                 //NOOP
@@ -75,6 +75,7 @@ public final class ReTweakStateHandler {
 
     private static void constructing(final LoadController loadController) {
         //TODO
+        //Currently NOOP
     }
 
 }

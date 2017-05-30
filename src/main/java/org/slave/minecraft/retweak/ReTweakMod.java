@@ -111,7 +111,9 @@ public final class ReTweakMod {
         if (event.gui instanceof GuiMainMenu) {
             switch(event.button.id) {
                 case 13:
-                    event.gui.mc.displayGuiScreen(new GuiScreenReTweakMods(event.gui));
+                    event.gui.mc.displayGuiScreen(
+                        new GuiScreenReTweakMods(event.gui)
+                    );
                     break;
             }
         }
