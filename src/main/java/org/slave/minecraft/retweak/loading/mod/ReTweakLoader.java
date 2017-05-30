@@ -30,6 +30,7 @@ public final class ReTweakLoader {
 
     private final Map<GameVersion, ReTweakModDiscoverer> reTweakModDiscovererList;
     private final Map<GameVersion, File> reTweakModsDirList;
+    private final Map<GameVersion, ReTweakLoadController> reTweakLoadControllerMap;
 
     private Map<GameVersion, List<ModContainer>> reTweakMods = new HashMap<>();
     private Map<GameVersion, Map<String, ModContainer>> reTweakNamedMods = new HashMap<>();
@@ -37,6 +38,7 @@ public final class ReTweakLoader {
     private ReTweakLoader() {
         Map<GameVersion, ReTweakModDiscoverer> reTweakModDiscovererList = new EnumMap<>(GameVersion.class);
         Map<GameVersion, File> reTweakModsDirList = new EnumMap<>(GameVersion.class);
+        Map<GameVersion, ReTweakLoadController> reTweakLoadControllerMap = new EnumMap<>(GameVersion.class);
 
         for(GameVersion gameVersion : GameVersion.values()) {
             reTweakModDiscovererList.put(
@@ -50,10 +52,15 @@ public final class ReTweakLoader {
                             gameVersion.getVersion()
                     )
             );
+            reTweakLoadControllerMap.put(
+                gameVersion,
+                new ReTweakLoadController(gameVersion)
+            );
         }
 
         this.reTweakModDiscovererList = ImmutableMap.copyOf(reTweakModDiscovererList);
         this.reTweakModsDirList = ImmutableMap.copyOf(reTweakModsDirList);
+        this.reTweakLoadControllerMap = ImmutableMap.copyOf(reTweakLoadControllerMap);
     }
 
     public void loadMods() {
@@ -105,6 +112,10 @@ public final class ReTweakLoader {
                         new ModIdFunction()
                 )
         );
+    }
+
+    ReTweakLoadController getReTweakLoadController(final GameVersion gameVersion) {
+        return reTweakLoadControllerMap.get(gameVersion);
     }
 
     List<ModContainer> getModList(final GameVersion gameVersion) {

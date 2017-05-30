@@ -1,6 +1,11 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import cpw.mods.fml.common.eventhandler.EventBus;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import cpw.mods.fml.common.LoaderState;
+import cpw.mods.fml.common.event.FMLEvent;
+import cpw.mods.fml.common.event.FMLLoadEvent;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 /**
  * <p>
@@ -13,9 +18,39 @@ import cpw.mods.fml.common.eventhandler.EventBus;
  */
 public final class ReTweakLoadController {
 
-    private EventBus masterController;
+    private static final String ID = "ReTweakMainChannel";
 
-    ReTweakLoadController() {
+    private final GameVersion gameVersion;
+    private final EventBus eventBus;
+
+    ReTweakLoadController(final GameVersion gameVersion) {
+        this.gameVersion = gameVersion;
+        eventBus = new EventBus(ReTweakLoadController.ID + "_" + gameVersion.getVersion());
+        eventBus.register(this);
+    }
+
+    public GameVersion getGameVersion() {
+        return gameVersion;
+    }
+
+    public void distributeStateMessage(final LoaderState loaderState, final Object... objects) {
+        if (loaderState.hasEvent()) {
+            eventBus.post(
+                loaderState.getEvent(objects)
+            );
+        }
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void buildModList(final FMLLoadEvent fmlLoadEvent) {
+        //TODO
+    }
+
+    @SuppressWarnings("unused")
+    @Subscribe
+    public void propogateStateMessage(final FMLEvent fmlEvent) {
+        //TODO
     }
 
 }

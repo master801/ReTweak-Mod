@@ -1,17 +1,8 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import cpw.mods.fml.common.event.FMLInitializationEvent;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.event.FMLServerAboutToStartEvent;
-import cpw.mods.fml.common.event.FMLServerStartedEvent;
-import cpw.mods.fml.common.event.FMLServerStartingEvent;
-import cpw.mods.fml.common.event.FMLServerStoppedEvent;
-import cpw.mods.fml.common.event.FMLServerStoppingEvent;
-import cpw.mods.fml.common.event.FMLStateEvent;
+import cpw.mods.fml.common.LoaderState;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * Created by Master on 4/26/2016 at 3:26 PM.
@@ -20,90 +11,89 @@ import java.lang.reflect.InvocationTargetException;
  */
 public final class ReTweakModStateHandler {
 
-    private static final String STATE_NAME_PREINITIALIZATION = "pre-initialization";
-    private static final String STATE_NAME_INITIALIZATION = "initialization";
-    private static final String STATE_NAME_POSTINITIALIZATION = "post-initialization";
-    private static final String STATE_NAME_SERVER_ABOUT_TO_START = "server about to start";
-    private static final String STATE_NAME_SERVER_STARTING = "server starting";
-    private static final String STATE_NAME_SERVER_STARTED = "server started";
-    private static final String STATE_NAME_SERVER_STOPPING = "server stopping";
-    private static final String STATE_NAME_SERVER_STOPPED = "server stopped";
-
     private ReTweakModStateHandler() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
         throw new IllegalStateException();
     }
 
-    static void preInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void preInitialization() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_PREINITIALIZATION,
-                FMLPreInitializationEvent.class
+            LoaderState.PREINITIALIZATION,
+
+            ReTweakLoader.INSTANCE.getReTweakModDiscoverer(GameVersion.V_1_4_7).getASMTable(),
+            ReTweakResources.RETWEAK_CONFIG_DIRECTORY
         );
     }
 
-    static void initialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void initialization() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_INITIALIZATION,
-                FMLInitializationEvent.class
+            LoaderState.INITIALIZATION
         );
     }
 
-    static void postInitialization() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void postInitialization() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_POSTINITIALIZATION,
-                FMLPostInitializationEvent.class
+            LoaderState.POSTINITIALIZATION
         );
     }
 
-    static void serverAboutToStart() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void serverAboutToStart() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_SERVER_ABOUT_TO_START,
-                FMLServerAboutToStartEvent.class
+            LoaderState.SERVER_ABOUT_TO_START
         );
     }
 
-    static void serverStarting() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void serverStarting() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_SERVER_STARTING,
-                FMLServerStartingEvent.class
+            LoaderState.SERVER_STARTING
         );
     }
 
-    static void serverStarted() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void serverStarted() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_SERVER_STARTED,
-                FMLServerStartedEvent.class
+            LoaderState.SERVER_STARTED
         );
     }
 
-    static void serverStopping() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void serverStopping() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_SERVER_STOPPING,
-                FMLServerStoppingEvent.class
+            LoaderState.SERVER_STOPPING
         );
     }
 
-    static void serverStopped() throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    static void serverStopped() {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         ReTweakModStateHandler.callState(
-                ReTweakModStateHandler.STATE_NAME_SERVER_STOPPED,
-                FMLServerStoppedEvent.class
+            LoaderState.SERVER_STOPPED
         );
     }
 
-    private static void callState(final String stateName, final Class<? extends FMLStateEvent> fmlStateEventClass) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
+    private static void callState(final LoaderState loaderState, final Object... objects) {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
-        //TODO
 
-
-        ReTweakResources.RETWEAK_LOGGER.debug("");
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakLoader.INSTANCE.getReTweakLoadController(
+                gameVersion
+            ).distributeStateMessage(
+                loaderState,
+                objects
+            );
+        }
     }
 
 }
