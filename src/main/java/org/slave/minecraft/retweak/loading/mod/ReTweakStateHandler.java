@@ -19,7 +19,7 @@ public final class ReTweakStateHandler {
     }
 
     /**
-     * {@link org.slave.minecraft.retweak.asm.transformers.TransformerLoadController}
+     * {@link org.slave.minecraft.retweak.asm.transformers.TransformerLoadController#transformTransition(org.objectweb.asm.tree.MethodNode, boolean)}
      * {@link cpw.mods.fml.common.LoadController#transition(cpw.mods.fml.common.LoaderState, boolean)}
      *
      * @param currentState Such a fragile existence...

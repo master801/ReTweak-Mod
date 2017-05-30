@@ -11,7 +11,7 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.slave.lib.asm.transformers.MethodTransformer;
+import org.slave.lib.asm.transformers.MethodsTransformer;
 import org.slave.lib.resources.MethodStub;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
@@ -20,14 +20,31 @@ import org.slave.minecraft.retweak.util.ReTweakResources;
  *
  * @author Master801
  */
-public final class TransformerLoadController extends MethodTransformer implements IClassTransformer {
+public final class TransformerLoadController extends MethodsTransformer implements IClassTransformer {
 
     public TransformerLoadController() {
         super(ReTweakResources.RETWEAK_LOGGER);
     }
 
     @Override
-    protected void transformMethod(final MethodNode methodNode, final boolean isObfuscated) {
+    protected void transformMethod(final MethodStub methodStub, final MethodNode methodNode, final boolean isObfuscated) throws Exception {
+        switch(methodStub.getName()) {
+            case "transition":
+                transformTransition(
+                    methodNode,
+                    isObfuscated
+                );
+                break;
+            case "distributeStateMessage":
+                transformDistributeMessage(
+                    methodNode,
+                    isObfuscated
+                );
+                break;
+        }
+    }
+
+    private void transformTransition(final MethodNode methodNode, final boolean isObfuscated) {
         AbstractInsnNode injectionNode = null;
         for(int i = 0; i < methodNode.instructions.size(); ++i) {
             AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
@@ -43,50 +60,94 @@ public final class TransformerLoadController extends MethodTransformer implement
         if (injectionNode != null) {
             InsnList instructionsToInject = new InsnList();
             instructionsToInject.add(
-                    new LabelNode(
-                            new Label()
-                    )
+                new LabelNode(
+                    new Label()
+                )
             );
             instructionsToInject.add(
-                    new VarInsnNode(
-                            Opcodes.ALOAD,
-                            0
-                    )
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    0
+                )
             );
             instructionsToInject.add(
-                    new VarInsnNode(
-                            Opcodes.ALOAD,
-                            0
-                    )
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    0
+                )
             );
             instructionsToInject.add(
-                    new FieldInsnNode(
-                            Opcodes.GETFIELD,
-                            "cpw/mods/fml/common/LoadController",
-                            "state",
-                            "Lcpw/mods/fml/common/LoaderState;"
-                    )
+                new FieldInsnNode(
+                    Opcodes.GETFIELD,
+                    "cpw/mods/fml/common/LoadController",
+                    "state",
+                    "Lcpw/mods/fml/common/LoaderState;"
+                )
             );
             instructionsToInject.add(
-                    new VarInsnNode(
-                            Opcodes.ALOAD,
-                            1
-                    )
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    1
+                )
             );
 
             instructionsToInject.add(
-                    new MethodInsnNode(
-                            Opcodes.INVOKESTATIC,
-                            "org/slave/minecraft/retweak/loading/mod/ReTweakStateHandler",
-                            "step",
-                            "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
-                            false
-                    )
+                new MethodInsnNode(
+                    Opcodes.INVOKESTATIC,
+                    "org/slave/minecraft/retweak/loading/mod/ReTweakStateHandler",
+                    "step",
+                    "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;Lcpw/mods/fml/common/LoaderState;)V",
+                    false
+                )
             );
 
             methodNode.instructions.insert(
-                    injectionNode,
-                    instructionsToInject
+                injectionNode,
+                instructionsToInject
+            );
+        }
+    }
+
+    private void transformDistributeMessage(final MethodNode methodNode, final boolean isObfuscated) {
+        AbstractInsnNode injectionNode = null;
+        for(int i = 0; i < methodNode.instructions.size(); ++i) {
+            AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+            if (abstractInsnNode instanceof VarInsnNode) {
+                VarInsnNode varInsnNode = (VarInsnNode)abstractInsnNode;
+                if (varInsnNode.getOpcode() == Opcodes.ALOAD && varInsnNode.var == 0) {
+                    //LABEL <-- What we want
+                    //LINE NUMBER
+                    //ALOAD, 0 <-- What we're checking for
+                    injectionNode = varInsnNode.getPrevious().getPrevious();
+                    break;
+                }
+            }
+        }
+
+        if (injectionNode != null) {
+            InsnList instructionsToInject = new InsnList();
+            instructionsToInject.add(
+                new LabelNode(new Label())
+            );
+            instructionsToInject.add(
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    1
+                )
+            );
+            instructionsToInject.add(
+                new MethodInsnNode(
+                    Opcodes.INVOKESTATIC,
+                    "org/slave/minecraft/retweak/loading/mod/ReTweakLoadHandler",
+                    "distributeStateMessage",
+                    "(Ljava/lang/Class;)V",
+                    false
+                )
+            );
+
+            methodNode.instructions.insertBefore(
+                injectionNode,
+                instructionsToInject
             );
         }
     }
@@ -97,11 +158,17 @@ public final class TransformerLoadController extends MethodTransformer implement
     }
 
     @Override
-    protected MethodStub getMethod() {
-        return new MethodStub(
+    protected MethodStub[] getMethods() {
+        return new MethodStub[] {
+            new MethodStub(
                 "transition",
                 "(Lcpw/mods/fml/common/LoaderState;Z)V"
-        );
+            ),
+            new MethodStub(
+                "distributeStateMessage",
+                "(Ljava/lang/Class;)V"
+            )
+        };
     }
 
     @Override
