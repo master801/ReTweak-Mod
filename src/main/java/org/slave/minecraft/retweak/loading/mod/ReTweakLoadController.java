@@ -11,11 +11,11 @@ import cpw.mods.fml.common.eventhandler.EventBus;
  *
  * @author Master
  */
-public final class ReTweakModController {
+public final class ReTweakLoadController {
 
     private EventBus masterController;
 
-    ReTweakModController() {
+    ReTweakLoadController() {
     }
 
 }
