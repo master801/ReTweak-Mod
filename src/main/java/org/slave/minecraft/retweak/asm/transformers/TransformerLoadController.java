@@ -36,10 +36,20 @@ public final class TransformerLoadController extends MethodsTransformer implemen
                 );
                 break;
             case "distributeStateMessage":
-                transformDistributeMessage(
-                    methodNode,
-                    isObfuscated
-                );
+                switch(methodStub.getDesc()) {
+                    case "(Ljava/lang/Class;)V":
+                        transformDistributeMessage_Event(
+                            methodNode,
+                            isObfuscated
+                        );
+                        break;
+                    case "(Lcpw/mods/fml/common/LoaderState;[Ljava/lang/Object;)V":
+                        transformDistributeStateMessage(
+                            methodNode,
+                            isObfuscated
+                        );
+                        break;
+                }
                 break;
         }
     }
@@ -108,7 +118,7 @@ public final class TransformerLoadController extends MethodsTransformer implemen
         }
     }
 
-    private void transformDistributeMessage(final MethodNode methodNode, final boolean isObfuscated) {
+    private void transformDistributeMessage_Event(final MethodNode methodNode, final boolean isObfuscated) {
         AbstractInsnNode injectionNode = null;
         for(int i = 0; i < methodNode.instructions.size(); ++i) {
             AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
@@ -132,6 +142,12 @@ public final class TransformerLoadController extends MethodsTransformer implemen
             instructionsToInject.add(
                 new VarInsnNode(
                     Opcodes.ALOAD,
+                    0
+                )
+            );
+            instructionsToInject.add(
+                new VarInsnNode(
+                    Opcodes.ALOAD,
                     1
                 )
             );
@@ -140,7 +156,58 @@ public final class TransformerLoadController extends MethodsTransformer implemen
                     Opcodes.INVOKESTATIC,
                     "org/slave/minecraft/retweak/loading/mod/ReTweakLoadHandler",
                     "distributeStateMessage",
-                    "(Ljava/lang/Class;)V",
+                    "(Lcpw/mods/fml/common/LoadController;Ljava/lang/Class;)V",
+                    false
+                )
+            );
+
+            methodNode.instructions.insertBefore(
+                injectionNode,
+                instructionsToInject
+            );
+        }
+    }
+
+    private void transformDistributeStateMessage(final MethodNode methodNode, final boolean isObfuscated) {
+        AbstractInsnNode injectionNode = null;
+        for(int i = 0; i < methodNode.instructions.size(); ++i) {
+            AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+            if (abstractInsnNode instanceof VarInsnNode) {
+                VarInsnNode varInsnNode = (VarInsnNode)abstractInsnNode;
+                if (varInsnNode.getOpcode() == Opcodes.ALOAD && varInsnNode.var == 1) {
+                    //Label <-- What we want
+                    //ALOAD, 1 <-- What we're checking for
+                    injectionNode = abstractInsnNode.getPrevious();
+                }
+            }
+        }
+
+        if (injectionNode != null) {
+            InsnList instructionsToInject = new InsnList();
+            instructionsToInject.add(
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    0
+                )
+            );
+            instructionsToInject.add(
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    1
+                )
+            );
+            instructionsToInject.add(
+                new VarInsnNode(
+                    Opcodes.ALOAD,
+                    2
+                )
+            );
+            instructionsToInject.add(
+                new MethodInsnNode(
+                    Opcodes.INVOKESTATIC,
+                    "org/slave/minecraft/retweak/loading/mod/ReTweakLoadHandler",
+                    "distributeStateMessage",
+                    "(Lcpw/mods/fml/common/LoadController;Lcpw/mods/fml/common/LoaderState;[Ljava/lang/Object;)V",
                     false
                 )
             );
@@ -167,6 +234,10 @@ public final class TransformerLoadController extends MethodsTransformer implemen
             new MethodStub(
                 "distributeStateMessage",
                 "(Ljava/lang/Class;)V"
+            ),
+            new MethodStub(
+                "distributeStateMessage",
+                "(Lcpw/mods/fml/common/LoaderState;[Ljava/lang/Object;)V"
             )
         };
     }

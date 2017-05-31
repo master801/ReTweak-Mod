@@ -2,6 +2,7 @@ package org.slave.minecraft.retweak.loading.mod;
 
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
+import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.lang.reflect.InvocationTargetException;
@@ -74,6 +75,10 @@ public final class ReTweakStateHandler {
     }
 
     private static void constructing(final LoadController loadController) {
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakLoadController reTweakLoadController = ReTweakLoader.INSTANCE.getReTweakLoadController(gameVersion);
+        }
+
         //TODO
         //Currently NOOP
     }

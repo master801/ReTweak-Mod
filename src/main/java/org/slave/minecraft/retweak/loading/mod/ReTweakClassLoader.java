@@ -25,16 +25,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private final GameVersion gameVersion;
 
     private ReTweakClassLoader(final LaunchClassLoader parent, final GameVersion gameVersion) {
-        super(
-                new URL[0],
-                parent
-        );
+        super(new URL[0], parent);
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
+
         this.parent = parent;
         this.gameVersion = gameVersion;
         if (this.parent == null || super.getParent() == null) {
             throw new NullPointerException(
-                    "Parent class loader is null!"
+                "Parent class loader is null!"
             );
         }
     }
@@ -42,14 +40,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
         ReTweakResources.RETWEAK_LOGGER.debug(
-                "LOAD: {}, RESOLVE: {}",
-                name,
-                resolve
+            "LOAD: {}, RESOLVE: {}",
+            name,
+            resolve
         );
         //TODO
         return super.loadClass(
-                name,
-                resolve
+            name,
+            resolve
         );
     }
 
@@ -66,12 +64,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
     void addFile(final File file) {
         try {
             super.addURL(
-                    file.toURI().toURL()
+                file.toURI().toURL()
             );
         } catch(MalformedURLException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to add file \"" + file.getPath() + "\" to the class loader!",
-                    e
+                "Failed to add file \"" + file.getPath() + "\" to the class loader!",
+                e
             );
         }
     }
@@ -86,7 +84,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private static void init(final LaunchClassLoader launchClassLoader) {
         if (ReTweakClassLoader.reTweakClassLoaderMap != null) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    "Already init class loader? This should not happen!"
+                "Already init class loader? This should not happen!"
             );
             return;
         }
@@ -95,16 +93,16 @@ public final class ReTweakClassLoader extends URLClassLoader {
         Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap = new EnumMap<>(GameVersion.class);
         for(GameVersion gameVersion : GameVersion.values()) {
             reTweakClassLoaderMap.put(
-                    gameVersion,
-                    new ReTweakClassLoader(
-                            launchClassLoader,
-                            gameVersion
-                    )
+                gameVersion,
+                new ReTweakClassLoader(
+                    launchClassLoader,
+                    gameVersion
+                )
             );
         }
 
         ReTweakClassLoader.reTweakClassLoaderMap = ImmutableMap.copyOf(
-                reTweakClassLoaderMap
+            reTweakClassLoaderMap
         );
     }
 

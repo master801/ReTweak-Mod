@@ -15,6 +15,7 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.LoaderState.ModState;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLEvent;
 import cpw.mods.fml.common.event.FMLLoadEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -156,6 +157,12 @@ public final class ReTweakLoadController {
         }
     }
 
+    @Subscribe
+    public void constructMod(final FMLConstructionEvent fmlConstructionEvent) {
+        //TODO
+        ReTweakResources.RETWEAK_LOGGER.debug("");
+    }
+
     private void sendEventToModContainer(final FMLEvent stateEvent, final ModContainer mc) {
         String modId = mc.getModId();
         Collection<String> requirements =  Collections2.transform(
@@ -165,7 +172,10 @@ public final class ReTweakLoadController {
         for(ArtifactVersion av : mc.getDependencies()) {
             if (av.getLabel()!= null && requirements.contains(av.getLabel()) && modStates.containsEntry(av.getLabel(), ModState.ERRORED)) {
 //                FMLLog.log(modId, Level.ERROR, "Skipping event %s and marking errored mod %s since required dependency %s has errored", stateEvent.getEventType(), modId, av.getLabel());
-                modStates.put(modId, ModState.ERRORED);
+                modStates.put(
+                    modId,
+                    ModState.ERRORED
+                );
                 return;
             }
         }
@@ -225,7 +235,7 @@ public final class ReTweakLoadController {
         if (fmlLoadController == null) {
             try {
                 Field fieldLoadController = ReflectionHelper.getField(
-                    LoadController.class,
+                    Loader.class,
                     "modController"
                 );
                 fmlLoadController = ReflectionHelper.getFieldValue(
@@ -236,8 +246,12 @@ public final class ReTweakLoadController {
                 ReTweakResources.RETWEAK_LOGGER.debug(
                     MarkerFactory.getMarker("WARN"),
 
-                    "Failed to get instance of \"{}\"!",
-                    LoadController.class.getCanonicalName()
+                    String.format(
+                        "Failed to get instance of \"%s\"!",
+                        LoadController.class.getCanonicalName()
+                    ),
+
+                    e
                 );
             }
         }

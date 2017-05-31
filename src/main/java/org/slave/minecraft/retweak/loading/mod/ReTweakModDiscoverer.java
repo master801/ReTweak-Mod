@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.mod;
 
 import cpw.mods.fml.common.ModClassLoader;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ContainerType;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
@@ -9,7 +10,6 @@ import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
-import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
 import java.util.Collection;
@@ -53,22 +53,11 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
         );
 
         List<ModCandidate> modCandidateList;
+
         try {
-            modCandidateList = ReflectionHelper.getFieldValue(//Hacky
-                    ReflectionHelper.getField(
-                            ModDiscoverer.class,
-                            "candidates"
-                    ),
-                    this
-            );
+            modCandidateList = getCandidates();
         } catch(NoSuchFieldException | IllegalAccessException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                    String.format(
-                            "Failed to find mods in dir \"%s\"!",
-                            modsDir.getPath()
-                    ),
-                    e
-            );
+            //TODO
             return;
         }
 
@@ -81,6 +70,33 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
                     )
             );
         }
+    }
+
+    @Override
+    public List<ModContainer> identifyMods() {
+//        return null;
+        return super.identifyMods();//TODO
+    }
+
+    private List<ModCandidate> getCandidates() throws NoSuchFieldException, IllegalAccessException {
+        return ReflectionHelper.getFieldValue(
+            ReflectionHelper.getField(
+                ModDiscoverer.class,
+                "candidates"
+            ),
+            this
+        );
+    }
+
+    private void setCandidates(final List<ModCandidate> modCandidateList) throws NoSuchFieldException, IllegalAccessException {
+        ReflectionHelper.setFieldValue(
+            ReflectionHelper.getField(
+                ModDiscoverer.class,
+                "candidates"
+            ),
+            this,
+            modCandidateList
+        );
     }
 
     private static final class ArchiveFileFilter extends AbstractFileFilter {
