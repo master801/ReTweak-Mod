@@ -4,10 +4,11 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
+import org.slave.lib.helpers.ColorHelper;
+import org.slave.lib.resources.Colors;
 import org.slave.minecraft.retweak.util.ReTweakStrings;
 
 /**
@@ -44,11 +45,13 @@ public final class GuiScreenReTweakMods extends GuiScreen {
                 1.0D
         );
 
+
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_BLEND);
         drawBackground();
         GL11.glDisable(GL11.GL_BLEND);
         GL11.glPopMatrix();
+
 
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_BLEND);
@@ -97,42 +100,61 @@ public final class GuiScreenReTweakMods extends GuiScreen {
     }
 
     private void drawForeground() {
-        mc.getTextureManager().bindTexture(GuiScreenReTweakMods.RESOURCE_LOCATION_RETWEAK_MODS_BORDER);
-        final Tessellator tessellator = Tessellator.instance;
-
-        tessellator.startDrawingQuads();
-        //Draw bottom-left corner
-        tessellator.addVertex(
-                0.0D,
-                (double)height,
-                0.0D
+        final int color = Colors.PINK;
+        final float r = ColorHelper.toGL(
+            ColorHelper.getRedFromHex(color)
+        );
+        final float g = ColorHelper.toGL(
+            ColorHelper.getGreenFromHex(color)
+        );
+        final float b = ColorHelper.toGL(
+            ColorHelper.getBlueFromHex(color)
+        );
+        GL11.glColor4f(
+            r,
+            g,
+            b,
+            1.0F
         );
 
-        //Draw bottom-right corner
-        tessellator.addVertex(
-                (double)width,
-                (double)height,
-                0.0D
-        );
+        final int thickness = 3;
 
-        //Draw top-right corner
-        tessellator.addVertex(
-                (double)width,
-                0.0D,
-                0.0D
+        //Top
+        super.drawTexturedModalRect(
+            0,
+            0,
+            0,
+            0,
+            width,
+            thickness
         );
-
-        //Draw top-left corner
-        tessellator.addVertex(
-                0.0D,
-                0.0D,
-                0.0D
+        //Right
+        super.drawTexturedModalRect(
+            width - thickness,
+            0,
+            0,
+            0,
+            thickness,
+            height
         );
-        tessellator.setTextureUV(
-                0.0D,
-                0.0D
+        //Bottom
+        super.drawTexturedModalRect(
+            0,
+            height - thickness,
+            0,
+            0,
+            width,
+            thickness
         );
-        tessellator.draw();
+        //Left
+        super.drawTexturedModalRect(
+            0,
+            0,
+            0,
+            0,
+            thickness,
+            height
+        );
     }
 
 }

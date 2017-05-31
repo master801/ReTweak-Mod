@@ -93,6 +93,14 @@ public final class ReTweakModStateHandler {
                 loaderState,
                 objects
             );
+
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Called state \"{}\" for game version \"{}\"",
+                    loaderState.name(),
+                    gameVersion.getVersion()
+                );
+            }
         }
     }
 

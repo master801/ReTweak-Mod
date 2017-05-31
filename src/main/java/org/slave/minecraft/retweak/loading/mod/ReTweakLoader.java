@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.loading.mod;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.functions.ModIdFunction;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
@@ -54,7 +55,10 @@ public final class ReTweakLoader {
             );
             reTweakLoadControllerMap.put(
                 gameVersion,
-                new ReTweakLoadController(gameVersion)
+                new ReTweakLoadController(
+                    this,
+                    gameVersion
+                )
             );
         }
 
@@ -112,6 +116,27 @@ public final class ReTweakLoader {
                         new ModIdFunction()
                 )
         );
+    }
+
+    private void checkReTweakLoadControllerConsistency(final LoaderState loaderState) {
+        if (loaderState == null) return;
+
+        for(GameVersion gameVersion : GameVersion.values()) {
+            ReTweakLoadController reTweakLoadController = reTweakLoadControllerMap.get(gameVersion);
+
+            if (reTweakLoadController.getLoaderState() != loaderState) {
+                ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Inconsistent loader state for game version \"{}\"!",
+                    gameVersion.getVersion()
+                );
+
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Game version's loader state: \"{}\", Loader state: \"{}\"",
+                    reTweakLoadController.getLoaderState().name(),
+                    loaderState.name()
+                );
+            }
+        }
     }
 
     ReTweakLoadController getReTweakLoadController(final GameVersion gameVersion) {
