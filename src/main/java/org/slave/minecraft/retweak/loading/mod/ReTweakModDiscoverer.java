@@ -1,7 +1,7 @@
 package org.slave.minecraft.retweak.loading.mod;
 
+import com.google.common.collect.Lists;
 import cpw.mods.fml.common.ModClassLoader;
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ContainerType;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
@@ -10,6 +10,7 @@ import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
 import java.util.Collection;
@@ -41,43 +42,44 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
     @Override
     public void findClasspathMods(final ModClassLoader modClassLoader) {
         //NOOP
+        //No point in doing this since older mods will not be (compiled) on the classpath
     }
 
     @Override
     public void findModDirMods(final File modsDir, final File[] supplementalModFileCandidates) {
         if (modsDir == null || !modsDir.isDirectory()) return;
         Collection<File> archiveFiles = FileUtils.listFiles(
-                modsDir,
-                ArchiveFileFilter.INSTANCE,
-                DirectoryFileFilter.DIRECTORY
+            modsDir,
+            ArchiveFileFilter.INSTANCE,
+            DirectoryFileFilter.DIRECTORY
         );
 
-        List<ModCandidate> modCandidateList;
-
-        try {
-            modCandidateList = getCandidates();
-        } catch(NoSuchFieldException | IllegalAccessException e) {
-            //TODO
-            return;
-        }
-
+        List<ModCandidate> modCandidateList = Lists.newArrayList();
         for(File archiveFile : archiveFiles) {
             modCandidateList.add(
-                    new ModCandidate(
-                            archiveFile,
-                            archiveFile,
-                            ContainerType.JAR
-                    )
+                new ReTweakModCandidate(
+                    archiveFile,
+                    archiveFile,
+                    ContainerType.JAR
+                )
+            );
+        }
+
+        try {
+            setCandidates(
+                modCandidateList
+            );
+        } catch(NoSuchFieldException | IllegalAccessException e) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                "Caught exception while setting candidates!",
+                e
             );
         }
     }
 
-    @Override
-    public List<ModContainer> identifyMods() {
-//        return null;
-        return super.identifyMods();//TODO
-    }
-
+    /**
+     * {@link cpw.mods.fml.common.discovery.ModDiscoverer#candidates}
+     */
     private List<ModCandidate> getCandidates() throws NoSuchFieldException, IllegalAccessException {
         return ReflectionHelper.getFieldValue(
             ReflectionHelper.getField(
@@ -88,6 +90,9 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
         );
     }
 
+    /**
+     * {@link cpw.mods.fml.common.discovery.ModDiscoverer#candidates}
+     */
     private void setCandidates(final List<ModCandidate> modCandidateList) throws NoSuchFieldException, IllegalAccessException {
         ReflectionHelper.setFieldValue(
             ReflectionHelper.getField(

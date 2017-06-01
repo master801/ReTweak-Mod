@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.loading.mod;
 
+import com.google.common.collect.ArrayListMultimap;
 import cpw.mods.fml.common.LoaderState;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
@@ -83,15 +84,23 @@ public final class ReTweakModStateHandler {
         );
     }
 
-    private static void callState(final LoaderState loaderState, final Object... objects) {
-        final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
+    private static void callState(final LoaderState loaderState, @SuppressWarnings("unused") final Object... objects) {
+        @SuppressWarnings("unused") final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
+            Object[] newObjects = new Object[] {
+                ReTweakClassLoader.getReTweakClassLoader(gameVersion),//Class loader
+                ReTweakLoader.INSTANCE.getReTweakModDiscoverer(//ASM Table
+                    gameVersion
+                ).getASMTable(),
+                ArrayListMultimap.create()//Create empty map for reversed dependencies -- TODO?
+            };
+
             ReTweakLoader.INSTANCE.getReTweakLoadController(
                 gameVersion
             ).distributeStateMessage(
                 loaderState,
-                objects
+                newObjects
             );
 
             if (ReTweakResources.DEBUG) {

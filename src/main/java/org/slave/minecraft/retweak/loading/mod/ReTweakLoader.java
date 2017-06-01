@@ -10,7 +10,6 @@ import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -99,22 +98,18 @@ public final class ReTweakLoader {
         reTweakModDiscoverer.findModDirMods(
                 reTweakModsDir
         );
-
-        List<ModContainer> modList = new ArrayList<>();
-        modList.addAll(
-                reTweakModDiscoverer.identifyMods()
-        );
+        List<ModContainer> identifiedMods = reTweakModDiscoverer.identifyMods();
 
         reTweakMods.put(
             gameVersion,
-            modList
+            identifiedMods
         );
         this.reTweakNamedMods.put(
-                gameVersion,
-                Maps.uniqueIndex(
-                        modList,
-                        new ModIdFunction()
-                )
+            gameVersion,
+            Maps.uniqueIndex(
+                identifiedMods,
+                new ModIdFunction()
+            )
         );
     }
 

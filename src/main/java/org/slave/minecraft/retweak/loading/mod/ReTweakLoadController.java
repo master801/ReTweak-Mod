@@ -15,7 +15,6 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.LoaderState.ModState;
 import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLEvent;
 import cpw.mods.fml.common.event.FMLLoadEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -110,31 +109,46 @@ public final class ReTweakLoadController {
     @Subscribe
     public void buildModList(final FMLLoadEvent fmlLoadEvent) {
         Builder<String, EventBus> eventBus = ImmutableMap.builder();
-        for(ModContainer mod : reTweakLoader.getModList(gameVersion)) {
-            EventBus bus = new EventBus(mod.getModId());
-            boolean isActive = mod.registerBus(//Load Controller is a dummy
+        for(ModContainer modContainer : reTweakLoader.getModList(gameVersion)) {
+            ReTweakModContainer reTweakModContainer;
+            if (modContainer instanceof ReTweakModContainer) {
+                reTweakModContainer = (ReTweakModContainer)modContainer;
+            } else {
+                ReTweakResources.RETWEAK_LOGGER.error(
+                    "Mod container is not ReTweak's?"
+                );
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Mod ID: {}, Mod File: {}",
+                    modContainer.getModId(),
+                    modContainer.getSource().getAbsolutePath()
+                );
+                return;
+            }
+
+            EventBus bus = new EventBus(reTweakModContainer.getModId());
+            boolean isActive = reTweakModContainer.registerBus(
                 bus,
-                getFMLLoadController()
+                this
             );
             if (isActive) {
-                activeModList.add(mod);
+                activeModList.add(reTweakModContainer);
                 modStates.put(
-                    mod.getModId(),
+                    reTweakModContainer.getModId(),
                     ModState.UNLOADED
                 );
                 eventBus.put(
-                    mod.getModId(),
+                    reTweakModContainer.getModId(),
                     bus
                 );
 //                FMLCommonHandler.instance().addModToResourcePack(mod);//TODO
             } else {
 //                FMLLog.log(mod.getModId(), Level.WARN, "Mod %s has been disabled through configuration", mod.getModId());//TODO
                 modStates.put(
-                    mod.getModId(),
+                    reTweakModContainer.getModId(),
                     ModState.UNLOADED
                 );
                 modStates.put(
-                    mod.getModId(),
+                    reTweakModContainer.getModId(),
                     ModState.DISABLED
                 );
             }
@@ -157,12 +171,6 @@ public final class ReTweakLoadController {
         }
     }
 
-    @Subscribe
-    public void constructMod(final FMLConstructionEvent fmlConstructionEvent) {
-        //TODO
-        ReTweakResources.RETWEAK_LOGGER.debug("");
-    }
-
     private void sendEventToModContainer(final FMLEvent stateEvent, final ModContainer mc) {
         String modId = mc.getModId();
         Collection<String> requirements =  Collections2.transform(
@@ -171,7 +179,16 @@ public final class ReTweakLoadController {
         );
         for(ArtifactVersion av : mc.getDependencies()) {
             if (av.getLabel()!= null && requirements.contains(av.getLabel()) && modStates.containsEntry(av.getLabel(), ModState.ERRORED)) {
-//                FMLLog.log(modId, Level.ERROR, "Skipping event %s and marking errored mod %s since required dependency %s has errored", stateEvent.getEventType(), modId, av.getLabel());
+                /*
+                FMLLog.log(
+                    modId,
+                    Level.ERROR,
+                    "Skipping event %s and marking errored mod %s since required dependency %s has errored",
+                    stateEvent.getEventType(),
+                    modId,
+                    av.getLabel()
+                );
+                */
                 modStates.put(
                     modId,
                     ModState.ERRORED
