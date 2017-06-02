@@ -39,24 +39,34 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        ReTweakResources.RETWEAK_LOGGER.debug(
-            "LOAD: {}, RESOLVE: {}",
-            name,
-            resolve
-        );
-        //TODO
-        return super.loadClass(
-            name,
-            resolve
-        );
+        Class<?> returnClass;
+        if (gameVersion.getClasses().contains(name)) {
+            returnClass = gameVersion.getOverrideClass(name);
+        } else {
+            returnClass = super.loadClass(
+                name,
+                resolve
+            );
+        }
+
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                "LOAD: {}, RESOLVE: {}",
+                name,
+                resolve
+            );
+        }
+        return returnClass;
     }
 
     @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        ReTweakResources.RETWEAK_LOGGER.debug(
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
                 "FIND: {}",
                 name
-        );
+            );
+        }
         //TODO
         return super.findClass(name);
     }

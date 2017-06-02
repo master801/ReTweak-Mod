@@ -91,7 +91,7 @@ public final class ReTweakModCandidate extends ModCandidate {
                     if (tableClass.getSuperName().equals(gameVersion.getModType().getValue())) {
                         modContainer = new ReTweakModContainer(
                             gameVersion,
-                            tableClass.getName(),
+                            tableClass.getName().replace('/', '.'),
                             this,
                             Maps.newHashMap()//TODO
                         );
@@ -103,7 +103,7 @@ public final class ReTweakModCandidate extends ModCandidate {
                             if (asmAnnotation.getDesc().equals(gameVersion.getModType().getValue())) {
                                 modContainer = new ReTweakModContainer(
                                     gameVersion,
-                                    tableClass.getName(),
+                                    tableClass.getName().replace('/', '.'),
                                     this,
                                     asmAnnotation.getValues()
                                 );

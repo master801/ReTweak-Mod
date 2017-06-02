@@ -22,7 +22,7 @@ public final class ReTweakSetup implements IFMLCallHook {
     public void injectData(final Map<String, Object> data) {
         ReTweakSetup.deobfuscatedEnvironment = !(boolean)data.get("runtimeDeobfuscationEnabled");
         ReTweakSetup.initReTweakClassLoader(
-                (LaunchClassLoader)data.get("classLoader")
+            (LaunchClassLoader) data.get("classLoader")
         );
     }
 
@@ -38,22 +38,22 @@ public final class ReTweakSetup implements IFMLCallHook {
     private static void initReTweakClassLoader(final LaunchClassLoader launchClassLoader) {
         try {
             ReflectionHelper.invokeMethod(
-                    ReflectionHelper.getMethod(
-                            ReTweakClassLoader.class,
-                            "init",
-                            new Class<?>[] {
-                                    LaunchClassLoader.class
-                            }
-                    ),
-                    null,
-                    new Object[] {
-                            launchClassLoader
+                ReflectionHelper.getMethod(
+                    ReTweakClassLoader.class,
+                    "init",
+                    new Class<?>[] {
+                        LaunchClassLoader.class
+                    }
+                ),
+                null,
+                new Object[] {
+                    launchClassLoader
                     }
             );
         } catch(InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to init class loaders!",
-                    e
+                "Failed to init class loaders!",
+                e
             );
         }
     }

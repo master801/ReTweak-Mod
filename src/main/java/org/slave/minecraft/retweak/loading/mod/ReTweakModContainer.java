@@ -2,6 +2,7 @@ package org.slave.minecraft.retweak.loading.mod;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
@@ -37,6 +38,7 @@ import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -357,6 +359,7 @@ public final class ReTweakModContainer implements ModContainer {
                     modLanguage,
                     source.getAbsolutePath()
                 );
+                return;
             }
             modInstance = getLanguageAdapter().getNewInstance(
                 null,//TODO RIP custom language adapter support
@@ -425,9 +428,6 @@ public final class ReTweakModContainer implements ModContainer {
                 );
             }
         }
-
-        //TODO
-        ReTweakResources.RETWEAK_LOGGER.debug("");
     }
 
     private ILanguageAdapter getLanguageAdapter() {
@@ -441,16 +441,89 @@ public final class ReTweakModContainer implements ModContainer {
         parseSimpleFieldAnnotation(
             annotations,
             Instance.class.getName(),
-            (Function<ModContainer, Object>)ModContainer::getMod
+            ModContainer::getMod
         );
         parseSimpleFieldAnnotation(
             annotations,
             Metadata.class.getName(),
-            (Function<ModContainer, Object>)ModContainer::getMetadata
+            ModContainer::getMetadata
         );
     }
 
-    private Method gatherAnnotations(Class<?> clazz) throws Exception {
+    private void parseSimpleFieldAnnotation(final SetMultimap<String, ASMData> annotations, final String annotationClassName, final Function<ModContainer, Object> retreiver) throws IllegalAccessException {
+        String[] annName = annotationClassName.split("\\.");
+        String annotationName = annName[annName.length - 1];
+        for(ASMData targets : annotations.get(annotationClassName)) {
+            String targetMod = (String) targets.getAnnotationInfo().get("value");
+            Field field = null;
+            Object injectedMod = null;
+            ModContainer modContainer = this;
+            boolean isStatic = false;
+            Class<?> modClass = modInstance.getClass();
+            if (!Strings.isNullOrEmpty(targetMod)) {
+                if (Loader.isModLoaded(targetMod)) {
+                    modContainer = Loader.instance().getIndexedModList().get(targetMod);
+                } else {
+                    modContainer = null;
+                }
+            }
+            if (modContainer != null) {
+                try {
+                    modClass = Class.forName(
+                        targets.getClassName(),
+                        true,
+                        ReTweakClassLoader.getReTweakClassLoader(gameVersion)
+                    );
+                    field = ReflectionHelper.getField(
+                        modClass,
+                        targets.getObjectName()
+                    );
+                    isStatic = Modifier.isStatic(field.getModifiers());
+                    injectedMod = retreiver.apply(modContainer);
+                } catch (Exception e) {
+                    Throwables.propagateIfPossible(e);
+                    /*//TODO
+                    FMLLog.log(
+                        getModId(),
+                        Level.WARN,
+                        e,
+                        "Attempting to load @%s in class %s for %s and failing",
+                        annotationName,
+                        targets.getClassName(),
+                        modContainer.getModId()
+                    );
+                    */
+                }
+            }
+            if (field != null) {
+                Object target = null;
+                if (!isStatic) {
+                    target = modInstance;
+                    if (!modInstance.getClass().equals(modClass)) {
+                        /*//TODO
+                        FMLLog.log(
+                            getModId(),
+                            Level.WARN,
+                            "Unable to inject @%s in non-static field %s.%s for %s as it is NOT the primary mod instance",
+                            annotationName,
+                            targets.getClassName(),
+                            targets.getObjectName(),
+                            modContainer.getModId()
+                        );
+                        */
+                        continue;
+                    }
+                }
+                ReflectionHelper.setFieldValue(
+                    field,
+                    target,
+                    injectedMod
+                );
+            }
+        }
+    }
+
+    private Method gatherAnnotations(final Class<?> clazz) throws Exception {
         //TODO
         Method factoryMethod = null;
         for(Method method : clazz.getDeclaredMethods()) {
