@@ -55,8 +55,8 @@ public final class ReTweakLoader {
             reTweakLoadControllerMap.put(
                 gameVersion,
                 new ReTweakLoadController(
-                    this,
-                    gameVersion
+                    gameVersion,
+                    this
                 )
             );
         }

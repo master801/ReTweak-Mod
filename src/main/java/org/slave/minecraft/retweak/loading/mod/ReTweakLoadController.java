@@ -10,8 +10,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.LoadController;
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.LoaderState.ModState;
 import cpw.mods.fml.common.ModContainer;
@@ -25,10 +23,8 @@ import org.apache.logging.log4j.ThreadContext;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
-import org.slf4j.MarkerFactory;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
@@ -46,11 +42,9 @@ public final class ReTweakLoadController {
 
     private static final String ID = "ReTweakMainChannel";
 
-    private final ReTweakLoader reTweakLoader;
     private final GameVersion gameVersion;
-    private final EventBus channel;
-
-    private LoadController fmlLoadController;//Cache
+    private final ReTweakLoader reTweakLoader;
+    private final EventBus mainChannel;
 
     private ImmutableMap<String, EventBus> modChannels;
     private Multimap<String, ModState> modStates = ArrayListMultimap.create();
@@ -60,11 +54,13 @@ public final class ReTweakLoadController {
 
     private LoaderState loaderState;
 
-    ReTweakLoadController(final ReTweakLoader reTweakLoader, final GameVersion gameVersion) {
-        this.reTweakLoader = reTweakLoader;
+    ReTweakLoadController(final GameVersion gameVersion, final ReTweakLoader reTweakLoader) {
         this.gameVersion = gameVersion;
-        channel = new EventBus(ReTweakLoadController.ID + "_" + gameVersion.getVersion());
-        channel.register(this);
+        this.reTweakLoader = reTweakLoader;
+        mainChannel = new EventBus(
+            ReTweakLoadController.ID + "_" + gameVersion.getVersion()
+        );
+        mainChannel.register(this);
     }
 
     public void distributeStateMessage(final Class<?> customEvent) {
@@ -91,7 +87,7 @@ public final class ReTweakLoadController {
             return;
         }
         if (instance != null) {
-            channel.post(
+            mainChannel.post(
                 instance
             );
         }
@@ -100,8 +96,22 @@ public final class ReTweakLoadController {
     public void distributeStateMessage(final LoaderState loaderState, final Object... objects) {
         if (loaderState == null || !loaderState.hasEvent()) return;
 
-        channel.post(
-            loaderState.getEvent(objects)
+        Object[] newObjects;
+        switch(loaderState) {
+            case CONSTRUCTING:
+                newObjects = new Object[] {
+                    null,//No class loader is passed in -- if ReTweak's class loader is passed in, it will crash as it's expecting ModClassLoader
+                    ReTweakLoader.INSTANCE.getReTweakModDiscoverer(gameVersion).getASMTable(),//ASM Data Table
+                    ArrayListMultimap.create()//Create empty map for reversed dependencies -- //TODO?
+                };
+                break;
+            default:
+                newObjects = objects;
+                break;
+        }
+
+        mainChannel.post(
+            loaderState.getEvent(newObjects)
         );
     }
 
@@ -112,7 +122,7 @@ public final class ReTweakLoadController {
         for(ModContainer modContainer : reTweakLoader.getModList(gameVersion)) {
             ReTweakModContainer reTweakModContainer;
             if (modContainer instanceof ReTweakModContainer) {
-                reTweakModContainer = (ReTweakModContainer)modContainer;
+                reTweakModContainer = (ReTweakModContainer) modContainer;
             } else {
                 ReTweakResources.RETWEAK_LOGGER.error(
                     "Mod container is not ReTweak's?"
@@ -209,9 +219,10 @@ public final class ReTweakLoadController {
             modId
         );
 
-        modChannels.get(
+        EventBus modChannel = modChannels.get(
             modId
-        ).post(
+        );
+        modChannel.post(
             stateEvent
         );
 
@@ -238,7 +249,7 @@ public final class ReTweakLoadController {
     public ImmutableBiMap<ModContainer, Object> buildModObjectList() {
         ImmutableBiMap.Builder<ModContainer, Object> builder = ImmutableBiMap.builder();
         for(ModContainer mc : activeModList) {
-            if (!mc.isImmutable() && mc.getMod()!= null) {
+            if (!mc.isImmutable() && mc.getMod() != null) {
                 builder.put(
                     mc,
                     mc.getMod()
@@ -246,33 +257,6 @@ public final class ReTweakLoadController {
             }
         }
         return builder.build();
-    }
-
-    private LoadController getFMLLoadController() {
-        if (fmlLoadController == null) {
-            try {
-                Field fieldLoadController = ReflectionHelper.getField(
-                    Loader.class,
-                    "modController"
-                );
-                fmlLoadController = ReflectionHelper.getFieldValue(
-                    fieldLoadController,
-                    Loader.instance()
-                );
-            } catch(Exception e) {
-                ReTweakResources.RETWEAK_LOGGER.debug(
-                    MarkerFactory.getMarker("WARN"),
-
-                    String.format(
-                        "Failed to get instance of \"%s\"!",
-                        LoadController.class.getCanonicalName()
-                    ),
-
-                    e
-                );
-            }
-        }
-        return fmlLoadController;
     }
 
     LoaderState getLoaderState() {

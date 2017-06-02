@@ -21,10 +21,7 @@ public final class ReTweakModStateHandler {
         final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
 
         ReTweakModStateHandler.callState(
-            LoaderState.PREINITIALIZATION,
-
-            ReTweakLoader.INSTANCE.getReTweakModDiscoverer(GameVersion.V_1_4_7).getASMTable(),
-            ReTweakResources.RETWEAK_CONFIG_DIRECTORY
+            LoaderState.PREINITIALIZATION//Parameters are created in the function
         );
     }
 
@@ -88,13 +85,33 @@ public final class ReTweakModStateHandler {
         @SuppressWarnings("unused") final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
 
         for(GameVersion gameVersion : GameVersion.values()) {
-            Object[] newObjects = new Object[] {
-                ReTweakClassLoader.getReTweakClassLoader(gameVersion),//Class loader
-                ReTweakLoader.INSTANCE.getReTweakModDiscoverer(//ASM Table
-                    gameVersion
-                ).getASMTable(),
-                ArrayListMultimap.create()//Create empty map for reversed dependencies -- TODO?
-            };
+            Object[] newObjects;
+            switch(loaderState) {
+                case PREINITIALIZATION:
+                    newObjects = new Object[] {
+                        ReTweakLoader.INSTANCE.getReTweakModDiscoverer(gameVersion).getASMTable(),
+                        ReTweakResources.RETWEAK_CONFIG_DIRECTORY
+                    };
+                    break;
+                case CONSTRUCTING:
+                    newObjects = new Object[] {
+                        ReTweakClassLoader.getReTweakClassLoader(gameVersion),//Class loader
+                        ReTweakLoader.INSTANCE.getReTweakModDiscoverer(gameVersion).getASMTable(),//ASM Data Table
+                        ArrayListMultimap.create()//Create empty map for reversed dependencies -- //TODO?
+                    };
+                    break;
+                default:
+                    newObjects = objects;
+                    break;
+            }
+
+            if (ReTweakResources.DEBUG) {
+                ReTweakResources.RETWEAK_LOGGER.debug(
+                    "Calling state \"{}\" for game version \"{}\"",
+                    loaderState.name(),
+                    gameVersion.getVersion()
+                );
+            }
 
             ReTweakLoader.INSTANCE.getReTweakLoadController(
                 gameVersion

@@ -58,6 +58,7 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
         for(File archiveFile : archiveFiles) {
             modCandidateList.add(
                 new ReTweakModCandidate(
+                    gameVersion,
                     archiveFile,
                     archiveFile,
                     ContainerType.JAR
