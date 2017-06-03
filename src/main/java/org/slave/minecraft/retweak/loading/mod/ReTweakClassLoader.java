@@ -2,10 +2,18 @@ package org.slave.minecraft.retweak.loading.mod;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.loading.mod.vandy.ReTweakClassVisitor;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -38,28 +46,6 @@ public final class ReTweakClassLoader extends URLClassLoader {
     }
 
     @Override
-    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        Class<?> returnClass;
-        if (gameVersion.getClasses().contains(name)) {
-            returnClass = gameVersion.getOverrideClass(name);
-        } else {
-            returnClass = super.loadClass(
-                name,
-                resolve
-            );
-        }
-
-        if (ReTweakResources.DEBUG) {
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                "LOAD: {}, RESOLVE: {}",
-                name,
-                resolve
-            );
-        }
-        return returnClass;
-    }
-
-    @Override
     protected Class<?> findClass(final String name) throws ClassNotFoundException {
         if (ReTweakResources.DEBUG) {
             ReTweakResources.RETWEAK_LOGGER.debug(
@@ -69,6 +55,82 @@ public final class ReTweakClassLoader extends URLClassLoader {
         }
         //TODO
         return super.findClass(name);
+    }
+
+    @Override
+    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                "LOAD: {}, RESOLVE: {}",
+                name,
+                resolve
+            );
+        }
+
+        Class<?> returnClass = null;
+        if (gameVersion.getClasses().contains(name)) {
+            returnClass = gameVersion.getOverrideClass(name);
+        } else {
+            InputStream inputStream = super.getResourceAsStream(name);
+            if (inputStream != null) {
+                try {
+                    ClassReader classReader = new ClassReader(inputStream);
+
+                    ClassVisitor classVisitor = new ReTweakClassVisitor(
+                        Opcodes.ASM5,
+                        gameVersion,
+                        new ClassNode()
+                    );
+                    classReader.accept(
+                        classVisitor,
+                        0
+                    );
+
+                    ClassWriter classWriter = new ClassWriter(0);
+                    classReader.accept(
+                        classWriter,
+                        0
+                    );
+
+                    byte[] classData = classWriter.toByteArray();
+
+                    returnClass = super.defineClass(
+                        name,
+                        classData,
+                        0,
+                        classData.length
+                    );
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                        String.format(
+                            "Failed to transform class \"%s\"!",
+                            name
+                        ),
+                        e
+                    );
+                } finally {
+                    try {
+                        inputStream.close();
+                    } catch(IOException e) {
+                        ReTweakResources.RETWEAK_LOGGER.warn(
+                            String.format(
+                                "Failed to close inputstream while transforming class \"%s\"!",
+                                name
+                            ),
+                            e
+                        );
+                    }
+                }
+            }
+        }
+
+        if (returnClass == null) {
+            returnClass = super.loadClass(
+                name,
+                resolve
+            );
+        }
+        return returnClass;
     }
 
     void addFile(final File file) {
