@@ -14,32 +14,32 @@ import java.io.File;
 public final class ReTweakResources {
 
     public static final File RETWEAK_DIRECTORY = new File(
-            "retweak"
+        "retweak"
     );
     public static final File RETWEAK_MODS_DIRECTORY = new File(
-            ReTweakResources.RETWEAK_DIRECTORY,
-            "mods"
+        ReTweakResources.RETWEAK_DIRECTORY,
+        "mods"
     );
     public static final File RETWEAK_PLAY_DIRECTORY = new File(
-            ReTweakResources.RETWEAK_DIRECTORY,
-            "play"
+        ReTweakResources.RETWEAK_DIRECTORY,
+        "play"
     );
     public static final File RETWEAK_CONFIG_DIRECTORY = new File(
-            ReTweakResources.RETWEAK_DIRECTORY,
-            "config"
+        ReTweakResources.RETWEAK_DIRECTORY,
+        "config"
     );
     public static final File RETWEAK_MAIN_CONFIG_DIRECTORY = new File(
-            LibraryResources.CONFIG_DIRECTORY,
-            "retweak"
+        LibraryResources.CONFIG_DIRECTORY,
+        "retweak"
     );
 
     public static final Logger RETWEAK_LOGGER = LoggerFactory.getLogger("ReTweak-Mod");
 
     public static final Boolean DEBUG = Boolean.valueOf(
-            System.getProperty(
-                    "org.slave.minecraft.retweak.debug",
-                    Boolean.FALSE.toString()
-            )
+        System.getProperty(
+            "org.slave.minecraft.retweak.debug",
+            Boolean.FALSE.toString()
+        )
     );
 
     private ReTweakResources() {

@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.mod;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -12,6 +13,7 @@ import org.slave.minecraft.retweak.loading.mod.vandy.ReTweakClassVisitor;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -19,6 +21,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Master on 4/26/2016 at 8:27 PM.
@@ -27,6 +30,24 @@ import java.util.Map;
  */
 public final class ReTweakClassLoader extends URLClassLoader {
 
+    private static final File FILE_RETWEAK_ASM_DIRECTORY = new File(
+        ReTweakResources.RETWEAK_DIRECTORY,
+        "asm"
+    );
+    private static final Set<String> SET_EXCLUSIONS = Sets.newHashSet(
+        "java.",
+        "sun.",
+        "org.lwjgl.",
+        "org.apache.logging.",
+        "net.minecraft.launchwrapper.",
+
+        "javax.",
+        "argo.",
+        "org.objectweb.asm.",
+        "com.google.common.",
+        "org.bouncycastle.",
+        "net.minecraft.launchwrapper.injector."
+    );
     private static Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap;
 
     private final LaunchClassLoader parent;
@@ -41,107 +62,6 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (this.parent == null || super.getParent() == null) {
             throw new NullPointerException(
                 "Parent class loader is null!"
-            );
-        }
-    }
-
-    @Override
-    protected Class<?> findClass(final String name) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) {
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                "FIND: {}",
-                name
-            );
-        }
-        //TODO
-        return super.findClass(name);
-    }
-
-    @Override
-    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        if (ReTweakResources.DEBUG) {
-            ReTweakResources.RETWEAK_LOGGER.debug(
-                "LOAD: {}, RESOLVE: {}",
-                name,
-                resolve
-            );
-        }
-
-        Class<?> returnClass = null;
-        if (gameVersion.getClasses().contains(name)) {
-            returnClass = gameVersion.getOverrideClass(name);
-        } else {
-            InputStream inputStream = super.getResourceAsStream(name);
-            if (inputStream != null) {
-                try {
-                    ClassReader classReader = new ClassReader(inputStream);
-
-                    ClassVisitor classVisitor = new ReTweakClassVisitor(
-                        Opcodes.ASM5,
-                        gameVersion,
-                        new ClassNode()
-                    );
-                    classReader.accept(
-                        classVisitor,
-                        0
-                    );
-
-                    ClassWriter classWriter = new ClassWriter(0);
-                    classReader.accept(
-                        classWriter,
-                        0
-                    );
-
-                    byte[] classData = classWriter.toByteArray();
-
-                    returnClass = super.defineClass(
-                        name,
-                        classData,
-                        0,
-                        classData.length
-                    );
-                } catch(IOException e) {
-                    ReTweakResources.RETWEAK_LOGGER.error(
-                        String.format(
-                            "Failed to transform class \"%s\"!",
-                            name
-                        ),
-                        e
-                    );
-                } finally {
-                    try {
-                        inputStream.close();
-                    } catch(IOException e) {
-                        ReTweakResources.RETWEAK_LOGGER.warn(
-                            String.format(
-                                "Failed to close inputstream while transforming class \"%s\"!",
-                                name
-                            ),
-                            e
-                        );
-                    }
-                }
-            }
-        }
-
-        if (returnClass == null) {
-            returnClass = super.loadClass(
-                name,
-                resolve
-            );
-        }
-        return returnClass;
-    }
-
-    void addFile(final File file) {
-        try {
-            super.addURL(
-                file.toURI().toURL()
-            );
-        } catch(MalformedURLException e) {
-            ReTweakResources.RETWEAK_LOGGER.error(
-                "Failed to add file \"" + file.getPath() + "\" to the class loader!",
-                e
             );
         }
     }
@@ -176,6 +96,161 @@ public final class ReTweakClassLoader extends URLClassLoader {
         ReTweakClassLoader.reTweakClassLoaderMap = ImmutableMap.copyOf(
             reTweakClassLoaderMap
         );
+    }
+
+    @Override
+    protected Class<?> findClass(final String name) throws ClassNotFoundException {
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                "FIND: {}",
+                name
+            );
+        }
+        //TODO
+        return super.findClass(name);
+    }
+
+    @Override
+    protected Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
+        if (ReTweakResources.DEBUG) {
+            ReTweakResources.RETWEAK_LOGGER.debug(
+                "LOAD: {}, RESOLVE: {}",
+                name,
+                resolve
+            );
+        }
+
+        for(String s1 : ReTweakClassLoader.SET_EXCLUSIONS) {
+            if (name.startsWith(s1)) {
+                return super.loadClass(
+                    name,
+                    resolve
+                );
+            }
+        }
+
+        Class<?> returnClass = null;
+        InputStream inputStream = super.getResourceAsStream(name.replace('.', '/') + ".class");
+        if (inputStream != null) {
+            try {
+                ClassReader classReader = new ClassReader(inputStream);
+
+                ClassVisitor classVisitor = new ReTweakClassVisitor(
+                    Opcodes.ASM5,
+                    gameVersion,
+                    new ClassNode()
+                );
+                classReader.accept(
+                    classVisitor,
+                    0
+                );
+
+                ClassWriter classWriter = new ClassWriter(0);
+                classReader.accept(
+                    classWriter,
+                    0
+                );
+
+                byte[] classData = classWriter.toByteArray();
+
+                if (ReTweakResources.DEBUG) {
+                    String outputDirName = name.replace('.', '/');
+                    if (outputDirName.lastIndexOf('/') != -1) {
+                        outputDirName = outputDirName.substring(
+                            0,
+                            outputDirName.lastIndexOf('/')
+                        );
+                    }
+                    File outputDir = new File(
+                        ReTweakClassLoader.FILE_RETWEAK_ASM_DIRECTORY,
+                        outputDirName
+                    );
+
+                    String outputName = name.replace('.', '/');
+                    if (outputName.lastIndexOf('/') != -1) {
+                        outputName = outputName.substring(
+                            outputName.lastIndexOf('/') + 1,
+                            outputName.length()
+                        );
+                    }
+
+                    File outputFile = new File(
+                        outputDir,
+                        outputName + ".class"
+                    );
+
+                    if (!outputFile.getParentFile().exists()) outputFile.getParentFile().mkdirs();
+
+                    FileOutputStream fileOutputStream = null;
+                    try {
+                        fileOutputStream = new FileOutputStream(outputFile);
+                        fileOutputStream.write(
+                            classData,
+                            0,
+                            classData.length
+                        );
+                    } catch(IOException e) {
+                        //Ignore
+                    } finally {
+                        if (fileOutputStream != null) {
+                            try {
+                                fileOutputStream.close();
+                            } catch(IOException e) {
+                                //Ignore
+                            }
+                        }
+                    }
+                }
+
+                returnClass = super.defineClass(
+                    name,
+                    classData,
+                    0,
+                    classData.length
+                );
+            } catch(IOException e) {
+                ReTweakResources.RETWEAK_LOGGER.error(
+                    String.format(
+                        "Failed to transform class \"%s\"!",
+                        name
+                    ),
+                    e
+                );
+            } finally {
+                try {
+                    inputStream.close();
+                } catch(IOException e) {
+                    ReTweakResources.RETWEAK_LOGGER.warn(
+                        String.format(
+                            "Failed to close inputstream while transforming class \"%s\"!",
+                            name
+                        ),
+                        e
+                    );
+                }
+            }
+        }
+
+        if (returnClass == null) {
+            returnClass = super.loadClass(
+                name,
+                resolve
+            );
+        }
+        return returnClass;
+    }
+
+    void addFile(final File file) {
+        try {
+            super.addURL(
+                file.toURI().toURL()
+            );
+        } catch(MalformedURLException e) {
+            ReTweakResources.RETWEAK_LOGGER.error(
+                "Failed to add file \"" + file.getPath() + "\" to the class loader!",
+                e
+            );
+        }
     }
 
 }

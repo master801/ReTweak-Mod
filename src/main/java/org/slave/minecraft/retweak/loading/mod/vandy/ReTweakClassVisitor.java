@@ -24,13 +24,32 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces) {
+        String newSuperName = null;
+        String[] newInterfaces;
+
+        Class<?> overrideSuperNameClass = gameVersion.getOverrideClass(superName);
+        if (overrideSuperNameClass != null) newSuperName = Type.getInternalName(overrideSuperNameClass);
+
+        newInterfaces = new String[interfaces.length];
+        for(int i = 0; i < newInterfaces.length; i++) {
+            String _interface = interfaces[i];
+            String newInterface = null;
+
+            Class<?> overrideInterfaceClass = gameVersion.getOverrideClass(_interface);
+            if (overrideInterfaceClass != null) newInterface = Type.getInternalName(overrideInterfaceClass);
+
+            if (newInterface == null) newInterface = _interface;
+
+            newInterfaces[i] = newInterface;
+        }
+
         super.visit(
             version,
             access,
             name,
             signature,
-            superName,
-            interfaces
+            newSuperName != null ? newSuperName : superName,
+            newInterfaces
         );
     }
 
@@ -63,15 +82,13 @@ public final class ReTweakClassVisitor extends ClassVisitor {
             );
         }
 
-        if (newDescType == null) newDescType = descType;
-
         return new ReTweakFieldVisitor(
             super.api,
             gameVersion,
             super.visitField(
                 access,
                 name,
-                newDescType.getDescriptor(),
+                newDescType != null ? newDescType.getDescriptor() : desc,
                 signature,
                 value
             )
@@ -81,7 +98,7 @@ public final class ReTweakClassVisitor extends ClassVisitor {
     @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         Type[] argDescTypes = Type.getArgumentTypes(desc);
-        Type[] newArgDescTypes = null;
+        Type[] newArgDescTypes;
 
         Type returnDescType = Type.getReturnType(desc);
         Type newReturnDescType = null;
@@ -91,6 +108,9 @@ public final class ReTweakClassVisitor extends ClassVisitor {
             Type argDescType = argDescTypes[i];
             Type newArgDescType = null;
 
+            Class<?> overrideClass = gameVersion.getOverrideClass(argDescType.getClassName());
+            if (overrideClass != null) newArgDescType = Type.getType(overrideClass);
+
             if (argDescType.getSort() == Type.ARRAY) {
                 //TODO
                 ReTweakResources.RETWEAK_LOGGER.error(
@@ -99,13 +119,23 @@ public final class ReTweakClassVisitor extends ClassVisitor {
                     name,
                     desc
                 );
-            } else {
-                Class<?> overrideClass = gameVersion.getOverrideClass(name);
             }
 
             if (newArgDescType == null) newArgDescType = argDescType;
 
             newArgDescTypes[i] = newArgDescType;
+        }
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(name);
+        if (overrideClass != null) newReturnDescType = Type.getType(overrideClass);
+
+        if (returnDescType.getSort() == Type.ARRAY) {
+            //TODO
+            ReTweakResources.RETWEAK_LOGGER.error(
+                "Failed to get the return desc type of method \"{} {}\"! Array is not supported!",
+                name,
+                desc
+            );
         }
 
         return new ReTweakMethodVisitor(
@@ -114,7 +144,10 @@ public final class ReTweakClassVisitor extends ClassVisitor {
             super.visitMethod(
                 access,
                 name,
-                desc,
+                Type.getMethodDescriptor(
+                    newReturnDescType != null ? newReturnDescType : returnDescType,
+                    newArgDescTypes
+                ),
                 signature,
                 exceptions
             )
