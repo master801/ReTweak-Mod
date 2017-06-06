@@ -3,7 +3,9 @@ package org.slave.minecraft.retweak.loading.mod.vandy;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Type;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
+import org.slave.minecraft.retweak.util.ReTweakResources;
 
 /**
  * Created by Master on 6/3/2017 at 9:53 AM.
@@ -52,21 +54,67 @@ public final class ReTweakMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitFieldInsn(final int opcode, final String owner, final String name, final String desc) {
+        String newOwner = null;
+        Type descType = Type.getType(desc);
+        Type newDescType = null;
+
+        Class<?> overrideOwnerClass = gameVersion.getOverrideClass(owner);
+        if (overrideOwnerClass != null) newOwner = Type.getInternalName(overrideOwnerClass);
+
+        if (descType.getSort() == Type.ARRAY) {
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                "Could not transform desc of field insn \"{} {} {}\"! Arrays not yet supported!",
+                owner,
+                name,
+                desc
+            );
+        }
+
+        Class<?> overrideDescClass = gameVersion.getOverrideClass(descType.getClassName());
+        if (overrideDescClass != null) {
+            newDescType = Type.getType(
+                Type.getInternalName(overrideDescClass)
+            );
+        }
+
         super.visitFieldInsn(
             opcode,
-            owner,
+            newOwner != null ? newOwner : owner,
             name,
-            desc
+            newDescType != null ? newDescType.getDescriptor() : desc
         );
     }
 
     @Override
     public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc, final boolean itf) {
+        String newOwner = null;
+        Type descType = Type.getType(desc);
+        Type newDescType = null;
+
+        Class<?> overrideOwnerClass = gameVersion.getOverrideClass(owner);
+        if (overrideOwnerClass != null) newOwner = Type.getInternalName(overrideOwnerClass);
+
+        if (descType.getSort() == Type.ARRAY) {
+            ReTweakResources.RETWEAK_LOGGER.warn(
+                "Could not transform desc of method insn \"{} {}{}\"! Arrays not yet supported!",
+                owner,
+                name,
+                desc
+            );
+        }
+
+        Class<?> overrideDescClass = gameVersion.getOverrideClass(desc);
+        if (overrideDescClass != null) {
+            newDescType = Type.getType(
+                descType.getClassName()
+            );
+        }
+
         super.visitMethodInsn(
             opcode,
-            owner,
+            newOwner != null ? newOwner : owner,
             name,
-            desc,
+            newDescType != null ? newDescType.getDescriptor() : desc,
             itf
         );
     }

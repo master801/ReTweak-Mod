@@ -7,7 +7,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.ClassNode;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.loading.mod.vandy.ReTweakClassVisitor;
 import org.slave.minecraft.retweak.util.ReTweakResources;
@@ -134,20 +133,14 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (inputStream != null) {
             try {
                 ClassReader classReader = new ClassReader(inputStream);
-
+                ClassWriter classWriter = new ClassWriter(0);
                 ClassVisitor classVisitor = new ReTweakClassVisitor(
                     Opcodes.ASM5,
                     gameVersion,
-                    new ClassNode()
+                    classWriter
                 );
                 classReader.accept(
                     classVisitor,
-                    0
-                );
-
-                ClassWriter classWriter = new ClassWriter(0);
-                classReader.accept(
-                    classWriter,
                     0
                 );
 

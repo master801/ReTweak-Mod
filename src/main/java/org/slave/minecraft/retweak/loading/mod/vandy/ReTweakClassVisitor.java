@@ -17,6 +17,11 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
     private final GameVersion gameVersion;
 
+    public ReTweakClassVisitor(final int api, final GameVersion gameVersion) {
+        super(api);
+        this.gameVersion = gameVersion;
+    }
+
     public ReTweakClassVisitor(final int api, final GameVersion gameVersion, final ClassVisitor cv) {
         super(api, cv);
         this.gameVersion = gameVersion;
@@ -50,6 +55,16 @@ public final class ReTweakClassVisitor extends ClassVisitor {
             signature,
             newSuperName != null ? newSuperName : superName,
             newInterfaces
+        );
+    }
+
+    @Override
+    public void visitInnerClass(final String name, final String outerName, final String innerName, final int access) {
+        super.visitInnerClass(
+            name,
+            outerName,
+            innerName,
+            access
         );
     }
 
