@@ -46,6 +46,7 @@ import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -349,7 +350,7 @@ public final class ReTweakModContainer implements ModContainer {
             );
 
             Method factoryMethod = gatherAnnotations(modClass);
-            if (!modLanguage.equals("java")) {
+            if (!Optional.ofNullable(modLanguage).orElse(ReTweakModContainer.MOD_LANGUAGE_JAVA).equals(ReTweakModContainer.MOD_LANGUAGE_JAVA)) {
                 ReTweakResources.RETWEAK_LOGGER.warn(
                     "Custom languages are not yet supported!"
                 );

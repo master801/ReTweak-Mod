@@ -2,6 +2,7 @@ package org.slave.minecraft.retweak.loading.mod.vandy;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.Type;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 /**
@@ -20,11 +21,17 @@ public final class ReTweakFieldVisitor extends FieldVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
+        Type descType = Type.getType(desc);
+        Type newDescType = null;
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(descType.getClassName());
+        if (overrideClass != null) newDescType = Type.getType(overrideClass);
+
         return new ReTweakAnnotationVisitor(
             super.api,
             gameVersion,
             super.visitAnnotation(
-                desc,
+                newDescType != null ? newDescType.getDescriptor() : desc,
                 visible
             )
         );

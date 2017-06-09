@@ -1,12 +1,14 @@
 package org.slave.minecraft.retweak.loading.mod.vandy;
 
+import com.google.common.base.Joiner;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
-import org.slave.minecraft.retweak.util.ReTweakResources;
+
+import java.util.Arrays;
 
 /**
  * Created by Master on 6/3/2017 at 9:42 AM.
@@ -16,11 +18,6 @@ import org.slave.minecraft.retweak.util.ReTweakResources;
 public final class ReTweakClassVisitor extends ClassVisitor {
 
     private final GameVersion gameVersion;
-
-    public ReTweakClassVisitor(final int api, final GameVersion gameVersion) {
-        super(api);
-        this.gameVersion = gameVersion;
-    }
 
     public ReTweakClassVisitor(final int api, final GameVersion gameVersion, final ClassVisitor cv) {
         super(api, cv);
@@ -70,11 +67,17 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
+        Type descType = Type.getType(desc);
+        Type newDescType = null;
+
+        Class<?> overrideClass = gameVersion.getOverrideClass(descType.getClassName());
+        if (overrideClass != null) newDescType = Type.getType(overrideClass);
+
         return new ReTweakAnnotationVisitor(
             super.api,
             gameVersion,
             super.visitAnnotation(
-                desc,
+                newDescType != null ? newDescType.getDescriptor() : desc,
                 visible
             )
         );
@@ -85,15 +88,22 @@ public final class ReTweakClassVisitor extends ClassVisitor {
         Type descType = Type.getType(desc);
         Type newDescType = null;
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(descType.getClassName());
-        if (overrideClass != null) newDescType = Type.getType(overrideClass);
+        Class<?> descOverrideClass = gameVersion.getOverrideClass(descType.getClassName());
+        if (descOverrideClass != null) newDescType = Type.getType(descOverrideClass);
 
         if (descType.getSort() == Type.ARRAY) {
-            //TODO
-            ReTweakResources.RETWEAK_LOGGER.error(
-                "Failed to get the desc type of field \"{} {}\"! Array is not supported!",
-                name,
-                desc
+            Type elementDescType = descType.getElementType();
+
+            descOverrideClass = gameVersion.getOverrideClass(elementDescType.getClassName());
+
+            Object[] dimensions = new Object[descType.getDimensions()];
+            Arrays.fill(
+                dimensions,
+                '['
+            );
+
+            newDescType = Type.getType(
+                Joiner.on("").join(dimensions) + (descOverrideClass != null ? Type.getDescriptor(descOverrideClass) : elementDescType.getDescriptor())
             );
         }
 
@@ -120,36 +130,48 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
         newArgDescTypes = new Type[argDescTypes.length];
         for(int i = 0; i < argDescTypes.length; i++) {
-            Type argDescType = argDescTypes[i];
-            Type newArgDescType = null;
+            Type argumentDescType = argDescTypes[i];
+            Type newArgumentDescType = null;
 
-            Class<?> overrideClass = gameVersion.getOverrideClass(argDescType.getClassName());
-            if (overrideClass != null) newArgDescType = Type.getType(overrideClass);
+            Class<?> argumentDescOverrideClass = gameVersion.getOverrideClass(argumentDescType.getClassName());
+            if (argumentDescOverrideClass != null) newArgumentDescType = Type.getType(argumentDescOverrideClass);
 
-            if (argDescType.getSort() == Type.ARRAY) {
-                //TODO
-                ReTweakResources.RETWEAK_LOGGER.error(
-                    "Failed to get the desc type of method arg [{}] \"{} {}\"! Array is not supported!",
-                    i,
-                    name,
-                    desc
+            if (argumentDescType.getSort() == Type.ARRAY) {
+                Type elementArgumentDescType = argumentDescType.getElementType();
+
+                argumentDescOverrideClass = gameVersion.getOverrideClass(elementArgumentDescType.getClassName());
+
+                Object[] dimensions = new Object[argumentDescType.getDimensions()];
+                Arrays.fill(
+                    dimensions,
+                    '['
+                );
+
+                newArgumentDescType = Type.getType(
+                    Joiner.on("").join(dimensions) + (argumentDescOverrideClass != null ? Type.getDescriptor(argumentDescOverrideClass) : elementArgumentDescType.getDescriptor())
                 );
             }
 
-            if (newArgDescType == null) newArgDescType = argDescType;
-
-            newArgDescTypes[i] = newArgDescType;
+            if (newArgumentDescType == null) newArgumentDescType = argumentDescType;
+            newArgDescTypes[i] = newArgumentDescType;
         }
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(name);
-        if (overrideClass != null) newReturnDescType = Type.getType(overrideClass);
+        Class<?> returnDescOverrideClass = gameVersion.getOverrideClass(returnDescType.getClassName());
+        if (returnDescOverrideClass != null) newReturnDescType = Type.getType(returnDescOverrideClass);
 
         if (returnDescType.getSort() == Type.ARRAY) {
-            //TODO
-            ReTweakResources.RETWEAK_LOGGER.error(
-                "Failed to get the return desc type of method \"{} {}\"! Array is not supported!",
-                name,
-                desc
+            Type elementReturnDescType = returnDescType.getElementType();
+
+            returnDescOverrideClass = gameVersion.getOverrideClass(elementReturnDescType.getClassName());
+
+            Object[] dimensions = new Object[returnDescType.getSort()];
+            Arrays.fill(
+                dimensions,
+                '['
+            );
+
+            newReturnDescType = Type.getType(
+                Joiner.on("").join(dimensions) + (returnDescOverrideClass != null ? Type.getDescriptor(returnDescOverrideClass) : elementReturnDescType.getDescriptor())
             );
         }
 

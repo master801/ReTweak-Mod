@@ -15,9 +15,17 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        classpath 'net.sf.proguard:proguard-gradle:5.2.1'
-        classpath group: 'io.franzbecker', name: 'gradle-lombok', version: '1.8'
+        classpath(
+                'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+        )
+        classpath(
+                'net.sf.proguard:proguard-gradle:5.2.1'
+        )
+        classpath(
+                group: 'io.franzbecker',
+                name: 'gradle-lombok',
+                version: '1.8'
+        )
     }
 }
 
@@ -48,8 +56,16 @@ jar {
 }
 
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: project.properties['slf4j-version']
-    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: project.properties['log4j-version']
+    compile(
+            group: 'org.slf4j',
+            name: 'slf4j-api',
+            version: project.properties['slf4j-version']
+    )
+    compile(
+            group: 'org.apache.logging.log4j',
+            name: 'log4j-slf4j-impl',
+            version: project.properties['log4j-version']
+    )
 
     compile fileTree(
             dir: 'libs',

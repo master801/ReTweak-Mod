@@ -11,8 +11,8 @@ import java.io.File;
  * @author Master
  */
 @Deobfuscated(
-        name = "Configuration",
-        _package = @Package("net.minecraftforge.common.config")
+    name = "Configuration",
+    _package = @Package("net.minecraftforge.common.config")
 )
 public class Configuration extends net.minecraftforge.common.config.Configuration {
 
