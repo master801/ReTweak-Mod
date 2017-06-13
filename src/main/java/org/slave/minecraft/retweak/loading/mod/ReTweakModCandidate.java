@@ -100,7 +100,12 @@ public final class ReTweakModCandidate extends ModCandidate {
                 case ANNOTATION:
                     if (tableClass.getAnnotations() != null) {
                         for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
-                            if (asmAnnotation.getDesc().equals(gameVersion.getModType().getValue())) {
+                            String className = gameVersion.getModType().getValue().toString();
+                            className = className.substring(
+                                className.indexOf(' ') + 1
+                            );
+                            className = "L" + className.replace('.', '/') + ";";
+                            if (asmAnnotation.getDesc().equals(className)) {
                                 modContainer = new ReTweakModContainer(
                                     gameVersion,
                                     tableClass.getName().replace('/', '.'),

@@ -1,6 +1,5 @@
 package org.slave.minecraft.retweak.loading.mod;
 
-import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ArrayListMultimap;
@@ -9,7 +8,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.LoadController;
@@ -20,7 +18,6 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.ProxyInjector;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.discovery.ModCandidate;
@@ -48,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * <p>
@@ -376,12 +374,15 @@ public final class ReTweakModContainer implements ModContainer {
                 event.getASMHarvestedData()
             );
             */
+
+            /*//TODO
             ProxyInjector.inject(
                 this,
                 fmlConstructionEvent.getASMHarvestedData(),
                 FMLCommonHandler.instance().getSide(),
                 getLanguageAdapter()
             );
+            */
             processFieldAnnotations(
                 fmlConstructionEvent.getASMHarvestedData()
             );
@@ -435,7 +436,7 @@ public final class ReTweakModContainer implements ModContainer {
         return languageAdapter;
     }
 
-    private void processFieldAnnotations(ASMDataTable asmDataTable) throws Exception {
+    private void processFieldAnnotations(final ASMDataTable asmDataTable) throws Exception {
         SetMultimap<String, ASMData> annotations = asmDataTable.getAnnotationsFor(this);
 
         //TODO
@@ -525,11 +526,11 @@ public final class ReTweakModContainer implements ModContainer {
     }
 
     private Method gatherAnnotations(final Class<?> clazz) throws Exception {
-        //TODO
         Method factoryMethod = null;
         for(Method method : clazz.getDeclaredMethods()) {
             for(Annotation annotation : method.getAnnotations()) {
-                if (annotation.annotationType().equals(Mod.EventHandler.class)) {
+                Class<? extends Annotation> annotationType = annotation.annotationType();
+                if (annotationType == Mod.EventHandler.class) {
                     if (method.getParameterTypes().length == 1 && FMLEvent.class.isAssignableFrom(method.getParameterTypes()[0])) {
                         method.setAccessible(true);
                         eventMethods.put(

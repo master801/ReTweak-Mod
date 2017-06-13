@@ -47,6 +47,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
         "org.bouncycastle.",
         "net.minecraft.launchwrapper.injector."
     );
+
+    private static final Set<String> SET_CLASSLOADER_PARENT_EXCLUSIONS = Sets.newHashSet(
+        "cpw.mods.fml.",
+        "net.minecraftforge."
+    );
+
     private static Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap;
 
     private final LaunchClassLoader parent;
@@ -126,6 +132,11 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     resolve
                 );
             }
+        }
+
+
+        for(String prefix : ReTweakClassLoader.SET_CLASSLOADER_PARENT_EXCLUSIONS) {
+            if (name.startsWith(prefix) && gameVersion.getOverrideClass(name) == null) return super.getParent().loadClass(name);
         }
 
         Class<?> returnClass = null;

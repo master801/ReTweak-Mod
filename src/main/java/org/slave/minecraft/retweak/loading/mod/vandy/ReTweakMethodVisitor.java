@@ -164,7 +164,7 @@ public final class ReTweakMethodVisitor extends MethodVisitor {
 
             returnDescOverrideClass = gameVersion.getOverrideClass(elementReturnDescType.getClassName());
 
-            Object[] dimensions = new Object[returnDescType.getSort()];
+            Object[] dimensions = new Object[returnDescType.getDimensions()];
             Arrays.fill(
                 dimensions,
                 '['

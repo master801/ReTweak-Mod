@@ -1,6 +1,6 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
-import java.util.Arrays;
+import com.google.common.collect.Lists;
 
 /**
  * Created by Master on 4/19/2017 at 7:35 PM.
@@ -10,6 +10,8 @@ import java.util.Arrays;
 final class ClassHolder_1_5_2 {
 
     static final ClassHolder CLASS_HOLDER_1_5_2 = new ClassHolder(
+        Lists.newArrayList()
+        /*
         Arrays.asList(
             //<editor-fold desc="Minecraft Classes">
             "a",
@@ -1571,6 +1573,7 @@ final class ClassHolder_1_5_2 {
         Arrays.asList(
             //TODO
         )
+        */
     );
 
     private ClassHolder_1_5_2() {

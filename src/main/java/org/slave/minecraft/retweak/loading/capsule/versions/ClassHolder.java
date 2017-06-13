@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
-import java.util.Collections;
+import org.slave.lib.util.Bulk;
+
 import java.util.List;
 
 /**
@@ -10,6 +11,17 @@ import java.util.List;
  */
 final class ClassHolder {
 
+    private final List<Bulk<String, Class<?>>> override;
+
+    ClassHolder(final List<Bulk<String, Class<?>>> override) {
+        this.override = override;
+    }
+
+    public List<Bulk<String, Class<?>>> getOverrideClasses() {
+        return override;
+    }
+
+    /*
     private final List<String> classes;
     private final List<Class<?>> overrideClassList;
 
@@ -29,5 +41,6 @@ final class ClassHolder {
     public List<Class<?>> getOverrideClassList() {
         return overrideClassList;
     }
+    */
 
 }

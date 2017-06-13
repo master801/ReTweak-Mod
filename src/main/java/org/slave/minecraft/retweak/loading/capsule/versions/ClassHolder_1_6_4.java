@@ -1,5 +1,8 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
+import com.google.common.collect.Lists;
+import net.minecraftforge.common.config.Property;
+import org.slave.lib.util.Bulk;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aah;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.amw;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.aoe;
@@ -11,6 +14,8 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ms;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.net.minecraftforge.common.Configuration;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ni;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.of;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.uf;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wh;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.wp;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ww;
@@ -21,8 +26,6 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ye;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yp;
 
-import java.util.Arrays;
-
 /**
  * Created by Master on 4/19/2017 at 7:37 PM.
  *
@@ -31,6 +34,105 @@ import java.util.Arrays;
 final class ClassHolder_1_6_4 {
 
     static final ClassHolder CLASS_HOLDER_1_6_4 = new ClassHolder(
+        Lists.newArrayList(
+            //<editor-fold desc="Minecraft">
+            new Bulk<>(
+                "aah",
+                aah.class
+            ),
+            new Bulk<>(
+                "amw",
+                amw.class
+            ),
+            new Bulk<>(
+                "aoe",
+                aoe.class
+            ),
+            new Bulk<>(
+                "aqz",
+                aqz.class
+            ),
+            new Bulk<>(
+                "ark",
+                ark.class
+            ),
+            new Bulk<>(
+                "bje",
+                bje.class
+            ),
+            new Bulk<>(
+                "by",
+                by.class
+            ),
+            new Bulk<>(
+                "ms",
+                ms.class
+            ),
+            new Bulk<>(
+                "ni",
+                ni.class
+            ),
+            new Bulk<>(
+                "of",
+                of.class
+            ),
+            new Bulk<>(
+                "uf",
+                uf.class
+            ),
+            new Bulk<>(
+                "wh",
+                wh.class
+            ),
+            new Bulk<>(
+                "wp",
+                wp.class
+            ),
+            new Bulk<>(
+                "ww",
+                ww.class
+            ),
+            new Bulk<>(
+                "xo",
+                xo.class
+            ),
+            new Bulk<>(
+                "xv",
+                xv.class
+            ),
+            new Bulk<>(
+                "xx",
+                xx.class
+            ),
+            new Bulk<>(
+                "yc",
+                yc.class
+            ),
+            new Bulk<>(
+                "ye",
+                ye.class
+            ),
+            new Bulk<>(
+                "yp",
+                yp.class
+            ),
+            //</editor-fold>
+            //<editor-fold desc="Override">
+            new Bulk<>(
+                "net.minecraftforge.common.Configuration",
+                Configuration.class
+            ),
+            new Bulk<>(
+                "net.minecraftforge.common.Property",
+                Property.class
+            ),
+            new Bulk<>(
+                "cpw.mods.fml.common.network.NetworkMod",
+                NetworkMod.class
+            )
+            //</editor-fold>
+        )
+        /*
         Arrays.asList(
             //<editor-fold desc="Start Minecraft classes">
             "a",
@@ -1609,6 +1711,7 @@ final class ClassHolder_1_6_4 {
 
             //<editor-fold desc="Start override classes">
             "net.minecraftforge.common.Configuration",
+            "net.minecraftforge.common.Property",
             "cpw.mods.fml.common.network.NetworkMod"
             //</editor-fold>
         ),
@@ -1639,6 +1742,7 @@ final class ClassHolder_1_6_4 {
             NetworkMod.class
             //</editor-fold>
         )
+        */
     );
 
     private ClassHolder_1_6_4() {
