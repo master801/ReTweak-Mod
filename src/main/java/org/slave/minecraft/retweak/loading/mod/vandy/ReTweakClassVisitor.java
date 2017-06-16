@@ -20,7 +20,10 @@ public final class ReTweakClassVisitor extends ClassVisitor {
     private final GameVersion gameVersion;
 
     public ReTweakClassVisitor(final int api, final GameVersion gameVersion, final ClassVisitor cv) {
-        super(api, cv);
+        super(
+            api,
+            cv
+        );
         this.gameVersion = gameVersion;
     }
 

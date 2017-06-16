@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  * @author Master
  */
 @Target(ElementType.TYPE)
-@Retention(RetentionPolicy.SOURCE)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface Interfaces {
 
     Class<?>[] value();

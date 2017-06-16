@@ -1,6 +1,9 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.net.minecraftforge.common;
 
 import net.minecraftforge.common.config.Property;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
 
 import java.io.File;
 
@@ -9,6 +12,14 @@ import java.io.File;
  *
  * @author Master
  */
+@Obfuscated(
+    name = "Configuration",
+    _package = @Package("net.minecraftforge.common")
+)
+@Deobfuscated(
+    name = "Configuration",
+    _package = @Package("net.minecraftforge.common.config")
+)
 public class Configuration extends net.minecraftforge.common.config.Configuration {
 
     private static final String CATEGORY_BLOCKS = "blocks", CATEGORY_ITEMS = "items";

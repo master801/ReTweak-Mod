@@ -19,7 +19,10 @@ public final class ReTweakMethodVisitor extends MethodVisitor {
     private final GameVersion gameVersion;
 
     public ReTweakMethodVisitor(final int api, final GameVersion gameVersion, final MethodVisitor mv) {
-        super(api, mv);
+        super(
+            api,
+            mv
+        );
         this.gameVersion = gameVersion;
     }
 
@@ -88,7 +91,9 @@ public final class ReTweakMethodVisitor extends MethodVisitor {
         Type newDescType = null;
 
         Class<?> overrideOwnerClass = gameVersion.getOverrideClass(owner);
-        if (overrideOwnerClass != null) newOwner = Type.getInternalName(overrideOwnerClass);
+        if (overrideOwnerClass != null) {
+            newOwner = Type.getInternalName(overrideOwnerClass);
+        }
 
         if (descType.getSort() == Type.ARRAY) {
             Type elementDescType = descType.getElementType();

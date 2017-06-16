@@ -15,7 +15,10 @@ public final class ReTweakFieldVisitor extends FieldVisitor {
     private final GameVersion gameVersion;
 
     public ReTweakFieldVisitor(final int api, final GameVersion gameVersion, final FieldVisitor fv) {
-        super(api, fv);
+        super(
+            api,
+            fv
+        );
         this.gameVersion = gameVersion;
     }
 

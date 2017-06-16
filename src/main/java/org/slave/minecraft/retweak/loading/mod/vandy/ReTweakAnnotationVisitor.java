@@ -13,28 +13,43 @@ public final class ReTweakAnnotationVisitor extends AnnotationVisitor {
     private final GameVersion gameVersion;
 
     public ReTweakAnnotationVisitor(final int api, final GameVersion gameVersion, final AnnotationVisitor av) {
-        super(api, av);
+        super(
+            api,
+            av
+        );
         this.gameVersion = gameVersion;
     }
 
     @Override
     public void visit(final String name, final Object value) {
-        super.visit(name, value);
+        super.visit(
+            name,
+            value
+        );
     }
 
     @Override
     public void visitEnum(final String name, final String desc, final String value) {
-        super.visitEnum(name, desc, value);
+        super.visitEnum(
+            name,
+            desc,
+            value
+        );
     }
 
     @Override
     public AnnotationVisitor visitAnnotation(final String name, final String desc) {
-        return super.visitAnnotation(name, desc);
+        return super.visitAnnotation(
+            name,
+            desc
+        );
     }
 
     @Override
     public AnnotationVisitor visitArray(final String name) {
-        return super.visitArray(name);
+        return super.visitArray(
+            name
+        );
     }
 
 }

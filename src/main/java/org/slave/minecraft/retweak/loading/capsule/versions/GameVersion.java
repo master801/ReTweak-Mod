@@ -4,6 +4,7 @@ import cpw.mods.fml.common.Mod;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.lib.util.Bulk;
 import org.slave.minecraft.retweak.loading.capsule.Type;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.ClassEntry;
 
 import java.util.Map.Entry;
 
@@ -16,8 +17,8 @@ public enum GameVersion {
 
     V_1_4_7(
         "1.4.7",
-        ClassHolder_1_4_7.CLASS_HOLDER_1_4_7,
-        true,
+        new ClassHolderWrapper_1_4_7(),
+        Boolean.TRUE,
         new Bulk<>(
             Type.ANNOTATION,
             Mod.class
@@ -26,8 +27,8 @@ public enum GameVersion {
 
     V_1_5_2(
         "1.5.2",
-        ClassHolder_1_5_2.CLASS_HOLDER_1_5_2,
-        true,
+        new ClassHolderWrapper_1_5_2(),
+        Boolean.TRUE,
         new Bulk<>(
             Type.ANNOTATION,
             Mod.class
@@ -36,8 +37,8 @@ public enum GameVersion {
 
     V_1_6_4(
         "1.6.4",
-        ClassHolder_1_6_4.CLASS_HOLDER_1_6_4,
-        false,
+        new ClassHolderWrapper_1_6_4(),
+        Boolean.FALSE,
         new Bulk<>(
             Type.ANNOTATION,
             Mod.class
@@ -47,14 +48,14 @@ public enum GameVersion {
     private static final String INTERPRETER_PACKAGE_PREFIX = "org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.";
 
     private final String version;
-    private final ClassHolder classHolder;
+    private final ClassHolderWrapper classHolderWrapper;
     private final String interpreterPackagePrefix;
     private final boolean hasResources;
     private final Entry<Type, ?> modType;
 
-    GameVersion(final String version, final ClassHolder classHolder, final boolean hasResources, final Bulk<Type, ?> modType) {
+    GameVersion(final String version, final ClassHolderWrapper classHolderWrapper, final boolean hasResources, final Bulk<Type, ?> modType) {
         this.version = version;
-        this.classHolder = classHolder;
+        this.classHolderWrapper = classHolderWrapper;
         interpreterPackagePrefix = GameVersion.INTERPRETER_PACKAGE_PREFIX + "_" + version.replace('.', '_') + ".";
         this.hasResources = hasResources;
         this.modType = modType;
@@ -76,9 +77,9 @@ public enum GameVersion {
     */
 
     public Class<?> getOverrideClass(final String className) {
-        for(Bulk<String, Class<?>> overrideClass : classHolder.getOverrideClasses()) {
-            if (overrideClass.getKey().equals(className.replace('/', '.'))) {
-                return overrideClass.getValue();
+        for(ClassEntry overrideClass : classHolderWrapper.getClassHolder().getOverrideClasses()) {
+            if (overrideClass.getFrom().equals(className.replace('/', '.'))) {
+                return overrideClass.getTo();
             }
         }
         /*

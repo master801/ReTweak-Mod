@@ -10,6 +10,7 @@ import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.lib.resources.ASMAnnotation;
 import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.ASMTable.TableClass;
+import org.slave.lib.resources.ASMTable.TableClass.TableField;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
@@ -127,6 +128,22 @@ public final class ReTweakModCandidate extends ModCandidate {
                         tableClass.getName(),//Same as class name
                         asmAnnotation.getValues()
                     );
+                }
+            }
+
+            if (tableClass.getFields() != null) {
+                for(TableField tableField : tableClass.getFields()) {
+                    if (tableField.getAnnotations() != null) {
+                        for(ASMAnnotation asmAnnotation : tableField.getAnnotations()) {
+                            asmDataTable.addASMData(//I don't know what I'm doing
+                                this,
+                                asmAnnotation.getDesc(),
+                                tableClass.getName(),
+                                tableClass.getName(),
+                                asmAnnotation.getValues()
+                            );
+                        }
+                    }
                 }
             }
 

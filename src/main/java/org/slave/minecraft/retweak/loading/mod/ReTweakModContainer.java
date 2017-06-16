@@ -8,6 +8,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.LoadController;
@@ -18,6 +19,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.ProxyInjector;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.discovery.ModCandidate;
@@ -375,6 +377,13 @@ public final class ReTweakModContainer implements ModContainer {
             );
             */
 
+            ProxyInjector.inject(
+                this,
+                fmlConstructionEvent.getASMHarvestedData(),
+                FMLCommonHandler.instance().getSide(),
+                getLanguageAdapter()
+            );
+
             /*//TODO
             ProxyInjector.inject(
                 this,
@@ -604,7 +613,7 @@ public final class ReTweakModContainer implements ModContainer {
                 );
             }
         }
-        if (languageAdapter == null) languageAdapter = new ILanguageAdapter.JavaAdapter();
+        if (languageAdapter == null) languageAdapter = new ILanguageAdapter.JavaAdapter();//
         return languageAdapter;
     }
 

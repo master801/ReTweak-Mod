@@ -21,6 +21,7 @@ import java.net.URLClassLoader;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Created by Master on 4/26/2016 at 8:27 PM.
@@ -48,9 +49,15 @@ public final class ReTweakClassLoader extends URLClassLoader {
         "net.minecraft.launchwrapper.injector."
     );
 
-    private static final Set<String> SET_CLASSLOADER_PARENT_EXCLUSIONS = Sets.newHashSet(
-        "cpw.mods.fml.",
-        "net.minecraftforge."
+    private static final Set<Pattern> SET_CLASSLOADER_PARENT_EXCLUSIONS = Sets.newHashSet(
+        Pattern.compile(
+            "^(cpw\\.mods\\.fml\\.).+",
+            Pattern.MULTILINE
+        ),
+        Pattern.compile(
+            "^(net\\.minecraftforge\\.).+",
+            Pattern.MULTILINE
+        )
     );
 
     private static Map<GameVersion, ReTweakClassLoader> reTweakClassLoaderMap;
@@ -135,8 +142,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
         }
 
 
-        for(String prefix : ReTweakClassLoader.SET_CLASSLOADER_PARENT_EXCLUSIONS) {
-            if (name.startsWith(prefix) && gameVersion.getOverrideClass(name) == null) return super.getParent().loadClass(name);
+        for(Pattern pattern : ReTweakClassLoader.SET_CLASSLOADER_PARENT_EXCLUSIONS) {
+            if (pattern.matcher(name).matches() && gameVersion.getOverrideClass(name) == null) return super.getParent().loadClass(name);
         }
 
         Class<?> returnClass = null;
