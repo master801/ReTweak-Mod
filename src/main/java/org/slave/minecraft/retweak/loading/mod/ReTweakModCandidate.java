@@ -123,9 +123,9 @@ public final class ReTweakModCandidate extends ModCandidate {
                 for(ASMAnnotation asmAnnotation : tableClass.getAnnotations()) {
                     asmDataTable.addASMData(//I don't understand the point of adding the asm data of annotations, but we'll do it anyway
                         this,
-                        asmAnnotation.getDesc(),
-                        tableClass.getName(),
-                        tableClass.getName(),//Same as class name
+                        asmAnnotation.getDesc().substring(1, asmAnnotation.getDesc().length() - 1).replace('/', '.'),
+                        tableClass.getName().replace('/', '.'),
+                        tableClass.getName().replace('/', '.'),//Same as class name
                         asmAnnotation.getValues()
                     );
                 }
@@ -137,9 +137,9 @@ public final class ReTweakModCandidate extends ModCandidate {
                         for(ASMAnnotation asmAnnotation : tableField.getAnnotations()) {
                             asmDataTable.addASMData(//I don't know what I'm doing
                                 this,
-                                asmAnnotation.getDesc(),
-                                tableClass.getName(),
-                                tableClass.getName(),
+                                asmAnnotation.getDesc().substring(1, asmAnnotation.getDesc().length() - 1).replace('/', '.'),
+                                tableClass.getName().replace('/', '.'),
+                                tableField.getName(),
                                 asmAnnotation.getValues()
                             );
                         }

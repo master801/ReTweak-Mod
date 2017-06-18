@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "wp",
-        _package = @Package("")
+    name = "wp",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "ItemBow",
-        _package = @Package("net.minecraft.item")
+    name = "ItemBow",
+    _package = @Package("net.minecraft.item")
 )
 public class wp extends yc {
 }

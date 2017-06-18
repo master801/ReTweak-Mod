@@ -1,7 +1,7 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
 import com.google.common.collect.ImmutableList;
-import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.ClassEntry;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassInfoBuilder.ClassInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +13,12 @@ import java.util.List;
  */
 final class ClassHolderWrapper_1_5_2 extends ClassHolderWrapper {
 
+    static final ClassHolderWrapper INSTANCE = new ClassHolderWrapper_1_5_2();
+
     private final ClassHolder classHolder;
 
-    ClassHolderWrapper_1_5_2() {
-        List<ClassEntry> list = new ArrayList<>();
+    private ClassHolderWrapper_1_5_2() {
+        List<ClassInfo> list = new ArrayList<>();
         /*
         Arrays.asList(
             //<editor-fold desc="Minecraft Classes">

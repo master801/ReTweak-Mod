@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "ye",
-        _package = @Package("")
+    name = "ye",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "ItemStack",
-        _package = @Package("net.minecraft.item")
+    name = "ItemStack",
+    _package = @Package("net.minecraft.item")
 )
 public class ye {
 

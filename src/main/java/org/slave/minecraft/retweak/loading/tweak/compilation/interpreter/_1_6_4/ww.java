@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "ww",
-        _package = @Package("")
+    name = "ww",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "CreativeTabs",
-        _package = @Package("net.minecraft.creativetab")
+    name = "CreativeTabs",
+    _package = @Package("net.minecraft.creativetab")
 )
 public class ww {
 

@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "ni",
-        _package = @Package("")
+    name = "ni",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "Potion",
-        _package = @Package("net.minecraft.potion")
+    name = "Potion",
+    _package = @Package("net.minecraft.potion")
 )
-public class ni {
+public class ni {//TODO
 }

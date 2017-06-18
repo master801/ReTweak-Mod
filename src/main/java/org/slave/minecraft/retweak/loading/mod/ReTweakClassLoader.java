@@ -66,7 +66,10 @@ public final class ReTweakClassLoader extends URLClassLoader {
     private final GameVersion gameVersion;
 
     private ReTweakClassLoader(final LaunchClassLoader parent, final GameVersion gameVersion) {
-        super(new URL[0], parent);
+        super(
+            new URL[0],
+            parent
+        );
         final Object _RETWEAK_INTERNAL_USAGE_ONLY_ = null;
 
         this.parent = parent;
@@ -143,7 +146,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
 
         for(Pattern pattern : ReTweakClassLoader.SET_CLASSLOADER_PARENT_EXCLUSIONS) {
-            if (pattern.matcher(name).matches() && gameVersion.getOverrideClass(name) == null) return super.getParent().loadClass(name);
+            if (pattern.matcher(name).matches() && gameVersion.getClassInfo(name) == null) return super.getParent().loadClass(name);
         }
 
         Class<?> returnClass = null;

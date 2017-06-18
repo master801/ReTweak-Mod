@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "of",
-        _package = @Package("")
+    name = "of",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "EntityLivingBase",
-        _package = @Package("net.minecraft.entity")
+    name = "EntityLivingBase",
+    _package = @Package("net.minecraft.entity")
 )
 public class of {
 }

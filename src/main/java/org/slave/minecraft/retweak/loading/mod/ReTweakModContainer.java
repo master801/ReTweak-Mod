@@ -19,7 +19,7 @@ import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.Mod.Metadata;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
-import cpw.mods.fml.common.ProxyInjector;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.discovery.ModCandidate;
@@ -30,8 +30,10 @@ import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
+import cpw.mods.fml.relauncher.Side;
 import org.apache.logging.log4j.Level;
 import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakResources;
 
@@ -377,14 +379,7 @@ public final class ReTweakModContainer implements ModContainer {
             );
             */
 
-            ProxyInjector.inject(
-                this,
-                fmlConstructionEvent.getASMHarvestedData(),
-                FMLCommonHandler.instance().getSide(),
-                getLanguageAdapter()
-            );
-
-            /*//TODO
+            /*
             ProxyInjector.inject(
                 this,
                 fmlConstructionEvent.getASMHarvestedData(),
@@ -392,6 +387,14 @@ public final class ReTweakModContainer implements ModContainer {
                 getLanguageAdapter()
             );
             */
+
+            ReTweakModContainer.injectProxy(
+                this,
+                fmlConstructionEvent.getASMHarvestedData(),
+                FMLCommonHandler.instance().getSide(),
+                getLanguageAdapter()
+            );
+
             processFieldAnnotations(
                 fmlConstructionEvent.getASMHarvestedData()
             );
@@ -465,7 +468,7 @@ public final class ReTweakModContainer implements ModContainer {
         String[] annName = annotationClassName.split("\\.");
         String annotationName = annName[annName.length - 1];
         for(ASMData targets : annotations.get(annotationClassName)) {
-            String targetMod = (String) targets.getAnnotationInfo().get("value");
+            String targetMod = (String)targets.getAnnotationInfo().get("value");
             Field field = null;
             Object injectedMod = null;
             ModContainer modContainer = this;
@@ -615,6 +618,79 @@ public final class ReTweakModContainer implements ModContainer {
         }
         if (languageAdapter == null) languageAdapter = new ILanguageAdapter.JavaAdapter();//
         return languageAdapter;
+    }
+
+
+    /**
+     * {@link cpw.mods.fml.common.ProxyInjector#inject(cpw.mods.fml.common.ModContainer, cpw.mods.fml.common.discovery.ASMDataTable, cpw.mods.fml.relauncher.Side, cpw.mods.fml.common.ILanguageAdapter)}
+     */
+    private static void injectProxy(final ReTweakModContainer reTweakModContainer, final ASMDataTable asmHarvestedData, final Side side, final ILanguageAdapter languageAdapter) {
+        ClassLoader retweakClassLoader = ReTweakClassLoader.getReTweakClassLoader(reTweakModContainer.getGameVersion());
+        Set<ASMData> asmDataSet = asmHarvestedData.getAnnotationsFor(reTweakModContainer).get(SidedProxy.class.getName());
+
+        for(ASMData asmData : asmDataSet) {
+            try {
+                Class<?> proxyClass = Class.forName(
+                    asmData.getClassName(),
+                    true,
+                    retweakClassLoader
+                );
+                Field proxyField = ReflectionHelper.getField(
+                    proxyClass,
+                    asmData.getObjectName()
+                );
+                if (proxyField == null) {
+                    ReTweakResources.RETWEAK_LOGGER.error(
+                        "Something bad happened while loading the proxy!"
+                    );
+                    throw new IllegalStateException(
+                        "Something bad happened while loading the proxy!"
+                    );
+                }
+
+                SidedProxy sidedProxy = proxyField.getAnnotation(SidedProxy.class);
+
+                if (!StringHelper.isNullOrEmpty(sidedProxy.modId()) && !sidedProxy.modId().equals(reTweakModContainer.getModId())) {
+                    continue;
+                }
+
+                String proxyTargetType = side.isClient() ? sidedProxy.clientSide() : sidedProxy.serverSide();
+                Class<?> proxyInstanceClass = Class.forName(
+                    proxyTargetType,
+                    true,
+                    retweakClassLoader
+                );
+                Object proxyInstance = ReflectionHelper.createFromConstructor(
+                    ReflectionHelper.getConstructor(
+                        proxyInstanceClass,
+                        new Class<?>[0]
+                    ),
+                    new Object[0]
+                );
+
+                if (!proxyField.getType().isAssignableFrom(proxyInstance.getClass())) {
+                    return;
+                }
+
+                languageAdapter.setProxy(
+                    proxyField,
+                    proxyClass,
+                    proxyInstance
+                );
+            } catch(Exception e) {
+                ReTweakResources.RETWEAK_LOGGER.warn(
+                    "Failed to construct proxy!",
+                    e
+                );
+                continue;
+            }
+
+            languageAdapter.setInternalProxies(
+                reTweakModContainer,
+                side,
+                retweakClassLoader
+            );
+        }
     }
 
 }

@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "uf",
-        _package = @Package("")
+    name = "uf",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "EntityPlayer",
-        _package = @Package("net.minecraft.entity.player")
+    name = "EntityPlayer",
+    _package = @Package("net.minecraft.entity.player")
 )
 public class uf extends of {
 }

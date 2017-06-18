@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "yp",
-        _package = @Package("")
+    name = "yp",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "ItemPotion",
-        _package = @Package("net.minecraft.item")
+    name = "ItemPotion",
+    _package = @Package("net.minecraft.item")
 )
 public class yp extends yc {
 }

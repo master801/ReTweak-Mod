@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import net.minecraft.nbt.NBTTagCompound;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
@@ -10,12 +11,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "by",
-        _package = @Package("")
+    name = "by",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "NBTTagCompound",
-        _package = @Package("net.minecraft.nbt")
+    name = "NBTTagCompound",
+    _package = @Package("net.minecraft.nbt")
 )
-public class by {
+public class by extends NBTTagCompound {
 }

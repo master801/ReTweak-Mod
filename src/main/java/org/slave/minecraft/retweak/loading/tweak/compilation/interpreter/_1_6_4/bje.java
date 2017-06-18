@@ -1,5 +1,8 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
@@ -10,12 +13,13 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "bje",
-        _package = @Package("")
+    name = "bje",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "TileEntitySpecialRenderer",
-        _package = @Package("net.minecraft.client.renderer.tileentity")
+    name = "TileEntitySpecialRenderer",
+    _package = @Package("net.minecraft.client.renderer.tileentity")
 )
-public class bje {
+@SideOnly(Side.CLIENT)
+public abstract class bje extends TileEntitySpecialRenderer {
 }

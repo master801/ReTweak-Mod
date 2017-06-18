@@ -6,6 +6,10 @@ import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.ClassEntry;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.FieldEntryBuilder.FieldEntry;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.MethodEntryBuilder.MethodEntry;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassInfoBuilder.ClassInfo;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 import java.util.Arrays;
@@ -18,6 +22,8 @@ import java.util.Arrays;
 public final class ReTweakClassVisitor extends ClassVisitor {
 
     private final GameVersion gameVersion;
+
+    private ClassEntry classEntry;
 
     public ReTweakClassVisitor(final int api, final GameVersion gameVersion, final ClassVisitor cv) {
         super(
@@ -32,21 +38,38 @@ public final class ReTweakClassVisitor extends ClassVisitor {
         String newSuperName = null;
         String[] newInterfaces;
 
-        Class<?> overrideSuperNameClass = gameVersion.getOverrideClass(superName);
-        if (overrideSuperNameClass != null) newSuperName = Type.getInternalName(overrideSuperNameClass);
+        //<editor-fold name="Name">
+        ClassInfo classInfo = gameVersion.getClassInfo(name);
+        if (classInfo != null) classEntry = classInfo.getClassEntry();
+        //</editor-fold>
 
+        //<editor-fold desc="Super">
+        ClassInfo superNameClassInfo = gameVersion.getClassInfo(superName);
+
+        if (superNameClassInfo != null) {
+            Class<?> overrideSuperNameClass = superNameClassInfo.getClassEntry().getTo();
+            if (overrideSuperNameClass != null) newSuperName = Type.getInternalName(overrideSuperNameClass);
+        }
+        //</editor-fold>
+
+        //<editor-fold desc="Interfaces">
         newInterfaces = new String[interfaces.length];
         for(int i = 0; i < newInterfaces.length; i++) {
             String _interface = interfaces[i];
             String newInterface = null;
 
-            Class<?> overrideInterfaceClass = gameVersion.getOverrideClass(_interface);
-            if (overrideInterfaceClass != null) newInterface = Type.getInternalName(overrideInterfaceClass);
+            ClassInfo interfaceClassInfo = gameVersion.getClassInfo(_interface);
+
+            if (interfaceClassInfo != null) {
+                Class<?> overrideInterfaceClass = interfaceClassInfo.getClassEntry().getTo();
+                if (overrideInterfaceClass != null) newInterface = Type.getInternalName(overrideInterfaceClass);
+            }
 
             if (newInterface == null) newInterface = _interface;
 
             newInterfaces[i] = newInterface;
         }
+        //</editor-fold>
 
         super.visit(
             version,
@@ -73,8 +96,14 @@ public final class ReTweakClassVisitor extends ClassVisitor {
         Type descType = Type.getType(desc);
         Type newDescType = null;
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(descType.getClassName());
-        if (overrideClass != null) newDescType = Type.getType(overrideClass);
+        //<editor-fold desc="Desc">
+        ClassInfo descClassInfo = gameVersion.getClassInfo(descType.getClassName());
+
+        if (descClassInfo != null) {
+            Class<?> overrideClass = descClassInfo.getClassEntry().getTo();
+            if (overrideClass != null) newDescType = Type.getType(overrideClass);
+        }
+        //</editor-fold>
 
         return new ReTweakAnnotationVisitor(
             super.api,
@@ -88,16 +117,31 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(final int access, final String name, final String desc, final String signature, final Object value) {
+        String newName = null;
+
         Type descType = Type.getType(desc);
         Type newDescType = null;
 
-        Class<?> descOverrideClass = gameVersion.getOverrideClass(descType.getClassName());
-        if (descOverrideClass != null) newDescType = Type.getType(descOverrideClass);
+        //<editor-fold desc="Name">
+        if (classEntry != null) {
+            FieldEntry fieldEntry = classEntry.getField(name, desc);
+            if (fieldEntry != null) newName = fieldEntry.getDeobfuscatedName();
+        }
+        //</editor-fold>
 
+        //<editor-fold desc="Desc">
+        ClassInfo descClassInfo = gameVersion.getClassInfo(descType.getClassName());
+        Class<?> descOverrideClass = descClassInfo != null ? descClassInfo.getClassEntry().getTo() : null;
+        if (descOverrideClass != null) {
+            newDescType = Type.getType(descOverrideClass);
+        }
+
+        //<editor-fold desc="Array">
         if (descType.getSort() == Type.ARRAY) {
             Type elementDescType = descType.getElementType();
 
-            descOverrideClass = gameVersion.getOverrideClass(elementDescType.getClassName());
+            ClassInfo elementClassInfo = gameVersion.getClassInfo(elementDescType.getClassName());
+            if (elementClassInfo != null) descOverrideClass = elementClassInfo.getClassEntry().getTo();
 
             Object[] dimensions = new Object[descType.getDimensions()];
             Arrays.fill(
@@ -109,13 +153,16 @@ public final class ReTweakClassVisitor extends ClassVisitor {
                 Joiner.on("").join(dimensions) + (descOverrideClass != null ? Type.getDescriptor(descOverrideClass) : elementDescType.getDescriptor())
             );
         }
+        //</editor-fold>
+        //</editor-fold>
 
         return new ReTweakFieldVisitor(
             super.api,
             gameVersion,
+            classEntry,
             super.visitField(
                 access,
-                name,
+                newName != null ? newName : name,
                 newDescType != null ? newDescType.getDescriptor() : desc,
                 signature,
                 value
@@ -125,24 +172,41 @@ public final class ReTweakClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+        String newName = null;
+
+        //<editor-fold desc="Name">
+        if (classEntry != null) {
+            MethodEntry methodEntry = classEntry.getMethod(name, desc);
+            if (methodEntry != null) newName = methodEntry.getDeobfuscatedName();
+        }
+        //</editor-fold>
+
+        //<editor-fold desc="Desc">
         Type[] argDescTypes = Type.getArgumentTypes(desc);
         Type[] newArgDescTypes;
 
         Type returnDescType = Type.getReturnType(desc);
         Type newReturnDescType = null;
 
+        //<editor-fold desc="Args">
         newArgDescTypes = new Type[argDescTypes.length];
         for(int i = 0; i < argDescTypes.length; i++) {
             Type argumentDescType = argDescTypes[i];
             Type newArgumentDescType = null;
 
-            Class<?> argumentDescOverrideClass = gameVersion.getOverrideClass(argumentDescType.getClassName());
-            if (argumentDescOverrideClass != null) newArgumentDescType = Type.getType(argumentDescOverrideClass);
+            ClassInfo argumentClassInfo = gameVersion.getClassInfo(argumentDescType.getClassName());
+            Class<?> argumentDescOverrideClass = null;
+            if (argumentClassInfo != null) {
+                argumentDescOverrideClass = argumentClassInfo.getClassEntry().getTo();
+                if (argumentDescOverrideClass != null) newArgumentDescType = Type.getType(argumentDescOverrideClass);
+            }
 
+            //<editor-fold desc="Array">
             if (argumentDescType.getSort() == Type.ARRAY) {
                 Type elementArgumentDescType = argumentDescType.getElementType();
 
-                argumentDescOverrideClass = gameVersion.getOverrideClass(elementArgumentDescType.getClassName());
+                ClassInfo elementClassInfo = gameVersion.getClassInfo(elementArgumentDescType.getClassName());
+                if (elementClassInfo != null) argumentDescOverrideClass = elementClassInfo.getClassEntry().getTo();
 
                 Object[] dimensions = new Object[argumentDescType.getDimensions()];
                 Arrays.fill(
@@ -154,18 +218,27 @@ public final class ReTweakClassVisitor extends ClassVisitor {
                     Joiner.on("").join(dimensions) + (argumentDescOverrideClass != null ? Type.getDescriptor(argumentDescOverrideClass) : elementArgumentDescType.getDescriptor())
                 );
             }
+            //</editor-fold>
 
             if (newArgumentDescType == null) newArgumentDescType = argumentDescType;
             newArgDescTypes[i] = newArgumentDescType;
         }
+        //</editor-fold>
 
-        Class<?> returnDescOverrideClass = gameVersion.getOverrideClass(returnDescType.getClassName());
-        if (returnDescOverrideClass != null) newReturnDescType = Type.getType(returnDescOverrideClass);
+        //<editor-fold desc="Return">
+        ClassInfo returnClassInfo = gameVersion.getClassInfo(returnDescType.getClassName());
+        Class<?> returnDescOverrideClass = null;
+        if (returnClassInfo != null) {
+            returnDescOverrideClass = returnClassInfo.getClassEntry().getTo();
+            if (returnDescOverrideClass != null) newReturnDescType = Type.getType(returnDescOverrideClass);
+        }
 
+        //<editor-fold desc="Array">
         if (returnDescType.getSort() == Type.ARRAY) {
             Type elementReturnDescType = returnDescType.getElementType();
 
-            returnDescOverrideClass = gameVersion.getOverrideClass(elementReturnDescType.getClassName());
+            ClassInfo elementClassInfo = gameVersion.getClassInfo(elementReturnDescType.getClassName());
+            if (elementClassInfo != null) returnDescOverrideClass = elementClassInfo.getClassEntry().getTo();
 
             Object[] dimensions = new Object[returnDescType.getDimensions()];
             Arrays.fill(
@@ -176,14 +249,20 @@ public final class ReTweakClassVisitor extends ClassVisitor {
             newReturnDescType = Type.getType(
                 Joiner.on("").join(dimensions) + (returnDescOverrideClass != null ? Type.getDescriptor(returnDescOverrideClass) : elementReturnDescType.getDescriptor())
             );
+            //</editor-fold>
         }
+        //</editor-fold>
+        //</editor-fold>
+
+        //</editor-fold>
 
         return new ReTweakMethodVisitor(
             super.api,
             gameVersion,
+            classEntry,
             super.visitMethod(
                 access,
-                name,
+                newName != null ? newName : name,
                 Type.getMethodDescriptor(
                     newReturnDescType != null ? newReturnDescType : returnDescType,
                     newArgDescTypes

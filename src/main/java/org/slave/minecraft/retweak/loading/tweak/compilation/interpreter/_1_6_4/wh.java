@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "wh",
-        _package = @Package("")
+    name = "wh",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "ItemArmor",
-        _package = @Package("net.minecraft.item")
+    name = "ItemArmor",
+    _package = @Package("net.minecraft.item")
 )
 public class wh extends yc {
 }

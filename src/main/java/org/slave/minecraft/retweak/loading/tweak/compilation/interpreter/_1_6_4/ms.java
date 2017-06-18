@@ -10,12 +10,12 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
  * @author Master
  */
 @Obfuscated(
-        name = "ms",
-        _package = @Package("")
+    name = "ms",
+    _package = @Package("")
 )
 @Deobfuscated(
-        name = "Icon",
-        _package = @Package("net.minecraft.util")
+    name = "Icon",
+    _package = @Package("net.minecraft.util")
 )
-public class ms {
+public class ms {//TODO
 }

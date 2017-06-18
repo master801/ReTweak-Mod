@@ -3,6 +3,8 @@ package org.slave.minecraft.retweak.loading.mod.vandy;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Type;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.ClassEntry;
+import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassInfoBuilder.ClassInfo;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 
 /**
@@ -13,13 +15,15 @@ import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 public final class ReTweakFieldVisitor extends FieldVisitor {
 
     private final GameVersion gameVersion;
+    private final ClassEntry classEntry;
 
-    public ReTweakFieldVisitor(final int api, final GameVersion gameVersion, final FieldVisitor fv) {
+    public ReTweakFieldVisitor(final int api, final GameVersion gameVersion, final ClassEntry classEntry, final FieldVisitor fv) {
         super(
             api,
             fv
         );
         this.gameVersion = gameVersion;
+        this.classEntry = classEntry;
     }
 
     @Override
@@ -27,8 +31,14 @@ public final class ReTweakFieldVisitor extends FieldVisitor {
         Type descType = Type.getType(desc);
         Type newDescType = null;
 
-        Class<?> overrideClass = gameVersion.getOverrideClass(descType.getClassName());
-        if (overrideClass != null) newDescType = Type.getType(overrideClass);
+        //<editor-fold desc="Desc">
+        ClassInfo descClassInfo = gameVersion.getClassInfo(descType.getClassName());
+
+        if (descClassInfo != null) {
+            Class<?> overrideClass = descClassInfo.getClassEntry().getTo();
+            if (overrideClass != null) newDescType = Type.getType(overrideClass);
+        }
+        //</editor-fold>
 
         return new ReTweakAnnotationVisitor(
             super.api,
