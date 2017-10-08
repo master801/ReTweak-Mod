@@ -2,6 +2,8 @@ package org.slave.minecraft.retweak.util;
 
 import com.google.common.base.Joiner;
 import cpw.mods.fml.common.ModContainer;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import net.minecraft.util.EnumChatFormatting;
 import org.slave.minecraft.library.api.Metadata;
 import org.slave.minecraft.library.helpers.ChatHelper;
@@ -13,20 +15,18 @@ import org.slave.minecraft.retweak.ReTweakMod;
  *
  * @author Master801
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReTweakMetadata implements Metadata {
 
     public static final Metadata INSTANCE = new ReTweakMetadata();
 
-    private ReTweakMetadata() {
-    }
-
     @Override
     public String[] getAuthorList() {
         return new String[] {
-                ChatHelper.formatString(
-                        "Master801",
-                        EnumChatFormatting.AQUA
-                )
+            ChatHelper.formatString(
+                "Master801",
+                EnumChatFormatting.AQUA
+            )
         };
     }
 
@@ -43,29 +43,29 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String getCredits() {
         return Joiner.on(
-                '\n'
+            '\n'
         ).join(
-                new String[] {
-                        ChatHelper.formatString(
-                                "FyberOptic - Intermediary",
-                                EnumChatFormatting.DARK_GREEN
-                        )
-                }
+            new String[] {
+                ChatHelper.formatString(
+                    "FyberOptic - Intermediary",
+                    EnumChatFormatting.DARK_GREEN
+                )
+            }
         );
     }
 
     @Override
     public String getDescription() {
         return Joiner.on(
-                "\n\n"
+            "\n\n"
         ).join(
-                new String[] {
-                        "Loads [some] Forge mods from [some] previous versions of Minecraft.",
-                        ChatHelper.formatString(
-                                "Uses trickery and may cause crashes. Use at your own risk.",
-                                EnumChatFormatting.DARK_RED
-                        )
-                }
+            new String[] {
+                "Loads [some] Forge mods from [some] previous versions of Minecraft.",
+                ChatHelper.formatString(
+                    "Uses trickery and may cause crashes. Use at your own risk.",
+                    EnumChatFormatting.DARK_RED
+                )
+            }
         );
     }
 
@@ -77,16 +77,16 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String getModID() {
         return ChatHelper.formatString(
-                ModHelper.getReflectiveModID(ReTweakMod.class),
-                EnumChatFormatting.DARK_AQUA
+            ModHelper.getReflectiveModID(ReTweakMod.class),
+            EnumChatFormatting.DARK_AQUA
         );
     }
 
     @Override
     public String getModName() {
         return ChatHelper.formatString(
-                ModHelper.getReflectiveModName(ReTweakMod.class),
-                EnumChatFormatting.DARK_RED
+            ModHelper.getReflectiveModName(ReTweakMod.class),
+            EnumChatFormatting.DARK_RED
         );
     }
 
@@ -113,8 +113,8 @@ public final class ReTweakMetadata implements Metadata {
     @Override
     public String getModVersion() {
         return ChatHelper.formatString(
-                ModHelper.getReflectiveModVersion(ReTweakMod.class),
-                EnumChatFormatting.LIGHT_PURPLE
+            ModHelper.getReflectiveModVersion(ReTweakMod.class),
+            EnumChatFormatting.LIGHT_PURPLE
         );
     }
 

@@ -1,6 +1,5 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
@@ -27,7 +26,7 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
         aoe.class
     }
 )
-public class amw extends aqz implements ITileEntityProvider {
+public class amw extends aqz implements aoe {
 
     public amw(final int par1, final Material material) {
         super(par1, material);

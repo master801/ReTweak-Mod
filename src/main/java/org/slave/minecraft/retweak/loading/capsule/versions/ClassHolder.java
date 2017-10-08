@@ -1,6 +1,11 @@
 package org.slave.minecraft.retweak.loading.capsule.versions;
 
 import com.google.common.collect.Sets;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.objectweb.asm.Type;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.ClassHolder.ClassEntryBuilder.ClassEntry;
@@ -19,18 +24,13 @@ import java.util.Set;
  *
  * @author Master
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ClassHolder {
 
-    private final List<ClassInfo> override;
+    @Getter
+    private final List<ClassInfo> overrideClasses;
 
-    ClassHolder(final List<ClassInfo> override) {
-        this.override = override;
-    }
-
-    public List<ClassInfo> getOverrideClasses() {
-        return override;
-    }
-
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class ClassEntryBuilder {
 
         private static ClassEntryBuilder instance;
@@ -40,9 +40,6 @@ public final class ClassHolder {
 
         private Set<FieldEntry> fieldEntries;
         private Set<MethodEntry> methodEntries;
-
-        private ClassEntryBuilder() {
-        }
 
         public ClassEntryBuilder setFrom(final String from) {
             if (from == null) return this;
@@ -95,26 +92,17 @@ public final class ClassHolder {
             return ClassEntryBuilder.instance;
         }
 
+        @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class ClassEntry {
 
+            @Getter
             private final String from;
+
+            @Getter
             private final Class<?> to;
 
             private Set<FieldEntry> fieldEntries;
             private Set<MethodEntry> methodEntries;
-
-            private ClassEntry(final String from, final Class<?> to) {
-                this.from = from;
-                this.to = to;
-            }
-
-            public String getFrom() {
-                return from;
-            }
-
-            public Class<?> getTo() {
-                return to;
-            }
 
             public Set<FieldEntry> getFields() {
                 return fieldEntries;
@@ -147,10 +135,10 @@ public final class ClassHolder {
                 Type[] argTypes = Type.getArgumentTypes(desc);
 
                 for(MethodEntry methodEntry : methodEntries) {
-                    boolean descMatches = returnType.equals(methodEntry.getReturnDescType());
-                    if (methodEntry.getArgumentsDescTypes() != null) {
-                        descMatches = descMatches && argTypes.length == methodEntry.getArgumentsDescTypes().length;
-                        descMatches = descMatches && Arrays.equals(argTypes, methodEntry.getArgumentsDescTypes());
+                    boolean descMatches = returnType.equals(methodEntry.getReturnTypeDesc());
+                    if (methodEntry.getArgumentDescTypes() != null) {
+                        descMatches = descMatches && argTypes.length == methodEntry.getArgumentDescTypes().length;
+                        descMatches = descMatches && Arrays.equals(argTypes, methodEntry.getArgumentDescTypes());
                     }
 
                     if (methodEntry.getObfuscatedName().equals(name) && descMatches) return methodEntry;
@@ -212,7 +200,7 @@ public final class ClassHolder {
                         return this;
                     }
                     if (reflectedFieldValue == fieldValue) {
-                        deobfuscatedName = field.getName();
+                        setDeobfuscatedName(field.getName());
                         break;
                     }
                 }
@@ -244,41 +232,26 @@ public final class ClassHolder {
                 return FieldEntryBuilder.instance;
             }
 
+            @AllArgsConstructor(access = AccessLevel.PRIVATE)
             public static final class FieldEntry {
 
+                @Getter
                 private final String obfuscatedName;
+
+                @Getter
                 private final String deobfuscatedName;
 
+                @Getter
                 private final org.objectweb.asm.Type fromDescType;
+
+                @Getter
                 private final org.objectweb.asm.Type toDescType;
-
-                FieldEntry(final String obfuscatedName, final String deobfuscatedName, final org.objectweb.asm.Type fromDescType, final org.objectweb.asm.Type toDescType) {
-                    this.obfuscatedName = obfuscatedName;
-                    this.deobfuscatedName = deobfuscatedName;
-                    this.fromDescType = fromDescType;
-                    this.toDescType = toDescType;
-                }
-
-                public String getObfuscatedName() {
-                    return obfuscatedName;
-                }
-
-                public String getDeobfuscatedName() {
-                    return deobfuscatedName;
-                }
-
-                public org.objectweb.asm.Type getFromDescType() {
-                    return fromDescType;
-                }
-
-                public org.objectweb.asm.Type getToDescType() {
-                    return toDescType;
-                }
 
             }
 
         }
 
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class MethodEntryBuilder {
 
             private static MethodEntryBuilder instance;
@@ -288,9 +261,6 @@ public final class ClassHolder {
 
             private Type descReturnType;
             private Type[] descArgumentTypes;
-
-            private MethodEntryBuilder() {
-            }
 
             public MethodEntryBuilder setObfuscatedName(final String obfuscatedName) {
                 this.obfuscatedName = obfuscatedName;
@@ -335,37 +305,20 @@ public final class ClassHolder {
                 return MethodEntryBuilder.instance;
             }
 
+            @AllArgsConstructor(access = AccessLevel.PRIVATE)
             public static final class MethodEntry {
 
-
+                @Getter
                 private String obfuscatedName;
+
+                @Getter
                 private String deobfuscatedName;
 
-                private Type descReturnType;
-                private Type[] descArgumentsType;
+                @Getter
+                private Type returnTypeDesc;
 
-                private MethodEntry(final String obfuscatedName, final String deobfuscatedName, final Type descReturnType, final Type[] descArgumentsType) {
-                    this.obfuscatedName = obfuscatedName;
-                    this.deobfuscatedName = deobfuscatedName;
-                    this.descReturnType = descReturnType;
-                    this.descArgumentsType = descArgumentsType;
-                }
-
-                public String getObfuscatedName() {
-                    return obfuscatedName;
-                }
-
-                public String getDeobfuscatedName() {
-                    return deobfuscatedName;
-                }
-
-                public Type getReturnDescType() {
-                    return descReturnType;
-                }
-
-                public Type[] getArgumentsDescTypes() {
-                    return descArgumentsType;
-                }
+                @Getter
+                private Type[] argumentDescTypes;
 
             }
 
@@ -373,14 +326,12 @@ public final class ClassHolder {
 
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class ClassInfoBuilder {
 
         private static ClassInfoBuilder instance;
 
         private ClassEntry classEntry;
-
-        private ClassInfoBuilder() {
-        }
 
         public ClassInfoBuilder setClassEntry(final ClassEntry classEntry) {
             this.classEntry = classEntry;
@@ -393,10 +344,14 @@ public final class ClassHolder {
             ClassInfo classInfo = new ClassInfo(classEntry);
 
             //<editor-fold desc="Cleanup">
-            classEntry = null;
+            cleanup();
             //</editor-fold>
 
             return classInfo;
+        }
+
+        private void cleanup() {
+            classEntry = null;
         }
 
         public static ClassInfoBuilder instance() {
@@ -404,17 +359,11 @@ public final class ClassHolder {
             return ClassInfoBuilder.instance;
         }
 
+        @AllArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class ClassInfo {
 
+            @Getter
             private final ClassEntry classEntry;
-
-            private ClassInfo(final ClassEntry classEntry) {
-                this.classEntry = classEntry;
-            }
-
-            public ClassEntry getClassEntry() {
-                return classEntry;
-            }
 
         }
 

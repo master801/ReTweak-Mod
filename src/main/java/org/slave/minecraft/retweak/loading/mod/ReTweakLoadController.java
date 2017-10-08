@@ -124,9 +124,7 @@ public final class ReTweakLoadController {
             if (modContainer instanceof ReTweakModContainer) {
                 reTweakModContainer = (ReTweakModContainer) modContainer;
             } else {
-                ReTweakResources.RETWEAK_LOGGER.error(
-                    "Mod container is not ReTweak's?"
-                );
+                ReTweakResources.RETWEAK_LOGGER.error("Mod container is not ReTweak's?");
                 ReTweakResources.RETWEAK_LOGGER.debug(
                     "Mod ID: {}, Mod File: {}",
                     modContainer.getModId(),

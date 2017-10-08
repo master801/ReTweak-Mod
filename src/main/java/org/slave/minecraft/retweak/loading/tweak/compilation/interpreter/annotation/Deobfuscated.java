@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
         ElementType.FIELD
     }
 )
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Deobfuscated {
 
     Package[] _package() default {};

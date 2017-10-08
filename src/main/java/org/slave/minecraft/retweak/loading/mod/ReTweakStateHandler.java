@@ -27,8 +27,8 @@ public final class ReTweakStateHandler {
     public static void step(final LoadController loadController, final LoaderState currentState, final LoaderState wantedState) throws ClassNotFoundException, IllegalAccessException, InvocationTargetException {
         if (loadController == null || currentState == null || wantedState == null) {
             ReTweakResources.RETWEAK_LOGGER.error(
-                    "An error occurred while stepping (variables for {} are null)! The ASM hacks may have failed?",
-                    ReTweakStateHandler.class.getName()
+                "An error occurred while stepping (variables for {} are null)! The ASM hacks may have failed?",
+                ReTweakStateHandler.class.getName()
             );
             throw new IllegalStateException();
         }

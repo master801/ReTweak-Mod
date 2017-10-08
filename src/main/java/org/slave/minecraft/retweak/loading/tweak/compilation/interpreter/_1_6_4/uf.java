@@ -1,5 +1,8 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import com.mojang.authlib.GameProfile;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
@@ -17,5 +20,10 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
     name = "EntityPlayer",
     _package = @Package("net.minecraft.entity.player")
 )
-public class uf extends of {
+public abstract class uf extends EntityPlayer {//TODO
+
+    public uf(final World world, final GameProfile gameProfile) {//TODO GameProfile not in 1.6.4?
+        super(world, gameProfile);
+    }
+
 }

@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import net.minecraft.potion.Potion;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
@@ -17,5 +18,10 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
     name = "Potion",
     _package = @Package("net.minecraft.potion")
 )
-public class ni {//TODO
+public class ni extends Potion {
+
+    protected ni(final int id, final boolean isBadEffect, final int color) {
+        super(id, isBadEffect, color);
+    }
+
 }

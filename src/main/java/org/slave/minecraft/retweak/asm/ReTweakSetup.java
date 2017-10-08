@@ -22,13 +22,8 @@ public final class ReTweakSetup implements IFMLCallHook {
     public void injectData(final Map<String, Object> data) {
         ReTweakSetup.deobfuscatedEnvironment = !(boolean)data.get("runtimeDeobfuscationEnabled");
         ReTweakSetup.initReTweakClassLoader(
-            (LaunchClassLoader) data.get("classLoader")
+            (LaunchClassLoader)data.get("classLoader")
         );
-    }
-
-    @Override
-    public Void call() throws Exception {
-        return null;
     }
 
     public static boolean isDeobfuscatedEnvironment() {
@@ -48,7 +43,7 @@ public final class ReTweakSetup implements IFMLCallHook {
                 null,
                 new Object[] {
                     launchClassLoader
-                    }
+                }
             );
         } catch(InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
             ReTweakResources.RETWEAK_LOGGER.error(
@@ -56,6 +51,11 @@ public final class ReTweakSetup implements IFMLCallHook {
                 e
             );
         }
+    }
+
+    @Override
+    public Void call() throws Exception {
+        return null;//NOOP
     }
 
 }

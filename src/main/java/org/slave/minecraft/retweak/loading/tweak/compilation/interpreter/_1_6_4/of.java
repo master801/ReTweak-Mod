@@ -1,5 +1,7 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.world.World;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Obfuscated;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation._class.Package;
@@ -17,5 +19,10 @@ import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotat
     name = "EntityLivingBase",
     _package = @Package("net.minecraft.entity")
 )
-public class of {
+public abstract class of extends EntityLivingBase {
+
+    public of(final World world) {
+        super(world);
+    }
+
 }

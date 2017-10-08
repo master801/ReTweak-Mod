@@ -11,6 +11,10 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.slave.lib.helpers.StringHelper;
 import org.slave.minecraft.retweak.loading.capsule.versions.GameVersion;
 import org.slave.minecraft.retweak.util.ReTweakConfig.Config.GameVersionConfig.ConfigEntry.Category;
@@ -47,39 +51,39 @@ public final class ReTweakConfig {
         gsonBuilder.setPrettyPrinting();
 
         gsonBuilder.registerTypeAdapter(
-                Config.class,
-                new Config.Deserializer()
+            Config.class,
+            new Config.Deserializer()
         );
         gsonBuilder.registerTypeAdapter(
-                Config.class,
-                new Config.Serializer()
-        );
-
-        gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.class,
-                new Config.GameVersionConfig.Deserializer()
-        );
-        gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.class,
-                new Config.GameVersionConfig.Serializer()
+            Config.class,
+            new Config.Serializer()
         );
 
         gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.ConfigEntry.class,
-                new Config.GameVersionConfig.ConfigEntry.Deserializer()
+            Config.GameVersionConfig.class,
+            new Config.GameVersionConfig.Deserializer()
         );
         gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.ConfigEntry.class,
-                new Config.GameVersionConfig.ConfigEntry.Serializer()
+            Config.GameVersionConfig.class,
+            new Config.GameVersionConfig.Serializer()
         );
 
         gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.ConfigEntry.Value.class,
-                new Config.GameVersionConfig.ConfigEntry.Value.Deserializer()
+            Config.GameVersionConfig.ConfigEntry.class,
+            new Config.GameVersionConfig.ConfigEntry.Deserializer()
         );
         gsonBuilder.registerTypeAdapter(
-                Config.GameVersionConfig.ConfigEntry.Value.class,
-                new Config.GameVersionConfig.ConfigEntry.Value.Serializer()
+            Config.GameVersionConfig.ConfigEntry.class,
+            new Config.GameVersionConfig.ConfigEntry.Serializer()
+        );
+
+        gsonBuilder.registerTypeAdapter(
+            Config.GameVersionConfig.ConfigEntry.Value.class,
+            new Config.GameVersionConfig.ConfigEntry.Value.Deserializer()
+        );
+        gsonBuilder.registerTypeAdapter(
+            Config.GameVersionConfig.ConfigEntry.Value.class,
+            new Config.GameVersionConfig.ConfigEntry.Value.Serializer()
         );
 
         gson = gsonBuilder.create();
@@ -90,8 +94,8 @@ public final class ReTweakConfig {
         InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream);
 
         config = gson.fromJson(
-                inputStreamReader,
-                Config.class
+            inputStreamReader,
+            Config.class
         );
 
         inputStreamReader.close();
@@ -103,38 +107,35 @@ public final class ReTweakConfig {
         OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream);
 
         gson.toJson(
-                config,
-                outputStreamWriter
+            config,
+            outputStreamWriter
         );
 
         outputStreamWriter.close();
         fileOutputStream.close();
     }
 
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static final class Config {
 
         private List<GameVersionConfig> gameVersionConfigs;
-
-        Config() {
-        }
 
         private void init() {
             gameVersionConfigs = new ArrayList<>();
             for(GameVersion gameVersion : GameVersion.values()) {
                 gameVersionConfigs.add(
-                        new GameVersionConfig(gameVersion)
+                    new GameVersionConfig(gameVersion)
                 );
             }
         }
 
+        @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class GameVersionConfig {
 
+            @NonNull
             private GameVersion gameVersion;
-            private Map<Category, List<ConfigEntry>> categories;
 
-            GameVersionConfig(final GameVersion gameVersion) {
-                this.gameVersion = gameVersion;
-            }
+            private Map<Category, List<ConfigEntry>> categories;
 
             private void init() {
                 categories = new HashMap<>();

@@ -13,6 +13,12 @@ buildscript {
             name = 'sonatype'
             url = 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
+        /*
+        maven {
+            name = 'sponge'
+            url = 'http://repo.spongepowered.org/maven'
+        }
+        */
     }
     dependencies {
         classpath(
@@ -26,12 +32,27 @@ buildscript {
                 name: 'gradle-lombok',
                 version: '1.8'
         )
+        /*
+        classpath(
+                group: 'org.spongepowered',
+                name: 'mixingradle',
+                version: '0.7.4'
+        )
+        */
+    }
+}
+repositories {
+    mavenCentral()
+    maven {
+        name = 'sponge'
+        url = 'http://repo.spongepowered.org/maven'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'forge'
 apply plugin: 'io.franzbecker.gradle-lombok'
+//apply plugin: 'org.spongepowered.mixin'
 
 version = project.properties['version']
 group = 'org.slave.minecraft'
@@ -65,6 +86,16 @@ dependencies {
             group: 'org.apache.logging.log4j',
             name: 'log4j-slf4j-impl',
             version: project.properties['log4j-version']
+    )
+    compile(
+            group: 'org.spongepowered',
+            name: 'spongeapi',
+            version: project.properties['mixin-version']
+    )
+    compile(
+            group: 'org.spongepowered',
+            name: 'mixin',
+            version: project.properties['mixin-version']
     )
 
     compile fileTree(

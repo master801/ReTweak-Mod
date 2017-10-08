@@ -5,6 +5,9 @@ import cpw.mods.fml.common.ModClassLoader;
 import cpw.mods.fml.common.discovery.ContainerType;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.AbstractFileFilter;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -26,18 +29,16 @@ import java.util.regex.Pattern;
  *
  * @author Master
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class ReTweakModDiscoverer extends ModDiscoverer {
 
     private static final Pattern PATTERN_ZIP_JAR_MATCHER = Pattern.compile(
-            ".+(\\.(jar|zip))$",
-            Pattern.MULTILINE
+        ".+(\\.(jar|zip))$",
+        Pattern.MULTILINE
     );
 
+    @NonNull
     private final GameVersion gameVersion;
-
-    ReTweakModDiscoverer(final GameVersion gameVersion) {
-        this.gameVersion = gameVersion;
-    }
 
     @Override
     public void findClasspathMods(final ModClassLoader modClassLoader) {

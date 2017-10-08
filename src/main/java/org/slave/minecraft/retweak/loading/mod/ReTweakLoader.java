@@ -42,15 +42,15 @@ public final class ReTweakLoader {
 
         for(GameVersion gameVersion : GameVersion.values()) {
             reTweakModDiscovererList.put(
-                    gameVersion,
-                    new ReTweakModDiscoverer(gameVersion)
+                gameVersion,
+                new ReTweakModDiscoverer(gameVersion)
             );
             reTweakModsDirList.put(
-                    gameVersion,
-                    new File(
-                            ReTweakResources.RETWEAK_MODS_DIRECTORY,
-                            gameVersion.getVersion()
-                    )
+                gameVersion,
+                new File(
+                    ReTweakResources.RETWEAK_MODS_DIRECTORY,
+                    gameVersion.getVersion()
+                )
             );
             reTweakLoadControllerMap.put(
                 gameVersion,
@@ -88,15 +88,15 @@ public final class ReTweakLoader {
 
     private void findMods(final GameVersion gameVersion) {
         ReTweakModDiscoverer reTweakModDiscoverer = getReTweakModDiscoverer(
-                gameVersion
+            gameVersion
         );
 
         File reTweakModsDir = getReTweakModsDirectory(
-                gameVersion
+            gameVersion
         );
 
         reTweakModDiscoverer.findModDirMods(
-                reTweakModsDir
+            reTweakModsDir
         );
         List<ModContainer> identifiedMods = reTweakModDiscoverer.identifyMods();
 

@@ -19,11 +19,13 @@ import java.lang.annotation.Target;
         ElementType.FIELD
     }
 )
-@Retention(RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Obfuscated {
 
     Package[] _package() default {};
 
     String name();
+
+    Class<?>[] parameters() default {};
 
 }

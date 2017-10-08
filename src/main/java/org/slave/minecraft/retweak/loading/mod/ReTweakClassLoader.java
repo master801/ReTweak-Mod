@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.loading.mod;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -34,7 +35,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         ReTweakResources.RETWEAK_DIRECTORY,
         "asm"
     );
-    private static final Set<String> SET_EXCLUSIONS = Sets.newHashSet(
+    private static final String[] EXCLUSIONS = new String[] {
         "java.",
         "sun.",
         "org.lwjgl.",
@@ -47,7 +48,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         "com.google.common.",
         "org.bouncycastle.",
         "net.minecraft.launchwrapper.injector."
-    );
+    };
 
     private static final Set<Pattern> SET_CLASSLOADER_PARENT_EXCLUSIONS = Sets.newHashSet(
         Pattern.compile(
@@ -135,15 +136,12 @@ public final class ReTweakClassLoader extends URLClassLoader {
             );
         }
 
-        for(String s1 : ReTweakClassLoader.SET_EXCLUSIONS) {
-            if (name.startsWith(s1)) {
-                return super.loadClass(
-                    name,
-                    resolve
-                );
-            }
+        if (StringUtils.startsWithAny(name, ReTweakClassLoader.EXCLUSIONS)) {
+            return super.loadClass(
+                name,
+                resolve
+            );
         }
-
 
         for(Pattern pattern : ReTweakClassLoader.SET_CLASSLOADER_PARENT_EXCLUSIONS) {
             if (pattern.matcher(name).matches() && gameVersion.getClassInfo(name) == null) return super.getParent().loadClass(name);
@@ -167,6 +165,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
                 byte[] classData = classWriter.toByteArray();
 
+                //<editor-fold desc="DEBUG">
                 if (ReTweakResources.DEBUG) {
                     String outputDirName = name.replace('.', '/');
                     if (outputDirName.lastIndexOf('/') != -1) {
@@ -215,6 +214,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                         }
                     }
                 }
+                //</editor-fold>
 
                 returnClass = super.defineClass(
                     name,
@@ -234,7 +234,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 try {
                     inputStream.close();
                 } catch(IOException e) {
-                    ReTweakResources.RETWEAK_LOGGER.warn(
+                    ReTweakResources.RETWEAK_LOGGER.error(
                         String.format(
                             "Failed to close inputstream while transforming class \"%s\"!",
                             name
