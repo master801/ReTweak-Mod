@@ -11,18 +11,25 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiMainMenu;
+import net.minecraft.item.Item;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.slave.minecraft.library.helpers.ModHelper;
 import org.slave.minecraft.retweak.client.screens.GuiScreenReTweakMods;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.net.minecraftforge.common.Configuration;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.yc;
+import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4.ye;
 import org.slave.minecraft.retweak.util.ReTweakMetadata;
 import org.slave.minecraft.retweak.util.ReTweakStrings;
 
+import java.io.File;
 import java.util.List;
 
 /**

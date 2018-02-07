@@ -47,6 +47,9 @@ repositories {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
     }
+    maven {
+        url = project.properties['artifactory_contextUrl'] + '/gradle-dev'
+    }
 }
 
 apply plugin: 'java'
@@ -78,6 +81,33 @@ jar {
 
 dependencies {
     compile(
+            group: 'org.slave.lib',
+            name: 'lib',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'minecraft-asm',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'config',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'log',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'io',
+            version: project.properties['slave-lib-version']
+    )
+
+
+    compile(
             group: 'org.slf4j',
             name: 'slf4j-api',
             version: project.properties['slf4j-version']
@@ -96,16 +126,6 @@ dependencies {
             group: 'org.spongepowered',
             name: 'mixin',
             version: project.properties['mixin-version']
-    )
-
-    compile fileTree(
-            dir: 'libs',
-            exclude: [
-                    '*-src.jar'
-            ],
-            include: [
-                    '*.jar'
-            ]
     )
 }
 

@@ -22,6 +22,7 @@ import org.slave.minecraft.retweak.util.ReTweakResources;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by Master on 4/27/2016 at 7:26 AM.
@@ -29,6 +30,8 @@ import java.util.List;
  * @author Master
  */
 public final class InterpreterTweak implements Tweak {
+
+    private static final Pattern PATTERN_DESC = Pattern.compile("^(\\*L).+(;)$");
 
     private final GameVersion gameVersion;
 
@@ -854,7 +857,7 @@ public final class InterpreterTweak implements Tweak {
                 //<editor-fold desc="String">
                 if (originalLocal instanceof String) {
                     String stringLocal = (String) originalLocal;
-                    boolean isDesc = ASMHelper.PATTERN_DESC_MATCHER.matcher(stringLocal).matches();
+                    boolean isDesc = InterpreterTweak.PATTERN_DESC.matcher(stringLocal).matches();
 
                     Type originalType = null;
                     Type modifyType = null;
@@ -935,7 +938,7 @@ public final class InterpreterTweak implements Tweak {
                 //<editor-fold desc="String">
                 if (originalStack instanceof String) {
                     String stringStack = (String) originalStack;
-                    boolean isDesc = ASMHelper.PATTERN_DESC_MATCHER.matcher(stringStack).matches();
+                    boolean isDesc = InterpreterTweak.PATTERN_DESC.matcher(stringStack).matches();
 
                     Type originalType = null;
                     Type modifyType = null;

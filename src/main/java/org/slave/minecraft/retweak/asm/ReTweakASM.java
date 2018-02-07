@@ -23,7 +23,7 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {
-                TransformerLoadController.class.getCanonicalName()
+            TransformerLoadController.class.getCanonicalName()
         };
     }
 

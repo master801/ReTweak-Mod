@@ -100,15 +100,15 @@ public final class GuiScreenReTweakMods extends GuiScreen {
     }
 
     private void drawForeground() {
-        final int color = Colors.PINK;
-        final float r = ColorHelper.toGL(
-            ColorHelper.getRedFromHex(color)
+        int color = Colors.COLOR_RGB_PINK;
+        float r = ColorHelper.toGL(
+            ColorHelper.getR(color)
         );
-        final float g = ColorHelper.toGL(
-            ColorHelper.getGreenFromHex(color)
+        float g = ColorHelper.toGL(
+            ColorHelper.getG(color)
         );
-        final float b = ColorHelper.toGL(
-            ColorHelper.getBlueFromHex(color)
+        float b = ColorHelper.toGL(
+            ColorHelper.getB(color)
         );
         GL11.glColor4f(
             r,

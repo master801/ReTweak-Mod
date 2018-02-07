@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation.interpreter._1_6_4;
 
+import cpw.mods.fml.common.registry.GameData;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import org.slave.minecraft.retweak.loading.tweak.compilation.interpreter.annotation.Deobfuscated;
@@ -80,14 +81,20 @@ public class aqz extends Block {//TODO
 
     @Obfuscated(name = "d")
     @Deobfuscated(name = "idPicked")
-    public int d(final abw world, final int x, final int y, final int z) {
-        return -1;//TODO idk
+    public int d(final abw world, final int xCoord, final int yCoord, final int zCoord) {
+        return -1;
     }
 
     @Obfuscated(name = "a")
     @Deobfuscated(name = "idDropped")
-    public int a(final int meta, final Random par2Random, final int par3) {
-        return -1;//TODO idk
+    public int a(final int metadata, final Random random, final int fortune) {
+        return GameData.getItemRegistry().getId(
+            super.getItemDropped(
+                metadata,
+                random,
+                fortune
+            )
+        );
     }
 
     @Obfuscated(name = "a")
@@ -97,14 +104,14 @@ public class aqz extends Block {//TODO
     }
 
     @Deobfuscated(name = "getBlockDropped")
-    public ArrayList<ye> getBlockDropped(final abw world, final int xCoord, final int yCoord, final int zCoord, final int metadata, final int fortune) {
+    public ArrayList<ye> getBlockDropped(final abw world, final int xCoord, final int yCoord, final int zCoord, final int metadata, final int fortune) {//Forge method
 //        return super.getDrops(world, xCoord, yCoord, zCoord, metadata, fortune);
         return null;//TODO
     }
 
     @Obfuscated(name = "a")
     @Deobfuscated(name = "registerIcons")
-    public void a(final mt reg) {//TODO
+    public void a(final mt iconRegistry) {//TODO
     }
 
     @Obfuscated(name = "a")
