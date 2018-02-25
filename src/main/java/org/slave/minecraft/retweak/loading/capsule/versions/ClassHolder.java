@@ -147,6 +147,7 @@ public final class ClassHolder {
             }
         }
 
+        @NoArgsConstructor(access = AccessLevel.PRIVATE)
         public static final class FieldEntryBuilder {
 
             private static FieldEntryBuilder instance;
@@ -155,9 +156,6 @@ public final class ClassHolder {
             private String deobfuscatedName;
             private Type fromDescType;
             private Type toDescType;
-
-            private FieldEntryBuilder() {
-            }
 
             public FieldEntryBuilder setObfuscatedName(final String obfuscatedName) {
                 this.obfuscatedName = obfuscatedName;
@@ -340,13 +338,8 @@ public final class ClassHolder {
 
         public ClassInfo build() {
             if (classEntry == null) throw new NullPointerException("Class entry not set!");
-
             ClassInfo classInfo = new ClassInfo(classEntry);
-
-            //<editor-fold desc="Cleanup">
             cleanup();
-            //</editor-fold>
-
             return classInfo;
         }
 
@@ -368,27 +361,5 @@ public final class ClassHolder {
         }
 
     }
-
-    /*
-    private final List<String> classes;
-    private final List<Class<?>> overrideClassList;
-
-    ClassHolder(final List<String> classes, final List<Class<?>> overrideClassList) {
-        this.classes = Collections.unmodifiableList(
-                classes
-        );
-        this.overrideClassList = Collections.unmodifiableList(
-                overrideClassList
-        );
-    }
-
-    public List<String> getClasses() {
-        return classes;
-    }
-
-    public List<Class<?>> getOverrideClassList() {
-        return overrideClassList;
-    }
-    */
 
 }

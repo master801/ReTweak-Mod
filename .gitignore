@@ -1,4 +1,4 @@
-#Workspace
+##Workspace
 /build
 /run
 /out
@@ -6,12 +6,15 @@
 *.ipr
 *.iws
 
-#Misc
+##Misc
 /libs
 /Docs
 
-#Gradle
+##Gradle
 /.gradle
 
-#Garbage
+##Garbage
 Thumbs.db
+
+##Ignore test folder
+src/test/

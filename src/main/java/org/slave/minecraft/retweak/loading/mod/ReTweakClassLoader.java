@@ -35,6 +35,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         ReTweakResources.RETWEAK_DIRECTORY,
         "asm"
     );
+
     private static final String[] EXCLUSIONS = new String[] {
         "java.",
         "sun.",
@@ -76,9 +77,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
         this.parent = parent;
         this.gameVersion = gameVersion;
         if (this.parent == null || super.getParent() == null) {
-            throw new NullPointerException(
-                "Parent class loader is null!"
-            );
+            throw new NullPointerException("Parent class loader is null!");
         }
     }
 

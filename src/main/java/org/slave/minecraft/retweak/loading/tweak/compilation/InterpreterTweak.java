@@ -1,6 +1,8 @@
 package org.slave.minecraft.retweak.loading.tweak.compilation;
 
 import com.google.common.base.Joiner;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -29,15 +31,13 @@ import java.util.regex.Pattern;
  *
  * @author Master
  */
+@RequiredArgsConstructor
 public final class InterpreterTweak implements Tweak {
 
     private static final Pattern PATTERN_DESC = Pattern.compile("^(\\*L).+(;)$");
 
+    @NonNull
     private final GameVersion gameVersion;
-
-    public InterpreterTweak(final GameVersion gameVersion) {
-        this.gameVersion = gameVersion;
-    }
 
     @Override
     public String getName() {
@@ -125,10 +125,9 @@ public final class InterpreterTweak implements Tweak {
 
     private void classInterfaces(final ClassNode classNode) {
         List<String> originalInterfaces = classNode.interfaces;
-        List<String> finalInterfaces = new ArrayList<>();
 
         if (originalInterfaces != null) {
-            finalInterfaces.addAll(originalInterfaces);
+            List<String> finalInterfaces = new ArrayList<>(originalInterfaces);
             for(int i = 0; i < originalInterfaces.size(); ++i) {
                 String originalInterface = originalInterfaces.get(i);
                 String finalInterface = null;
@@ -846,10 +845,9 @@ public final class InterpreterTweak implements Tweak {
 
     private void frameNodeLocal(final String className, final String methodName, final String methodDesc, final int index, final FrameNode frameNode) {
         List<Object> originalLocalList = frameNode.local;
-        List<Object> finalLocalList = new ArrayList<>();
 
         if (originalLocalList != null) {
-            finalLocalList.addAll(originalLocalList);
+            List<Object> finalLocalList = new ArrayList<>(originalLocalList);
 
             for(int i = 0; i < originalLocalList.size(); ++i) {
                 Object originalLocal = originalLocalList.get(i);

@@ -1,9 +1,15 @@
 buildscript {
     repositories {
+        mavenLocal()
         mavenCentral()
         jcenter()
         maven {
-            url 'https://plugins.gradle.org/m2/'
+            name = 'plugins'
+            url = 'https://plugins.gradle.org/m2/'
+        }
+        maven {
+            name = 'artifactory'
+            url = project.properties['artifactory_contextUrl'] + '/gradle-dev'
         }
         maven {
             name = 'forge'
@@ -13,20 +19,20 @@ buildscript {
             name = 'sonatype'
             url = 'https://oss.sonatype.org/content/repositories/snapshots/'
         }
-        /*
         maven {
             name = 'sponge'
             url = 'http://repo.spongepowered.org/maven'
         }
-        */
     }
     dependencies {
         classpath(
                 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
         )
+        /*
         classpath(
                 'net.sf.proguard:proguard-gradle:5.2.1'
         )
+        */
         classpath(
                 group: 'io.franzbecker',
                 name: 'gradle-lombok',
@@ -48,6 +54,7 @@ repositories {
         url = 'http://repo.spongepowered.org/maven'
     }
     maven {
+        name = 'artifactory'
         url = project.properties['artifactory_contextUrl'] + '/gradle-dev'
     }
 }
@@ -65,10 +72,16 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
-    version = project.properties['forge-version']
+    version = '1.7.10-10.13.4.1614-1.7.10'
+//    mappings = 'snapshot_20140925'
     runDir = 'run'
 
     replace '@MOD_VERSION@', project.version
+}
+
+lombok {
+    version = '1.16.18'
+    sha256 = ''//idk - do not set sha256
 }
 
 jar {
@@ -105,6 +118,11 @@ dependencies {
             name: 'io',
             version: project.properties['slave-lib-version']
     )
+    compile(
+            group: 'org.slave.lib',
+            name: 'program-home',
+            version: project.properties['slave-lib-version']
+    )
 
 
     compile(
@@ -130,12 +148,19 @@ dependencies {
 }
 
 processResources {
-    inputs.property 'version', project.version
-    inputs.property 'mcversion', project.minecraft.version
+    inputs.property(
+        'version', project.version
+    )
+    inputs.property(
+        'mcversion', project.minecraft.version
+    )
 
     from(sourceSets.main.resources.srcDirs) {
         include 'mcmod.info'
-        expand 'version': project.version, 'mcversion': project.minecraft.version
+        expand(
+            'version': project.version,
+            'mcversion': project.minecraft.version
+        )
     }
 
     from(sourceSets.main.resources.srcDirs) {
@@ -143,9 +168,9 @@ processResources {
     }
 }
 
-task proguard(type: proguard.gradle.ProGuardTask) {
-    configuration 'configuration.pro'
-}
+// task proguard(type: proguard.gradle.ProGuardTask) {
+    // configuration 'configuration.pro'
+// }
 
 task mkSrcJar(type: Jar) {
     from sourceSets.main.allSource

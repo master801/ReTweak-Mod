@@ -1,5 +1,7 @@
 package org.slave.minecraft.retweak.loading;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.slave.lib.exceptions.InvalidSortException;
 import org.slave.minecraft.retweak.loading.tweak.Tweak;
 
@@ -10,23 +12,22 @@ import java.util.Comparator;
  *
  * @author Master
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ReTweakTweakHandler {
 
-    public static final ReTweakTweakHandler INSTANCE = new ReTweakTweakHandler();
-
-    private ReTweakTweakHandler() {
-        final Object _RETWEAK_INTERNAL_USAGE_ONLY = null;
-    }
+    private static ReTweakTweakHandler instance;
 
     //TODO
 
+    public static ReTweakTweakHandler getInstance() {
+        if (ReTweakTweakHandler.instance == null) ReTweakTweakHandler.instance = new ReTweakTweakHandler();
+        return ReTweakTweakHandler.instance;
+    }
+
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class TweakComparator implements Comparator<Tweak> {
 
         static final Comparator<Tweak> INSTANCE = new TweakComparator();
-
-        private TweakComparator() {
-            final Object _INTERNAL_USAGE_ONLY_ = null;
-        }
 
         @Override
         public int compare(final Tweak o1, final Tweak o2) {
