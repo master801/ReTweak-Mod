@@ -9,6 +9,7 @@
 ##Misc
 /libs
 /Docs
+/bk
 
 ##Gradle
 /.gradle

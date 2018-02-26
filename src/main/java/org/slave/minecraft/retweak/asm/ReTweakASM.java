@@ -1,30 +1,22 @@
 package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
-import org.slave.minecraft.retweak.asm.transformers.TransformerLoadController;
+import net.minecraft.launchwrapper.IClassTransformer;
+import org.objectweb.asm.tree.ClassNode;
+import org.slave.lib.asm.transformers.BasicTransformer;
 
 import java.util.Map;
 
 /**
- * Created by Master801 on 3/18/2016 at 10:24 PM.
+ * Created by master on 2/25/18 at 9:24 PM
  *
- * @author Master801
+ * @author master
  */
-@Name("ReTweak-Mod-ASM")
-@MCVersion("1.7.10")
-@TransformerExclusions({
-        "org.slave.minecraft.retweak.asm."
-})
 public final class ReTweakASM implements IFMLLoadingPlugin {
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[] {
-            TransformerLoadController.class.getCanonicalName()
-        };
+        return new String[0];
     }
 
     @Override
@@ -34,11 +26,11 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
     @Override
     public String getSetupClass() {
-        return ReTweakSetup.class.getCanonicalName();
+        return null;
     }
 
     @Override
-    public void injectData(Map<String, Object> data) {
+    public void injectData(final Map<String, Object> data) {
     }
 
     @Override
