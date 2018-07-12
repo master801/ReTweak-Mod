@@ -20,4 +20,6 @@ public final class ReTweak {
     public static final File FILE_DIRECTORY_RETWEAK_MODS = new File(ReTweak.FILE_DIRECTORY_RETWEAK, "mods");
     public static final File FILE_DIRECTORY_RETWEAK_CONFIG = new File(ReTweak.FILE_DIRECTORY_RETWEAK, "config");
 
+    public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("retweak.debug", Boolean.FALSE.toString()));
+
 }

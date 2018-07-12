@@ -1,6 +1,7 @@
 package org.slave.minecraft.retweak.load.mod;
 
 import cpw.mods.fml.common.ModClassLoader;
+import cpw.mods.fml.common.discovery.ContainerType;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import lombok.AccessLevel;
@@ -32,11 +33,6 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public final class ReTweakModDiscoverer extends ModDiscoverer {
 
-    private static final Pattern PATTERN_ZIP_JAR_MATCHER = Pattern.compile(
-        ".+(\\.(jar|zip))$",
-        Pattern.MULTILINE
-    );
-
     @NonNull
     private final GameVersion gameVersion;
 
@@ -55,10 +51,8 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
             DirectoryFileFilter.DIRECTORY
         );
 
-        List<ModCandidate> candidates = getCandidates();
         for(File archiveFile : archiveFiles) {
-            /*
-            candidates.add(
+            getCandidates().add(
                 new ReTweakModCandidate(
                     gameVersion,
                     archiveFile,
@@ -66,8 +60,6 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
                     ContainerType.JAR
                 )
             );
-            */
-            //TODO
         }
     }
 
@@ -76,6 +68,7 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
     /**
      * {@link cpw.mods.fml.common.discovery.ModDiscoverer#candidates}
      */
+    @NonNull
     private List<ModCandidate> getCandidates() {
         try {
             if (ReTweakModDiscoverer.fieldCandidates == null) ReTweakModDiscoverer.fieldCandidates = ReflectionHelper.getField(ModDiscoverer.class, "candidates");
@@ -88,18 +81,42 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
                     "Failed to get candidates!",
                     e
             );
-            return null;
+            throw new NullPointerException();
         }
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     private static final class ArchiveFileFilter extends AbstractFileFilter {
 
+        private static Field fieldZipJar;
+
         static final AbstractFileFilter INSTANCE = new ArchiveFileFilter();
 
         @Override
         public boolean accept(final File file) {
-            return file.isFile() && ReTweakModDiscoverer.PATTERN_ZIP_JAR_MATCHER.matcher(file.getName()).matches();
+            return file.isFile() && ArchiveFileFilter.getPatternZipJar().matcher(file.getName()).matches();
+        }
+
+        @NonNull
+        static Pattern getPatternZipJar() {
+            try {
+                if (ArchiveFileFilter.fieldZipJar == null) {
+                    ArchiveFileFilter.fieldZipJar = ReflectionHelper.getField(
+                            ModDiscoverer.class,
+                            "zipJar"
+                    );
+                }
+                return ReflectionHelper.getFieldValue(
+                        ArchiveFileFilter.fieldZipJar,
+                        null
+                );
+            } catch(NoSuchFieldException |IllegalAccessException e) {
+                ReTweak.LOGGER_RETWEAK.error(
+                        "Failed to get Field Pattern \"zipJar\"",
+                        e
+                );
+            }
+            throw new NullPointerException("No pattern for \"zipJar\"!");
         }
 
     }
