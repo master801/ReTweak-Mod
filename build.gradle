@@ -36,6 +36,7 @@ buildscript {
     }
 }
 repositories {
+    mavenLocal()
     mavenCentral()
     maven {
         name = 'sponge'
@@ -97,7 +98,7 @@ dependencies {
     )
     compile(
             group: 'org.slave.lib',
-            name: 'log',
+            name: 'log4j',
             version: project.properties['slave-lib-version']
     )
     compile(
@@ -112,16 +113,6 @@ dependencies {
     )
 
 
-    compile(
-            group: 'org.slf4j',
-            name: 'slf4j-api',
-            version: project.properties['slf4j-version']
-    )
-    compile(
-            group: 'org.apache.logging.log4j',
-            name: 'log4j-slf4j-impl',
-            version: project.properties['log4j-version']
-    )
     compile(
             group: 'org.spongepowered',
             name: 'spongeapi',

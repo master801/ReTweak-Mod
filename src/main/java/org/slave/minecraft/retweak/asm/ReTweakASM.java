@@ -1,9 +1,13 @@
 package org.slave.minecraft.retweak.asm;
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
-import net.minecraft.launchwrapper.IClassTransformer;
-import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.asm.transformers.BasicTransformer;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import org.slave.minecraft.retweak.asm.transformers.TransformerLoader;
+import org.slave.minecraft.retweak.asm.transformers.TransformerSimpleReloadableResourceManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -12,21 +16,29 @@ import java.util.Map;
  *
  * @author master
  */
+@Name("ReTweak")
+@MCVersion("1.7.10")
+@TransformerExclusions({"org.slave.minecraft.retweak.asm."})
 public final class ReTweakASM implements IFMLLoadingPlugin {
+
+    public static final Logger LOGGER_RETWEAK_ASM = LoggerFactory.getLogger("ReTweak-ASM");
 
     @Override
     public String[] getASMTransformerClass() {
-        return new String[0];
+        return new String[] {
+                TransformerLoader.class.getName(),
+                TransformerSimpleReloadableResourceManager.class.getName()
+        };
     }
 
     @Override
     public String getModContainerClass() {
-        return null;
+        return ReTweakModContainer.class.getName();
     }
 
     @Override
     public String getSetupClass() {
-        return null;
+        return ReTweakSetup.class.getName();
     }
 
     @Override
