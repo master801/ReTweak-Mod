@@ -3,7 +3,6 @@ package org.slave.minecraft.retweak.load.mod;
 import cpw.mods.fml.common.discovery.asm.ModAnnotation;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.slave.minecraft.retweak.asm.ReTweakModContainer;
 import org.slave.minecraft.retweak.load.mod.asm.ReTweakASMModParser;
 import org.slave.minecraft.retweak.load.util.GameVersion.GameVersionModIdentifier;
 import org.slave.minecraft.retweak.load.util.GameVersion.GameVersionModIdentifier.Identifier;

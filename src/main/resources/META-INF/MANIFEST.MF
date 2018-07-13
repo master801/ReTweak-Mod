@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 Created-By: Master801
 FMLCorePlugin: org.slave.minecraft.retweak.asm.ReTweakASM
-FMLCorePluginContainsFMLMod: true
-FMLAT: 'META-INF/ReTweak_AT.cfg'
+FMLCorePluginContainsFMLMod: false
+FMLAT: 'ReTweak_AT.cfg'

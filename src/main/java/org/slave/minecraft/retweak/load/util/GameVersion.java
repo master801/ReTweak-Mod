@@ -1,11 +1,14 @@
 package org.slave.minecraft.retweak.load.util;
 
+import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.discovery.ITypeDiscoverer;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.util.discoverer.JarAnnotationDiscoverer;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_4_7;
+import org.slave.minecraft.retweak.load.mod.discoverer.JarAnnotationDiscoverer;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -20,17 +23,21 @@ public enum GameVersion {
 
     V_1_4_7(
             "1.4.7",
-            JarAnnotationDiscoverer.class,
-            GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD
+            GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD,
+            TweakClass_1_4_7.INSTANCE,
+            JarAnnotationDiscoverer.class
     );
 
     @Getter
     private final String version;
 
-    private final Class<? extends ITypeDiscoverer> discovererClass;
-
     @Getter
     private final GameVersionModIdentifier gameVersionModIdentifier;
+
+    @Getter
+    private final TweakClass tweakClass;
+
+    private final Class<? extends ITypeDiscoverer> discovererClass;
 
     public ITypeDiscoverer getDiscoverer(final GameVersion gameVersion) {
         if (gameVersion == null || gameVersion != this) return null;
@@ -66,7 +73,7 @@ public enum GameVersion {
 
         static final GameVersionModIdentifier IDENTIFIER_ANNOTATION_MOD = new GameVersionModIdentifier(
                 Identifier.ANNOTATION,
-                "cpw/mods/fml/common/Mod"
+                Mod.class.getName().replace('.', '/')
         );
 
         @Getter

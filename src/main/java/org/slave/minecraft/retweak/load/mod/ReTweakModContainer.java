@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.asm;
+package org.slave.minecraft.retweak.load.mod;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
@@ -18,7 +18,6 @@ import cpw.mods.fml.common.versioning.VersionRange;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.slave.minecraft.retweak.load.mod.ReTweakModCandidate;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
 import java.io.File;

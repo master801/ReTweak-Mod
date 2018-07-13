@@ -20,6 +20,9 @@ import java.util.List;
  */
 public final class ReTweakModCandidate extends ModCandidate {
 
+    /**
+     * {@link cpw.mods.fml.common.discovery.ModCandidate#mods}
+     */
     private static Field fieldMods;
 
     @Getter
@@ -33,10 +36,9 @@ public final class ReTweakModCandidate extends ModCandidate {
     @Override
     public List<ModContainer> explore(final ASMDataTable table) {
         setMods(
-                gameVersion.getDiscoverer(gameVersion).discover(
-                        this,
-                        table
-                )
+                gameVersion
+                        .getDiscoverer(gameVersion)
+                        .discover(this, table)
         );
         return getContainedMods();
     }
