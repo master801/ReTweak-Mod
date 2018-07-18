@@ -1,21 +1,24 @@
 package org.slave.minecraft.retweak.asm.transformers;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import net.minecraft.client.resources.IResource;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.client.resources.SimpleReloadableResourceManager;
 import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.util.ResourceLocation;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.asm.transformers.BasicTransformer;
-import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.asm.ReTweakASM;
+import org.slave.minecraft.retweak.asm.util.ReTweakASMHelper;
+import org.slave.minecraft.retweak.asm.util.ReTweakASMHelper.Injection;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 /**
@@ -23,74 +26,34 @@ import java.util.Map;
  *
  * @author Master
  */
-public final class TransformerSimpleReloadableResourceManager extends BasicTransformer implements IClassTransformer {
+public final class TransformerSimpleReloadableResourceManager implements IClassTransformer {
 
-    private static final String CLASS_NAME = SimpleReloadableResourceManager.class.getName();
+    private static final String CLASS_NAME = "net.minecraft.client.resources.SimpleReloadableResourceManager";
 
     public TransformerSimpleReloadableResourceManager() {
-        super(ReTweakASM.LOGGER_RETWEAK_ASM);
     }
 
     @Override
-    protected boolean transformClass(final ClassNode classNode) throws Exception {
-        return true;
-    }
+    public byte[] transform(final String name, final String transformedName, final byte[] basicClass) {
+        if (transformedName.equals(CLASS_NAME)) {
+            ClassReader classReader = new ClassReader(basicClass);
+            ClassNode classNode = new ClassNode();
+            ClassVisitor cv = new SimpleReloadableResourceManagerClassVisitor(Opcodes.ASM5, classNode);
+            classReader.accept(cv, 0);
 
-    @Override
-    protected ClassNode getClassNode() {
-        return new ClassNode() {
+            ClassWriter classWriter = new ClassWriter(0);
+            classNode.accept(classWriter);
 
-            @Override
-            public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-                MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-
-                for_:
-                for(Injection injection : Injection.values()) {
-                    for(String _name : injection.name) {
-                        if (_name.equals(name)) {
-                            for(String _desc : injection.desc) {
-                                if (_desc.equals(desc)) {
-                                    try {
-                                        Constructor<? extends MethodVisitor> constructor = ReflectionHelper.getConstructor(
-                                                injection.classMv,
-                                                new Class<?>[] {
-                                                        int.class,
-                                                        MethodVisitor.class
-                                                }
-                                        );
-                                        mv = ReflectionHelper.createFromConstructor(
-                                                constructor,
-                                                new Object[] {
-                                                        super.api,
-                                                        mv
-                                                }
-                                        );
-                                    } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
-                                        TransformerSimpleReloadableResourceManager.this.getLogger().error(
-                                                "Caught exception while creating method visitor!",
-                                                e
-                                        );
-                                    }
-                                    continue for_;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                return mv;
-            }
-
-        };
-    }
-
-    @Override
-    protected String getClassName(final boolean b) {
-        return TransformerSimpleReloadableResourceManager.CLASS_NAME.replace('/', '.');
+            byte[] data = classWriter.toByteArray();
+            BasicTransformer.writeASMFile(classNode, name.replace('.', '/'));
+            BasicTransformer.writeClassFile(name.replace('.', '/'), data);
+            return data;
+        }
+        return basicClass;
     }
 
     @AllArgsConstructor
-    private enum Injection {
+    private enum _Injection implements Injection {
 
         GET_RESOURCE(
                 new String[] {
@@ -102,13 +65,48 @@ public final class TransformerSimpleReloadableResourceManager extends BasicTrans
                 MethodVisitorGetResource.class
         );
 
+        @Getter
         private final String[] name;
+
+        @Getter
         private final String[] desc;
-        private final Class<? extends MethodVisitor> classMv;
+
+        @Getter
+        private final Class<? extends MethodVisitor> methodVisitorClass;
 
     }
 
-    static final class MethodVisitorGetResource extends MethodVisitor {//TODO
+    public static final class SimpleReloadableResourceManagerClassVisitor extends ClassVisitor {
+
+        public SimpleReloadableResourceManagerClassVisitor(final int api, final ClassVisitor cv) {
+            super(api, cv);
+        }
+
+        @Override
+        public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+            return ReTweakASMHelper.visitMethod(
+                    super.api,
+                    super.visitMethod(
+                            access,
+                            name,
+                            desc,
+                            signature,
+                            exceptions
+                    ),
+                    _Injection.values(),
+                    ReTweakASM.LOGGER_RETWEAK_ASM,
+
+                    access,
+                    name,
+                    desc,
+                    signature,
+                    exceptions
+            );
+        }
+
+    }
+
+    public static final class MethodVisitorGetResource extends MethodVisitor {//TODO
 
         public MethodVisitorGetResource(final int api, final MethodVisitor mv) {
             super(api, mv);
@@ -118,16 +116,12 @@ public final class TransformerSimpleReloadableResourceManager extends BasicTrans
 
             private Map domainResourceManagers = null;
 
-            public IResource getResource(ResourceLocation p_110536_1_) throws IOException
-            {
-                IResourceManager iresourcemanager = (IResourceManager)this.domainResourceManagers.get(p_110536_1_.getResourceDomain());
+            public IResource getResource(ResourceLocation p_110536_1_) throws IOException {
+                IResourceManager iresourcemanager = (IResourceManager) this.domainResourceManagers.get(p_110536_1_.getResourceDomain());
 
-                if (iresourcemanager != null)
-                {
+                if (iresourcemanager != null) {
                     return iresourcemanager.getResource(p_110536_1_);
-                }
-                else
-                {
+                } else {
                     throw new FileNotFoundException(p_110536_1_.toString());
                 }
             }

@@ -12,6 +12,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.MCVersion;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.Name;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import org.slave.minecraft.retweak.asm.transformers.TransformerLoadController;
 import org.slave.minecraft.retweak.asm.transformers.TransformerLoader;
 import org.slave.minecraft.retweak.asm.transformers.TransformerSimpleReloadableResourceManager;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import java.util.Set;
  */
 @Name("ReTweak")
 @MCVersion("1.7.10")
-@TransformerExclusions({"org.slave.minecraft.retweak.asm."})
+@TransformerExclusions({"org.slave.minecraft.retweak.asm.", "org.slave.minecraft.retweak.asm.util.", "org.slave.minecraft.retweak.handlers.", "org.slave.minecraft.retweak.load.asm.", "org.slave.minecraft.retweak.load.mod.", "org.slave.minecraft.retweak.load.util."})
 public final class ReTweakASM implements IFMLLoadingPlugin {
 
     public static final Logger LOGGER_RETWEAK_ASM = LoggerFactory.getLogger("ReTweak-ASM");
@@ -39,6 +40,7 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
     public String[] getASMTransformerClass() {
         return new String[] {
                 TransformerLoader.class.getName(),
+                TransformerLoadController.class.getName(),
                 TransformerSimpleReloadableResourceManager.class.getName()
         };
     }
@@ -193,9 +195,8 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
         @Override
         public List<String> getOwnedPackages() {
-            return Lists.asList(
+            return Lists.newArrayList(
                     "org.slave.minecraft.retweak",
-                    new String[] {
                             "org.slave.minecraft.retweak.asm",
                             "org.slave.minecraft.retweak.asm.transformers",
                             "org.slave.minecraft.retweak.asm.util",
@@ -205,8 +206,7 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
                             "org.slave.minecraft.retweak.load.mod",
                             "org.slave.minecraft.retweak.load.mod.asm",
                             "org.slave.minecraft.retweak.load.mod.discoverer",
-                            "org.slave.minecraft.retweak.load.util",
-                    }
+                            "org.slave.minecraft.retweak.load.util"
             );
         }
 

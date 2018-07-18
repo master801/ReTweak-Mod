@@ -2,7 +2,6 @@ package org.slave.minecraft.retweak.asm.util;
 
 import lombok.experimental.UtilityClass;
 import org.objectweb.asm.MethodVisitor;
-import org.slave.lib.helpers.ReflectionHelper;
 import org.slf4j.Logger;
 
 import java.lang.reflect.Constructor;
@@ -18,24 +17,20 @@ public final class ReTweakASMHelper {
 
     public static MethodVisitor visitMethod(final int api, final MethodVisitor mv, final Injection[] injections, final Logger logger, final int access, final String name, final String desc, final String signature, final String[] exceptions) {
         for(Injection _injection : injections) {
+            if (_injection.getMethodVisitorClass() == null) continue;
+
             for(String _name : _injection.getName()) {
                 if (_name.equals(name)) {
                     for(String _desc : _injection.getDesc()) {
                         if (_desc.equals(desc)) {
                             try {
-                                Constructor<? extends MethodVisitor> constructor = ReflectionHelper.getConstructor(
-                                        _injection.getMethodVisitorClass(),
-                                        new Class<?>[] {
-                                                int.class,
-                                                MethodVisitor.class
-                                        }
+                                Constructor<? extends MethodVisitor> constructor = _injection.getMethodVisitorClass().getDeclaredConstructor(
+                                        int.class,
+                                        MethodVisitor.class
                                 );
-                                return ReflectionHelper.createFromConstructor(
-                                        constructor,
-                                        new Object[] {
-                                                api,
-                                                mv
-                                        }
+                                return constructor.newInstance(
+                                        api,
+                                        mv
                                 );
                             } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
                                 logger.error(

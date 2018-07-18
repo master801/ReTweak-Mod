@@ -110,7 +110,7 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
                         ArchiveFileFilter.fieldZipJar,
                         null
                 );
-            } catch(NoSuchFieldException |IllegalAccessException e) {
+            } catch(NoSuchFieldException | IllegalAccessException e) {
                 ReTweak.LOGGER_RETWEAK.error(
                         "Failed to get Field Pattern \"zipJar\"",
                         e

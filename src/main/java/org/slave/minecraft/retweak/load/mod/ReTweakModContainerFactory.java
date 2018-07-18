@@ -27,7 +27,7 @@ public final class ReTweakModContainerFactory {
 
         if (gameVersionModIdentifier.getIdentifier() == Identifier.ANNOTATION) {
             for(ModAnnotation annotation : reTweakASMModParser.getAnnotations()) {
-                if (annotation.getASMType().getClassName().equals(gameVersionModIdentifier.getName())) {
+                if (annotation.getASMType().getClassName().replace('.', '/').equals(gameVersionModIdentifier.getName())) {
                     return new ReTweakModContainer(
                             reTweakModCandidate.getGameVersion(),
                             className,

@@ -20,30 +20,30 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
         _package = @Package("ItemStack"),
         name = "net.minecraft.item"
 )
-public class ur extends ItemStack {
+public class ur /*extends ItemStack*/ {
 
     public ur(final Block p_i1876_1_) {
-        super(p_i1876_1_);
+//        super(p_i1876_1_);
     }
 
     public ur(final Block p_i1877_1_, final int p_i1877_2_) {
-        super(p_i1877_1_, p_i1877_2_);
+//        super(p_i1877_1_, p_i1877_2_);
     }
 
     public ur(final Block p_i1878_1_, final int p_i1878_2_, final int p_i1878_3_) {
-        super(p_i1878_1_, p_i1878_2_, p_i1878_3_);
+//        super(p_i1878_1_, p_i1878_2_, p_i1878_3_);
     }
 
     public ur(final Item p_i1879_1_) {
-        super(p_i1879_1_);
+//        super(p_i1879_1_);
     }
 
     public ur(final Item p_i1880_1_, final int p_i1880_2_) {
-        super(p_i1880_1_, p_i1880_2_);
+//        super(p_i1880_1_, p_i1880_2_);
     }
 
     public ur(final Item p_i1881_1_, final int p_i1881_2_, final int p_i1881_3_) {
-        super(p_i1881_1_, p_i1881_2_, p_i1881_3_);
+//        super(p_i1881_1_, p_i1881_2_, p_i1881_3_);
     }
 
 }

@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.load;
 
+import com.google.common.collect.Maps;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slave.lib.helpers.ArrayHelper;
@@ -15,6 +16,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -26,6 +28,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
     private static Field fieldClassLoaderExceptions;
     private static Field fieldTransformerExceptions;
+
+    private static Map<GameVersion, ReTweakClassLoader> INSTANCES = Maps.newEnumMap(GameVersion.class);
 
     private final GameVersion gameVersion;
     private final LaunchClassLoader parent;
@@ -98,6 +102,18 @@ public final class ReTweakClassLoader extends URLClassLoader {
                     file.getPath()
             );
         }
+    }
+
+    /**
+     * {@link cpw.mods.fml.common.ModClassLoader#clearNegativeCacheFor(java.util.Set)}
+     */
+    public void clearNegativeCacheFor(final Set<String> classList) {
+        parent.clearNegativeEntries(classList);
+    }
+
+    public static ReTweakClassLoader getInstance(final GameVersion gameVersion) {
+        if (gameVersion == null) return null;
+        return ReTweakClassLoader.INSTANCES.get(gameVersion);
     }
 
     private static Set<String> getClassLoaderExceptions(final LaunchClassLoader launchClassLoader) {

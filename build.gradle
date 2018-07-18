@@ -31,7 +31,7 @@ buildscript {
         classpath(
                 group: 'io.franzbecker',
                 name: 'gradle-lombok',
-                version: '1.8'
+                version: '1.14'
         )
     }
 }
@@ -61,14 +61,13 @@ targetCompatibility = JavaVersion.VERSION_1_8
 
 minecraft {
     version = '1.7.10-10.13.4.1614-1.7.10'
-//    mappings = 'snapshot_20140925'
     runDir = 'run'
 
     replace '@MOD_VERSION@', project.version
 }
 
 lombok {
-    version = '1.16.18'
+    version = '1.18.0'
     sha256 = ''//idk - do not set sha256
 }
 
@@ -88,7 +87,17 @@ dependencies {
     )
     compile(
             group: 'org.slave.lib',
-            name: 'minecraft-asm',
+            name: 'io',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'asm-minecraft',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'asm-transformer',
             version: project.properties['slave-lib-version']
     )
     compile(
@@ -98,17 +107,12 @@ dependencies {
     )
     compile(
             group: 'org.slave.lib',
-            name: 'log4j',
-            version: project.properties['slave-lib-version']
-    )
-    compile(
-            group: 'org.slave.lib',
-            name: 'io',
-            version: project.properties['slave-lib-version']
-    )
-    compile(
-            group: 'org.slave.lib',
             name: 'program-home',
+            version: project.properties['slave-lib-version']
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'log4j-minecraft',
             version: project.properties['slave-lib-version']
     )
 

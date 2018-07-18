@@ -24,6 +24,7 @@ public final class ReTweakModCandidate extends ModCandidate {
      * {@link cpw.mods.fml.common.discovery.ModCandidate#mods}
      */
     private static Field fieldMods;
+    private static Field fieldTable;
 
     @Getter
     private final GameVersion gameVersion;
@@ -35,12 +36,56 @@ public final class ReTweakModCandidate extends ModCandidate {
 
     @Override
     public List<ModContainer> explore(final ASMDataTable table) {
-        setMods(
-                gameVersion
-                        .getDiscoverer(gameVersion)
-                        .discover(this, table)
-        );
+        ReTweakModCandidate.setTable(this, table);
+
+        List<ModContainer> modContainers = gameVersion
+                .getDiscoverer(gameVersion)
+                .discover(this, table);
+
+        setMods(modContainers);
         return getContainedMods();
+    }
+
+    private static void setTable(final ReTweakModCandidate reTweakModCandidate, final ASMDataTable asmDataTable) {
+        if (ReTweakModCandidate.fieldTable == null) {
+            try {
+                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(
+                        ModCandidate.class,
+                        "table"
+                );
+            } catch (NoSuchFieldException e) {
+                ReTweak.LOGGER_RETWEAK.error("Failed to get field \"table\"!", e);
+            }
+        }
+        try {
+            ReTweakModCandidate.fieldTable.setAccessible(true);
+            ReTweakModCandidate.fieldTable.set(reTweakModCandidate, asmDataTable);
+            ReTweakModCandidate.fieldTable.setAccessible(false);
+        } catch (IllegalAccessException e) {
+            ReTweak.LOGGER_RETWEAK.error("Failed to set field \"table\"!", e);
+        }
+    }
+
+    private static ASMDataTable getTable(final ReTweakModCandidate reTweakModCandidate) {
+        if (ReTweakModCandidate.fieldTable == null) {
+            try {
+                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(
+                        ModCandidate.class,
+                        "table"
+                );
+            } catch (NoSuchFieldException e) {
+                ReTweak.LOGGER_RETWEAK.error("Failed to get field \"table\"!", e);
+            }
+        }
+        try {
+            ReTweakModCandidate.fieldTable.setAccessible(true);
+            ASMDataTable table = (ASMDataTable)ReTweakModCandidate.fieldTable.get(reTweakModCandidate);
+            ReTweakModCandidate.fieldTable.setAccessible(false);
+            return table;
+        } catch (IllegalAccessException e) {
+            ReTweak.LOGGER_RETWEAK.error("Failed to set field \"table\"!", e);
+        }
+        return null;
     }
 
     private void setMods(final List<ModContainer> list) {

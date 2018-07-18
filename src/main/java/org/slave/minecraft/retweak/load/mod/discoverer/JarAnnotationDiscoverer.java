@@ -139,7 +139,9 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                 while (entryEnumeration.hasMoreElements()) {
                     JarEntry jarEntry = entryEnumeration.nextElement();
                     Matcher matcher = ITypeDiscoverer.classFile.matcher(jarEntry.getName());
-                    if (matcher.matches()) {
+                    if (matcher.matches()) {//Check if jar entry is class
+                        candidate.addClassEntry(jarEntry.getName());
+
                         ReTweakASMModParser reTweakASMModParser = null;
                         InputStream inputStream = null;
                         try {
