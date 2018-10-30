@@ -8,12 +8,13 @@ import cpw.mods.fml.common.ModContainer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.slave.minecraft.retweak.ReTweak;
+import org.slave.minecraft.retweak.load.mapping.SrgMap;
 import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 import org.slave.minecraft.retweak.load.mod.ReTweakModDiscoverer;
 
 import java.io.File;
-import java.lang.reflect.GenericArrayType;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,8 +35,9 @@ public final class ReTweakLoader {
     private Map<GameVersion, File> configDirs = null;
 
     private Map<GameVersion, List<ReTweakModContainer>> mods = null;
+    private final Map<GameVersion, SrgMap> mappings = new HashMap<>();//Used in org.slave.minecraft.retweak.asm.ReTweakSetup
 
-    private Map<GameVersion, ReTweakModDiscoverer> modDiscoverers = null;
+    private Map<GameVersion, ReTweakModDiscoverer> reTweakModDiscoverers = null;
     private Map<GameVersion, ReTweakLoadController> reTweakLoadControllers = null;
 
     /**
@@ -77,10 +79,10 @@ public final class ReTweakLoader {
         for(GameVersion gameVersion : GameVersion.values()) mods.put(gameVersion, Lists.newArrayList());
 
         //Create mod discoverers for game versions
-        modDiscoverers = Maps.newEnumMap(GameVersion.class);
+        reTweakModDiscoverers = Maps.newEnumMap(GameVersion.class);
         for(GameVersion gameVersion : GameVersion.values()) {
             ReTweakModDiscoverer reTweakModDiscoverer = new ReTweakModDiscoverer(gameVersion);
-            modDiscoverers.put(gameVersion, reTweakModDiscoverer);
+            reTweakModDiscoverers.put(gameVersion, reTweakModDiscoverer);
         }
 
         reTweakLoadControllers = Maps.newEnumMap(GameVersion.class);
@@ -96,19 +98,18 @@ public final class ReTweakLoader {
     @SuppressWarnings({ "unused" })
     public void identifyMods() {
         for(GameVersion gameVersion : GameVersion.values()) {
-            ReTweakModDiscoverer reTweakModDiscoverer = modDiscoverers.get(gameVersion);
+            ReTweakModDiscoverer reTweakModDiscoverer = reTweakModDiscoverers.get(gameVersion);
             reTweakModDiscoverer.findModDirMods(getModDirectory(gameVersion));
 
             List<ModContainer> modContainers = reTweakModDiscoverer.identifyMods();
 
             List<ReTweakModContainer> reTweakModContainers = mods.get(gameVersion);
             for(ModContainer modContainer : modContainers) reTweakModContainers.add((ReTweakModContainer)modContainer);
-
             mods.put(gameVersion, reTweakModContainers);
         }
     }
 
-    List<ReTweakModContainer> getMods(final GameVersion gameVersion) {
+    public List<ReTweakModContainer> getMods(final GameVersion gameVersion) {
         if (gameVersion == null) return null;
         return mods.get(gameVersion);
     }
@@ -120,9 +121,13 @@ public final class ReTweakLoader {
      */
     public void distributeStateMessage(final LoadController loadController, final LoaderState state, final Object... eventData) {
         if (loadController.getClass() == LoadController.class) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
-            for (GameVersion gameVersion: GameVersion.values()) {
+            for(GameVersion gameVersion: GameVersion.values()) {
+                if (gameVersion.isDisabled()) {//TODO Read from config
+                    ReTweak.LOGGER_RETWEAK.info("Game version {} has been disabled and no mods for it will be loaded.", gameVersion.getVersion());
+                    continue;
+                }
                 ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
-                reTweakLoadController.distributeStateMessage(state, eventData);//FIXME
+                reTweakLoadController.distributeStateMessage(state, eventData);
             }
         }
     }
@@ -134,7 +139,7 @@ public final class ReTweakLoader {
      */
     public void transition(final LoadController loadController, LoaderState desiredState, final boolean forceState) {
         if (loadController.getClass() == LoadController.class) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
-            for (GameVersion gameVersion: GameVersion.values()) {
+            for(GameVersion gameVersion: GameVersion.values()) {
                 ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
                 reTweakLoadController.transition(desiredState, forceState);
             }
@@ -148,7 +153,11 @@ public final class ReTweakLoader {
      */
     public void distributeStateMessage(final LoadController loadController, final Class<?> customEvent) {
         if (loadController.getClass() == LoadController.class) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
-            for (GameVersion gameVersion: GameVersion.values()) {
+            for(GameVersion gameVersion: GameVersion.values()) {
+                if (gameVersion.isDisabled()) {//TODO Read if disabled from config
+                    ReTweak.LOGGER_RETWEAK.info("Game version {} has been disabled and no mods for it will be loaded.", gameVersion.getVersion());
+                    continue;
+                }
                 ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
                 reTweakLoadController.distributeStateMessage(customEvent);//FIXME
             }
@@ -160,14 +169,24 @@ public final class ReTweakLoader {
         return modDirs.get(gameVersion);
     }
 
-    private File getConfigDirectory(final GameVersion gameVersion) {
+    public File getConfigDirectory(final GameVersion gameVersion) {
         if (gameVersion == null || configDirs == null) return null;
         return configDirs.get(gameVersion);
+    }
+
+    public ReTweakModDiscoverer getReTweakModDiscoverer(final GameVersion gameVersion) {
+        if (gameVersion == null || reTweakModDiscoverers == null) return null;
+        return reTweakModDiscoverers.get(gameVersion);
     }
 
     public ReTweakLoadController getReTweakLoadController(final GameVersion gameVersion) {
         if (gameVersion == null || reTweakLoadControllers == null) return null;
         return reTweakLoadControllers.get(gameVersion);
+    }
+
+    public SrgMap getMapping(final GameVersion gameVersion) {
+        if (gameVersion == null) return null;
+        return mappings.get(gameVersion);
     }
 
     public static ReTweakLoader instance() {

@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.objectweb.asm.Type;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.FieldEntryBuilder.FieldEntry;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MethodEntryBuilder.MethodEntry;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -29,8 +29,8 @@ public final class MigrationClassBuilder {
     private String from;
     private Class<?> to;
 
-    private Set<FieldEntry> fieldEntries;
-    private Set<MethodEntry> methodEntries;
+    private Set<MigrationField> fieldEntries;
+    private Set<MigrationMethod> methodEntries;
 
     public MigrationClassBuilder from(final String from) {
         if (from == null) return this;
@@ -44,14 +44,14 @@ public final class MigrationClassBuilder {
         return this;
     }
 
-    public MigrationClassBuilder addFieldMapping(final FieldEntry fieldEntry) {
+    public MigrationClassBuilder addFieldMapping(final MigrationField fieldEntry) {
         if (fieldEntry == null) return this;
         if (fieldEntries == null) fieldEntries = Sets.newHashSet();
         fieldEntries.add(fieldEntry);
         return this;
     }
 
-    public MigrationClassBuilder addMethodMapping(final MethodEntry methodEntry) {
+    public MigrationClassBuilder addMethodMapping(final MigrationMethod methodEntry) {
         if (methodEntry == null) return this;
         if (methodEntries == null) methodEntries = Sets.newHashSet();
         methodEntries.add(methodEntry);
@@ -61,10 +61,7 @@ public final class MigrationClassBuilder {
     public MigrationClass build() {
         if (from == null) throw new NullPointerException("From not set!");
 //            if (to == null) throw new NullPointerException("To not set!");
-        MigrationClass migrationClass = new MigrationClass(
-                from,
-                to
-        );
+        MigrationClass migrationClass = new MigrationClass(from, to);
         migrationClass.setFields(fieldEntries);
         migrationClass.setMethods(methodEntries);
 
@@ -92,45 +89,48 @@ public final class MigrationClassBuilder {
         @Getter
         private final Class<?> to;
 
-        private Set<FieldEntry> fieldEntries;
-        private Set<MethodEntry> methodEntries;
+        private Set<MigrationField> fieldMigrations;
+        private Set<MigrationMethod> methodMigrations;
 
-        public Set<FieldEntry> getFields() {
-            return fieldEntries;
+        public static MigrationClassBuilder builder() {
+            return MigrationClassBuilder.instance();
         }
 
-        void setFields(final Set<FieldEntry> fieldEntries) {
-            this.fieldEntries = fieldEntries;
+        public Set<MigrationField> getFields() {
+            return fieldMigrations;
         }
 
-        public FieldEntry getField(final String name, final String desc) {
-            if (fieldEntries == null) return null;
+        void setFields(final Set<MigrationField> fieldEntries) {
+            this.fieldMigrations = fieldEntries;
+        }
+
+        public MigrationField getField(final String name, final String desc) {
+            if (fieldMigrations == null) return null;
             Type descType = Type.getType(desc);
 
             if (descType == null) return null;
 
-            for (FieldEntry fieldEntry: fieldEntries) {
-                if (fieldEntry.getObfuscatedName().equals(name) && descType.equals(fieldEntry.getFromDescType()))
-                    return fieldEntry;
+            for (MigrationField fieldEntry: fieldMigrations) {
+                if (fieldEntry.getObfuscatedName().equals(name) && descType.equals(fieldEntry.getFromDescType())) return fieldEntry;
             }
             return null;
         }
 
-        public void setMethods(final Set<MethodEntry> methodEntries) {
-            this.methodEntries = methodEntries;
+        public void setMethods(final Set<MigrationMethod> methodEntries) {
+            this.methodMigrations = methodEntries;
         }
 
-        public MethodEntry getMethod(final String name, final String desc) {
-            if (methodEntries == null) return null;
+        public MigrationMethod getMethod(final String name, final String desc) {
+            if (methodMigrations == null) return null;
 
             Type returnType = Type.getReturnType(desc);
             Type[] argTypes = Type.getArgumentTypes(desc);
 
-            for (MethodEntry methodEntry: methodEntries) {
-                boolean descMatches = returnType.equals(methodEntry.getReturnTypeDesc());
-                if (methodEntry.getArgumentDescTypes() != null) {
-                    descMatches = descMatches && argTypes.length == methodEntry.getArgumentDescTypes().length;
-                    descMatches = descMatches && Arrays.equals(argTypes, methodEntry.getArgumentDescTypes());
+            for (MigrationMethod methodEntry: methodMigrations) {
+                boolean descMatches = returnType.equals(methodEntry.getObfuscatedReturnTypeDesc());
+                if (methodEntry.getObfuscatedArgumentDescTypes() != null) {
+                    descMatches = descMatches && argTypes.length == methodEntry.getObfuscatedArgumentDescTypes().length;
+                    descMatches = descMatches && Arrays.equals(argTypes, methodEntry.getObfuscatedArgumentDescTypes());
                 }
 
                 if (methodEntry.getObfuscatedName().equals(name) && descMatches) return methodEntry;
@@ -140,36 +140,36 @@ public final class MigrationClassBuilder {
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class FieldEntryBuilder {
+    public static final class BuilderMigrationField {
 
-        private static FieldEntryBuilder instance;
+        private static BuilderMigrationField instance;
 
         private String obfuscatedName;
         private String deobfuscatedName;
         private Type fromDescType;
         private Type toDescType;
 
-        public FieldEntryBuilder setObfuscatedName(final String obfuscatedName) {
+        public BuilderMigrationField setObfuscatedName(final String obfuscatedName) {
             this.obfuscatedName = obfuscatedName;
             return this;
         }
 
-        public FieldEntryBuilder setDeobfuscatedName(final String deobfuscatedName) {
+        public BuilderMigrationField setDeobfuscatedName(final String deobfuscatedName) {
             this.deobfuscatedName = deobfuscatedName;
             return this;
         }
 
-        public FieldEntryBuilder setFromDescType(final Type type) {
+        public BuilderMigrationField setFromDescType(final Type type) {
             this.fromDescType = type;
             return this;
         }
 
-        public FieldEntryBuilder setToDescType(final Type type) {
+        public BuilderMigrationField setToDescType(final Type type) {
             this.toDescType = type;
             return this;
         }
 
-        public FieldEntryBuilder setDeobfuscatedNameThroughField(final Class<?> clazz, final Object fieldValue) {
+        public BuilderMigrationField setDeobfuscatedNameThroughField(final Class<?> clazz, final Object fieldValue) {
             if (fieldValue == null) return this;
             for (Field field: clazz.getDeclaredFields()) {
                 Object reflectedFieldValue;
@@ -197,10 +197,10 @@ public final class MigrationClassBuilder {
             return this;
         }
 
-        public FieldEntryBuilder.FieldEntry build() {
+        public MigrationField build() {
             if (obfuscatedName == null) throw new NullPointerException("Obfuscated name not set!");
             if (deobfuscatedName == null) throw new NullPointerException("Deobfuscated name not set!");
-            FieldEntryBuilder.FieldEntry fieldEntry = new FieldEntryBuilder.FieldEntry(
+            MigrationField fieldEntry = new MigrationField(
                     obfuscatedName,
                     deobfuscatedName,
                     fromDescType,
@@ -217,13 +217,13 @@ public final class MigrationClassBuilder {
             return fieldEntry;
         }
 
-        public static FieldEntryBuilder instance() {
-            if (FieldEntryBuilder.instance == null) FieldEntryBuilder.instance = new FieldEntryBuilder();
-            return FieldEntryBuilder.instance;
+        public static BuilderMigrationField instance() {
+            if (BuilderMigrationField.instance == null) BuilderMigrationField.instance = new BuilderMigrationField();
+            return BuilderMigrationField.instance;
         }
 
         @AllArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class FieldEntry {
+        public static final class MigrationField {
 
             @Getter
             private final String obfuscatedName;
@@ -237,66 +237,105 @@ public final class MigrationClassBuilder {
             @Getter
             private final Type toDescType;
 
+            public static BuilderMigrationField builder() {
+                return BuilderMigrationField.instance();
+            }
+
         }
 
     }
 
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static final class MethodEntryBuilder {
+    public static final class BuilderMigrationMethod {
 
-        private static MethodEntryBuilder instance;
+        private static BuilderMigrationMethod instance;
 
         private String obfuscatedName;
         private String deobfuscatedName;
 
-        private Type descReturnType;
-        private Type[] descArgumentTypes;
+        private Type obfuscatedDescReturnType;
+        private Type[] obfuscatedDescArgumentTypes;
 
-        public MethodEntryBuilder setObfuscatedName(final String obfuscatedName) {
+        private Type deobfuscatedDescReturnType;
+        private Type[] deobfuscatedDescArgumentTypes;
+
+        public BuilderMigrationMethod setObfuscatedName(final String obfuscatedName) {
             this.obfuscatedName = obfuscatedName;
             return this;
         }
 
-        public MethodEntryBuilder setDeobfuscatedName(final String deobfuscatedName) {
+        public BuilderMigrationMethod setDeobfuscatedName(final String deobfuscatedName) {
             this.deobfuscatedName = deobfuscatedName;
             return this;
         }
 
-        public MethodEntryBuilder setDescReturnType(final Type descReturnType) {
-            this.descReturnType = descReturnType;
+        public BuilderMigrationMethod setObfuscatedDescReturnType(final Type descReturnType) {
+            this.obfuscatedDescReturnType = descReturnType;
             return this;
         }
 
-        public MethodEntryBuilder setDescArgumentTypes(final Type[] descArgumentTypes) {
-            this.descArgumentTypes = descArgumentTypes;
+        public BuilderMigrationMethod setObfuscatedDescArgumentTypes(final Type... descArgumentTypes) {
+            this.obfuscatedDescArgumentTypes = descArgumentTypes;
             return this;
         }
 
-        public MethodEntryBuilder.MethodEntry build() {
+        public BuilderMigrationMethod setDeobfuscatedDescReturnType(final Type descReturnType) {
+            this.deobfuscatedDescReturnType = descReturnType;
+            return this;
+        }
+
+        public BuilderMigrationMethod setDeobfuscatedDescArgumentTypes(final Type... descArgumentTypes) {
+            this.deobfuscatedDescArgumentTypes = descArgumentTypes;
+            return this;
+        }
+
+        public MigrationMethod build() {
             if (obfuscatedName == null) throw new NullPointerException("Obfuscated name not set!");
             if (deobfuscatedName == null) throw new NullPointerException("Deobfuscated name not set!");
-            if (descReturnType == null) throw new NullPointerException("Desc return type not set!");
-            if (descArgumentTypes == null) throw new NullPointerException("Argument return types not set!");
 
-            MethodEntryBuilder.MethodEntry methodEntry = new MethodEntryBuilder.MethodEntry(obfuscatedName, deobfuscatedName, descReturnType, descArgumentTypes);
+            //Check if obfuscated types are null
+            if (obfuscatedDescReturnType == null) throw new NullPointerException("Obfuscated desc return type not set!");
+            if (obfuscatedDescArgumentTypes == null) obfuscatedDescArgumentTypes = new Type[0];
+
+            //Check if deobfuscated types are null
+            if (deobfuscatedDescReturnType == null) throw new NullPointerException("Deobfuscated desc return type not set!");
+            if (deobfuscatedDescArgumentTypes == null) deobfuscatedDescArgumentTypes = new Type[0];
+
+            MigrationMethod methodEntry = new MigrationMethod(
+                    //Names
+                    obfuscatedName,
+                    deobfuscatedName,
+
+                    //Obfuscated types
+                    obfuscatedDescReturnType,
+                    obfuscatedDescArgumentTypes,
+
+                    //Deobfuscated types
+                    deobfuscatedDescReturnType,
+                    deobfuscatedDescArgumentTypes
+            );
 
             //<editor-fold desc="Cleanup">
             obfuscatedName = null;
             deobfuscatedName = null;
-            descReturnType = null;
-            descArgumentTypes = null;
+
+            obfuscatedDescReturnType = null;
+            obfuscatedDescArgumentTypes = null;
+
+            deobfuscatedDescReturnType = null;
+            deobfuscatedDescArgumentTypes = null;
             //</editor-fold>
 
             return methodEntry;
         }
 
-        public static MethodEntryBuilder instance() {
-            if (MethodEntryBuilder.instance == null) MethodEntryBuilder.instance = new MethodEntryBuilder();
-            return MethodEntryBuilder.instance;
+        public static BuilderMigrationMethod instance() {
+            if (BuilderMigrationMethod.instance == null) BuilderMigrationMethod.instance = new BuilderMigrationMethod();
+            return BuilderMigrationMethod.instance;
         }
 
         @AllArgsConstructor(access = AccessLevel.PRIVATE)
-        public static final class MethodEntry {
+        public static final class MigrationMethod {
 
             @Getter
             private String obfuscatedName;
@@ -305,10 +344,20 @@ public final class MigrationClassBuilder {
             private String deobfuscatedName;
 
             @Getter
-            private Type returnTypeDesc;
+            private Type obfuscatedReturnTypeDesc;
 
             @Getter
-            private Type[] argumentDescTypes;
+            private Type[] obfuscatedArgumentDescTypes;
+
+            @Getter
+            private Type deobfuscatedReturnTypeDesc;
+
+            @Getter
+            private Type[] deobfuscatedArgumentDescTypes;
+
+            public static BuilderMigrationMethod builder() {
+                return BuilderMigrationMethod.instance();
+            }
 
         }
 

@@ -8,6 +8,8 @@ import cpw.mods.fml.common.discovery.ITypeDiscoverer;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping;
+import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.mod.ReTweakModCandidate;
 import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
@@ -31,7 +33,7 @@ import java.util.zip.ZipEntry;
  * @author Master
  */
 @RequiredArgsConstructor
-public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
+public final class _JarDiscoverer implements ITypeDiscoverer {
 
     @Getter
     private final GameVersion gameVersion;
@@ -57,6 +59,19 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
 
         if (jarFile != null) {
             try {
+                //<editor-fold desc="ASM Table">
+                ASMTable asmTable = new ASMTable();
+                try {
+                    asmTable.load(jarFile);
+                } catch(IOException e) {
+                    ReTweak.LOGGER_RETWEAK.error(
+                            "Failed to load the ASM Table! The mod will not be loaded correctly!",
+                            e
+                    );
+                }
+                //</editor-fold>
+
+                //<editor-fold desc="Mod info metadata">
                 ZipEntry modInfoEntry = jarFile.getEntry("mcmod.info");
                 MetadataCollection metadata = null;
                 if (modInfoEntry != null) {
@@ -91,7 +106,9 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                     ReTweak.LOGGER_RETWEAK.info("Found no mcmod.info for mod {}", candidate.getModContainer().getName());
                     metadata = MetadataCollection.from(null, "");
                 }
+                //</editor-fold>
 
+                //<editor-fold desc="Manifest">
                 ZipEntry manifestEntry = jarFile.getEntry("META-INF/MANIFEST.MF");
                 if (manifestEntry != null) {
                     InputStream inputStream = null;
@@ -134,9 +151,11 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                         }
                     }
                 }
+                //</editor-fold>
 
+                //<editor-fold desc="Entries">
                 Enumeration<JarEntry> entryEnumeration = jarFile.entries();
-                while (entryEnumeration.hasMoreElements()) {
+                while(entryEnumeration.hasMoreElements()) {
                     JarEntry jarEntry = entryEnumeration.nextElement();
                     Matcher matcher = ITypeDiscoverer.classFile.matcher(jarEntry.getName());
                     if (matcher.matches()) {//Check if jar entry is class
@@ -147,7 +166,10 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                         try {
                             inputStream = jarFile.getInputStream(jarEntry);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            ReTweak.LOGGER_RETWEAK.warn(
+                                    "Failed to read a class file from the jar file!",
+                                    e
+                            );
                         }
                         if (inputStream != null) {
                             try {
@@ -158,7 +180,7 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                                             "Failed to open stream to class file!",
                                             e
                                     );
-                                    ReTweak.LOGGER_RETWEAK.debug("Jar File: {}, Jar Entry: {}", jarFile.getName(), jarEntry.getName());
+                                    ReTweak.LOGGER_RETWEAK.info("Jar File: {}, Jar Entry: {}", jarFile.getName(), jarEntry.getName());
                                 }
                                 if (reTweakASMModParser != null) {
                                     reTweakASMModParser.sendToTable(table, candidate);
@@ -167,6 +189,7 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                                             .instance()
                                             .build(
                                                     reTweakASMModParser,
+                                                    asmTable,
                                                     candidate.getModContainer(),
                                                     (ReTweakModCandidate)candidate
                                             );
@@ -184,12 +207,13 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                                             String.format("Failed to close stream for class file \"%s\"!", jarEntry.getName()),
                                             e
                                     );
-                                    ReTweak.LOGGER_RETWEAK.debug("Jar File: {}, Jar Entry: {}", jarFile.getName(), jarEntry.getName());
+                                    ReTweak.LOGGER_RETWEAK.info("Jar File: {}, Jar Entry: {}", jarFile.getName(), jarEntry.getName());
                                 }
                             }
                         }
                     }
                 }
+                //</editor-fold>
             } finally {
                 try {
                     jarFile.close();
@@ -198,10 +222,17 @@ public final class JarAnnotationDiscoverer implements ITypeDiscoverer {
                             "Failed to close jarFile!",
                             e
                     );
-                    ReTweak.LOGGER_RETWEAK.debug("Jar File: {}", jarFile.getName());
+                    ReTweak.LOGGER_RETWEAK.info("Jar File: {}", jarFile.getName());
                 }
             }
         }
+
+        for (ModContainer foundMod : foundMods) {
+            ReTweakModContainer reTweakModContainer = (ReTweakModContainer)foundMod;
+            ObfuscateRemapping obfuscateMapping = new ObfuscateRemapping();
+            //TODO
+        }
+
 
         return foundMods;
     }

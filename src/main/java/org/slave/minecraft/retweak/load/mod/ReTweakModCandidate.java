@@ -6,6 +6,7 @@ import cpw.mods.fml.common.discovery.ContainerType;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import lombok.Getter;
 import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
@@ -29,21 +30,32 @@ public final class ReTweakModCandidate extends ModCandidate {
     @Getter
     private final GameVersion gameVersion;
 
+    private ASMTable asmTable;
+
     public ReTweakModCandidate(final GameVersion gameVersion, final File classPathRoot, final File modContainer, final ContainerType sourceType) {
         super(classPathRoot, modContainer, sourceType);
         this.gameVersion = gameVersion;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public List<ModContainer> explore(final ASMDataTable table) {
         ReTweakModCandidate.setTable(this, table);
 
         List<ModContainer> modContainers = gameVersion
-                .getDiscoverer(gameVersion)
+                .getDiscoverer()
                 .discover(this, table);
 
-        setMods(modContainers);
+        ReTweakModCandidate.setMods(this, modContainers);
         return getContainedMods();
+    }
+
+    public ASMTable getASMTable() {
+        return asmTable;
+    }
+
+    void setASMTable(final ASMTable asmTable) {
+        this.asmTable = asmTable;
     }
 
     private static void setTable(final ReTweakModCandidate reTweakModCandidate, final ASMDataTable asmDataTable) {
@@ -88,7 +100,7 @@ public final class ReTweakModCandidate extends ModCandidate {
         return null;
     }
 
-    private void setMods(final List<ModContainer> list) {
+    private static void setMods(final ModCandidate modCandidate, final List<ModContainer> list) {
         if (list == null) return;
         try {
             if (ReTweakModCandidate.fieldMods == null) {
@@ -99,7 +111,7 @@ public final class ReTweakModCandidate extends ModCandidate {
             }
             ReflectionHelper.setFieldValue(
                     ReTweakModCandidate.fieldMods,
-                    this,
+                    modCandidate,
                     list
             );
         } catch(NoSuchFieldException | IllegalAccessException e) {

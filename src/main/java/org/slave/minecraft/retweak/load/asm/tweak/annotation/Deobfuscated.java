@@ -26,4 +26,6 @@ public @interface Deobfuscated {
 
     String name();
 
+    Class<?>[] parameters() default {};
+
 }

@@ -14,10 +14,7 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
  *
  * @author Master
  */
-@Obfuscated(
-        _package = @Package(""),
-        name = "yc"
-)
+@Obfuscated(name = "yc")
 @Deobfuscated(
         _package = @Package("net.minecraft.world"),
         name = "World"

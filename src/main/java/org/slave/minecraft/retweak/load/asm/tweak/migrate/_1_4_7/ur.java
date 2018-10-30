@@ -2,7 +2,6 @@ package org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation.Obfuscated;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
@@ -12,13 +11,10 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
  *
  * @author Master
  */
-@Obfuscated(
-        _package = @Package(""),
-        name = "yc"
-)
+@Obfuscated(name = "yc")
 @Deobfuscated(
-        _package = @Package("ItemStack"),
-        name = "net.minecraft.item"
+        _package = @Package("net.minecraft.item"),
+        name = "ItemStack"
 )
 public class ur /*extends ItemStack*/ {
 

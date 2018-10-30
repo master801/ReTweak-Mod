@@ -28,10 +28,7 @@ public final class ReTweakASMHelper {
                                         int.class,
                                         MethodVisitor.class
                                 );
-                                return constructor.newInstance(
-                                        api,
-                                        mv
-                                );
+                                return constructor.newInstance(api, mv);
                             } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
                                 logger.error(
                                         "Caught exception while creating method visitor!",

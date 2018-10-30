@@ -1,12 +1,13 @@
 package org.slave.minecraft.retweak.load.mod;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
@@ -14,6 +15,8 @@ import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.discovery.ASMDataTable;
+import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
 import cpw.mods.fml.common.event.FMLEvent;
 import cpw.mods.fml.common.event.FMLStateEvent;
@@ -23,22 +26,23 @@ import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.Level;
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.ReTweakClassLoader;
 import org.slave.minecraft.retweak.load.util.EventAnnotation;
 import org.slave.minecraft.retweak.load.util.GameVersion;
+import org.slave.minecraft.retweak.load.util.GameVersion.GameVersionModIdentifier.Identifier;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -89,10 +93,11 @@ public final class ReTweakModContainer implements ModContainer  {
     private Disableable disableability;
     private ListMultimap<Class<? extends FMLEvent>, Method> eventMethods = ArrayListMultimap.create();
 
-    public ReTweakModContainer(final GameVersion gameVersion, final String className, final ReTweakModCandidate reTweakModCandidate, final Map<String, Object> modDescriptor) {
+    public ReTweakModContainer(@NonNull final GameVersion gameVersion, @NonNull final String className, @NonNull final ReTweakModCandidate reTweakModCandidate, @NonNull final ASMTable asmTable, @NonNull final Map<String, Object> modDescriptor) {
         this.gameVersion = gameVersion;
         this.className = className;
         this.reTweakModCandidate = reTweakModCandidate;
+        reTweakModCandidate.setASMTable(asmTable);
         this.modDescriptor = modDescriptor;
         this.source = reTweakModCandidate.getModContainer();
 
@@ -256,14 +261,25 @@ public final class ReTweakModContainer implements ModContainer  {
         return reTweakModCandidate.getContainedPackages();
     }
 
+    public ReTweakModCandidate getReTweakModCandidate() {
+        return reTweakModCandidate;
+    }
+
+    /**
+     * @param clazz
+     * @return Instance factory {@link cpw.mods.fml.common.Mod.InstanceFactory}
+     */
     private Method gatherAnnotations(final Class<?> clazz) {
         Method factoryMethod = null;
         for(Method method : clazz.getDeclaredMethods()) {
             for(Annotation annotation : method.getAnnotations()) {
-                if (gameVersion.getEventAnnotations().contains(annotation)) {
-                    eventMethods.put((Class<? extends FMLEvent>)method.getParameterTypes()[0], method);
-                } else if (gameVersion.getInstanceFactoryAnnotation() != null && gameVersion.getInstanceFactoryAnnotation().equals(annotation)) {
-                    factoryMethod = method;
+                for(EventAnnotation eventAnnotation : gameVersion.getEventAnnotations()) {
+                    if (eventAnnotation.equals(annotation)) {
+                        eventMethods.put((Class<? extends FMLEvent>)method.getParameterTypes()[0], method);
+                        if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Found event method \"{}( {} )\" in class \"{}\"", method.getName(), Joiner.on(", ").join(method.getParameterTypes()), clazz.getName());
+                    } else if (gameVersion.getInstanceFactoryAnnotation() != null && gameVersion.getInstanceFactoryAnnotation().equals(annotation)) {
+                        factoryMethod = method;
+                    }
                 }
             }
         }
@@ -278,7 +294,6 @@ public final class ReTweakModContainer implements ModContainer  {
 
         @Subscribe
         public void constructMod(final FMLConstructionEvent fmlConstructionEvent) {
-            //TODO
             try {
                 ReTweakClassLoader reTweakClassLoader = reTweakModContainer.getGameVersion().getClassLoader();
                 reTweakClassLoader.addFile(reTweakModContainer.getSource());
@@ -289,9 +304,10 @@ public final class ReTweakModContainer implements ModContainer  {
 
                 reTweakModContainer.mod = reTweakModContainer.getLanguageAdapter().getNewInstance(null, modClass, reTweakClassLoader, factoryMethod);
 
-                //TODO Proxy injector
-
-                ReTweak.LOGGER_RETWEAK.info("");
+                EventAnnotation sidedProxyAnnotation = reTweakModContainer.getGameVersion().getSidedProxyAnnotation();
+                if (sidedProxyAnnotation != null) {
+                    injectProxy(reTweakModContainer, fmlConstructionEvent.getASMHarvestedData(), sidedProxyAnnotation);
+                }
             } catch(Throwable e) {
                 ReTweak.LOGGER_RETWEAK.error(
                         "Failed to construct mod!",
@@ -302,8 +318,44 @@ public final class ReTweakModContainer implements ModContainer  {
 
         @Subscribe
         public void handleModStateEvent(final FMLStateEvent fmlStateEvent) {
-            ReTweak.LOGGER_RETWEAK.info("");
-            //TODO
+            Class<? extends FMLStateEvent> fmlStateEventClass = fmlStateEvent.getClass();
+
+            List<Method> eventMethods = Lists.newArrayList();
+            if (reTweakModContainer.eventMethods.containsKey(fmlStateEvent.getClass())) {
+                List<Method> methods = reTweakModContainer.eventMethods.get(fmlStateEvent.getClass());
+                eventMethods.addAll(methods);
+            }
+
+            for(Method eventMethod : eventMethods) {
+                try {
+                    ReflectionHelper.invokeMethod(
+                            eventMethod,
+                            reTweakModContainer.mod,
+                            new Object[] {
+                                    fmlStateEvent
+                            }
+                    );
+                    if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Invoked mod event method \"{}({})\" for mod \"{}\"", eventMethod.getName(), Joiner.on(", ").join(eventMethod.getParameterTypes()), reTweakModContainer.getName());
+                } catch (IllegalAccessException | InvocationTargetException e) {
+                    ReTweak.LOGGER_RETWEAK.error(
+                            "Failed to invoke a mod method!",
+                            e
+                    );
+                }
+            }
+        }
+
+        /**
+         * {@link cpw.mods.fml.common.ProxyInjector}
+         */
+        private static void injectProxy(final ReTweakModContainer reTweakModContainer, final ASMDataTable asmHarvestedData, final EventAnnotation sidedProxyAnnotation) {
+            if (reTweakModContainer == null || asmHarvestedData == null || sidedProxyAnnotation == null) return;
+            if (sidedProxyAnnotation.getIdentifier() == Identifier.ANNOTATION) {
+                Set<ASMData> proxies = asmHarvestedData.getAnnotationsFor(reTweakModContainer).get(sidedProxyAnnotation.getName());
+
+                //TODO
+                ReTweak.LOGGER_RETWEAK.info("TODO: INJECT PROXY");
+            }
         }
 
     }

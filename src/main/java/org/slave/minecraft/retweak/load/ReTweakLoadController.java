@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
@@ -25,7 +24,7 @@ import org.slave.minecraft.retweak.load.util.GameVersion;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Created by Master on 7/11/2018 at 12:26 PM.
@@ -115,6 +114,22 @@ public final class ReTweakLoadController extends LoadController {
                     .append(mc.getSource().getName())
                     .append(") ");
         }
+    }
+
+    @Override
+    public void distributeStateMessage(final LoaderState state, final Object... eventData) {
+        if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Distributing state message {}", state.name());
+
+        Object[] newEventData = eventData != null ? Arrays.copyOf(eventData, eventData.length) : null;
+        if (state == LoaderState.CONSTRUCTING && newEventData != null) {
+            newEventData[1] = ReTweakLoader.instance().getReTweakModDiscoverer(gameVersion).getASMTable();
+        }
+        if (state == LoaderState.PREINITIALIZATION && newEventData != null) {
+            newEventData[1] = ReTweakLoader.instance().getConfigDirectory(gameVersion);
+        }
+        super.distributeStateMessage(state, newEventData);
+
+        if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Distributed state message {}", state.name());
     }
 
     private void sendEventToModContainer(final FMLEvent stateEvent, final ModContainer modContainer) {

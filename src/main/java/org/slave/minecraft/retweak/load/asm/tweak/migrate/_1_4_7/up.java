@@ -2,8 +2,6 @@ package org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -18,10 +16,7 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
  *
  * @author Master
  */
-@Obfuscated(
-        _package = @Package(""),
-        name = "up"
-)
+@Obfuscated(name = "up")
 @Deobfuscated(
         _package = @Package("net.minecraft.item"),
         name = "Item"
@@ -84,7 +79,7 @@ public class up extends Item implements TextureUser {
 
     @Obfuscated(name = "a")
     @Deobfuscated(name = "setCreativeTab")
-    public up a(final tf creativeTab) {
+    public up a(final CreativeTabs creativeTab) {
         super.setCreativeTab(creativeTab);
         return this;
     }

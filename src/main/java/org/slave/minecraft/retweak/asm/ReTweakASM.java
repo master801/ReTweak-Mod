@@ -15,6 +15,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 import org.slave.minecraft.retweak.asm.transformers.TransformerLoadController;
 import org.slave.minecraft.retweak.asm.transformers.TransformerLoader;
 import org.slave.minecraft.retweak.asm.transformers.TransformerSimpleReloadableResourceManager;
+import org.slave.minecraft.retweak.asm.transformers.access.TransformerItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,10 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
         return new String[] {
                 TransformerLoader.class.getName(),
                 TransformerLoadController.class.getName(),
-                TransformerSimpleReloadableResourceManager.class.getName()
+                TransformerSimpleReloadableResourceManager.class.getName(),
+
+                //Access
+                TransformerItemStack.class.getName()
         };
     }
 
@@ -66,21 +70,24 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
     public static final class ReTweakInternalModContainer implements ModContainer {
 
+        public static final String MODID = "ReTweak";
+        public static final String VERSION = "@VERSION@";
+
         private ModMetadata modMetadata;
 
         @Override
         public String getModId() {
-            return "ReTweak";
+            return ReTweakInternalModContainer.MODID;
         }
 
         @Override
         public String getName() {
-            return "ReTweak";
+            return ReTweakInternalModContainer.MODID;
         }
 
         @Override
         public String getVersion() {
-            return "@VERSION@";
+            return ReTweakInternalModContainer.VERSION;
         }
 
         @Override
@@ -190,7 +197,7 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
         @Override
         public String getGuiClassName() {
-            return null;
+            return "org.slave.minecraft.retweak.client.gui.ReTweakGuiFactory";
         }
 
         @Override

@@ -2,7 +2,6 @@ package org.slave.minecraft.retweak.load.mod;
 
 import cpw.mods.fml.common.ModClassLoader;
 import cpw.mods.fml.common.discovery.ContainerType;
-import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -32,6 +31,8 @@ import java.util.regex.Pattern;
  */
 @RequiredArgsConstructor
 public final class ReTweakModDiscoverer extends ModDiscoverer {
+
+    private static Field fieldCandidates = null;
 
     @NonNull
     private final GameVersion gameVersion;
@@ -63,13 +64,11 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
         }
     }
 
-    private static Field fieldCandidates = null;
-
     /**
      * {@link cpw.mods.fml.common.discovery.ModDiscoverer#candidates}
      */
     @NonNull
-    private List<ModCandidate> getCandidates() {
+    public List<ReTweakModCandidate> getCandidates() {
         try {
             if (ReTweakModDiscoverer.fieldCandidates == null) ReTweakModDiscoverer.fieldCandidates = ReflectionHelper.getField(ModDiscoverer.class, "candidates");
             return ReflectionHelper.getFieldValue(

@@ -45,7 +45,7 @@ public final class TransformerSimpleReloadableResourceManager implements IClassT
             classNode.accept(classWriter);
 
             byte[] data = classWriter.toByteArray();
-            BasicTransformer.writeASMFile(classNode, name.replace('.', '/'));
+            BasicTransformer.writeASMFile(name.replace('.', '/'), classNode);
             BasicTransformer.writeClassFile(name.replace('.', '/'), data);
             return data;
         }

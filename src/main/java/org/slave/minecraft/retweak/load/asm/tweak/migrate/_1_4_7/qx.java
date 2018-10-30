@@ -12,10 +12,7 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
  *
  * @author Master
  */
-@Obfuscated(
-        _package = @Package(""),
-        name = "qx"
-)
+@Obfuscated(name = "qx")
 @Deobfuscated(
         _package = @Package("net.minecraft.entity.player"),
         name = "EntityPlayer"

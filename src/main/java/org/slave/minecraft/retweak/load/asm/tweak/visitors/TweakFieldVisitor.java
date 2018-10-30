@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.load.asm;
+package org.slave.minecraft.retweak.load.asm.tweak.visitors;
 
 import org.objectweb.asm.FieldVisitor;
 import org.slave.minecraft.retweak.load.util.GameVersion;

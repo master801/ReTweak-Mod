@@ -3,65 +3,147 @@ package org.slave.minecraft.retweak.load.util;
 import com.google.common.collect.Lists;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.discovery.ITypeDiscoverer;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.ReTweakClassLoader;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_2_5;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_4_7;
-import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
-import org.slave.minecraft.retweak.load.mod.ReTweakModContainer.ReTweakModContainerEventHandler;
-import org.slave.minecraft.retweak.load.mod.discoverer.JarAnnotationDiscoverer;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_5_2;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_6_2;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass_1_6_4;
+import org.slave.minecraft.retweak.load.mod.discoverer._JarDiscoverer;
 import org.slave.minecraft.retweak.load.util.GameVersion.GameVersionModIdentifier.Identifier;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.concurrent.Callable;
 
 /**
  * Created by Master on 7/11/2018 at 8:45 PM.
  *
  * @author Master
  */
-@RequiredArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum GameVersion {
+
+    V_1_2_5(
+            "1.2.5",
+            GameVersionModIdentifier.IDENTIFIER_EXTENDS_MOD,
+            TweakClass_1_2_5.INSTANCE,
+            _JarDiscoverer.class,
+            null,//No event annotations
+            null,//No proxy annotation
+            true
+    ),
 
     V_1_4_7(
             "1.4.7",
             GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD,
             TweakClass_1_4_7.INSTANCE,
-            JarAnnotationDiscoverer.class,
+            _JarDiscoverer.class,
             Lists.newArrayList(
                     new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$PreInit"),
                     new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$Init"),
-                    new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$PostInit")
+                    new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$PostInit"),
+
+                    EventAnnotation.EVENT_ANNOTATION_EVENT_HANDLER
             ),
-            null
+            EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
+            true
+    ),
+
+    V_1_5_2(
+            "1.5.2",
+            GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD,
+            TweakClass_1_5_2.INSTANCE,
+            _JarDiscoverer.class,
+            Lists.newArrayList(
+                    new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$PreInit"),
+                    new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$Init"),
+                    new EventAnnotation(Identifier.ANNOTATION, "cpw/mods/fml/common/Mod$PostInit"),
+
+                    EventAnnotation.EVENT_ANNOTATION_EVENT_HANDLER
+            ),
+            EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
+            true
+    ),
+
+    V_1_6_2(
+            "1.6.2",
+            GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD,
+            TweakClass_1_6_2.INSTANCE,
+            _JarDiscoverer.class,
+            Lists.newArrayList(
+                    EventAnnotation.EVENT_ANNOTATION_EVENT_HANDLER
+            ),
+            EventAnnotation.EVENT_ANNOTATION_INSTANCE_FACTORY,
+            EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
+            true
+    ),
+
+    V_1_6_4(
+            "1.6.4",
+            GameVersionModIdentifier.IDENTIFIER_ANNOTATION_MOD,
+            TweakClass_1_6_4.INSTANCE,
+            _JarDiscoverer.class,
+            Lists.newArrayList(
+                    EventAnnotation.EVENT_ANNOTATION_EVENT_HANDLER
+            ),
+            EventAnnotation.EVENT_ANNOTATION_INSTANCE_FACTORY,
+            EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
+            false
     );
 
+    public static final GameVersion[] VALUES = GameVersion.values();
+
+    @NonNull
     @Getter
     private final String version;
 
+    @NonNull
     @Getter
     private final GameVersionModIdentifier gameVersionModIdentifier;
 
     @Getter
     private final TweakClass tweakClass;
 
+    @NonNull
     private final Class<? extends ITypeDiscoverer> discovererClass;
 
     @Getter
     private final List<EventAnnotation> eventAnnotations;
 
     @Getter
-    private final EventAnnotation instanceFactoryAnnotation;
+    private EventAnnotation instanceFactoryAnnotation;
 
-    public ITypeDiscoverer getDiscoverer(final GameVersion gameVersion) {
-        if (gameVersion == null || gameVersion != this) return null;
+    @Getter
+    private final EventAnnotation sidedProxyAnnotation;
+
+    @Getter
+    private final boolean isDisabled;
+
+    GameVersion(final String version, final GameVersionModIdentifier gameVersionModIdentifier, final TweakClass tweakClass, final Class<? extends ITypeDiscoverer> discovererClass, final List<EventAnnotation> eventAnnotations, final EventAnnotation instanceFactoryAnnotation, final EventAnnotation sidedProxyAnnotation, final boolean isDisabled) {
+        this.version = version;
+        this.gameVersionModIdentifier = gameVersionModIdentifier;
+        this.tweakClass = tweakClass;
+        this.discovererClass = discovererClass;
+        this.eventAnnotations = eventAnnotations;
+        this.instanceFactoryAnnotation = instanceFactoryAnnotation;
+        this.sidedProxyAnnotation = sidedProxyAnnotation;
+        this.isDisabled = isDisabled;
+    }
+
+    @Override
+    public String toString() {
+        return getVersion();
+    }
+
+    public ITypeDiscoverer getDiscoverer() {
         try {
             Constructor<? extends ITypeDiscoverer> constructor = ReflectionHelper.getConstructor(
                     discovererClass,
@@ -72,7 +154,7 @@ public enum GameVersion {
             return ReflectionHelper.createFromConstructor(
                     constructor,
                     new Object[] {
-                            gameVersion
+                            this
                     }
             );
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
@@ -82,8 +164,8 @@ public enum GameVersion {
             );
             ReTweak.LOGGER_RETWEAK.debug(
                     "GameVersion: {}/{}",
-                    gameVersion.name(),
-                    gameVersion.getVersion()
+                    name(),
+                    getVersion()
             );
         }
         return null;
@@ -93,12 +175,17 @@ public enum GameVersion {
         return ReTweakClassLoader.getInstance(this);
     }
 
-    @RequiredArgsConstructor
+    @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
     public static final class GameVersionModIdentifier {
 
         static final GameVersionModIdentifier IDENTIFIER_ANNOTATION_MOD = new GameVersionModIdentifier(
                 Identifier.ANNOTATION,
                 Mod.class.getName().replace('.', '/')
+        );
+
+        static final GameVersionModIdentifier IDENTIFIER_EXTENDS_MOD = new GameVersionModIdentifier(
+                Identifier.EXTENDS,
+                "forge/NetworkMod"
         );
 
         @Getter
@@ -108,6 +195,8 @@ public enum GameVersion {
         private final String name;
 
         public enum Identifier {
+
+            EXTENDS,
 
             ANNOTATION;
 

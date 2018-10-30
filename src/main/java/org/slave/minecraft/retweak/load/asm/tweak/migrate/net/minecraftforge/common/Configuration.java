@@ -1,4 +1,4 @@
-package org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7.net.minecraftforge.common;
+package org.slave.minecraft.retweak.load.asm.tweak.migrate.net.minecraftforge.common;
 
 import net.minecraftforge.common.config.Property;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation.Deobfuscated;
@@ -13,12 +13,12 @@ import java.io.File;
  * @author Master
  */
 @Obfuscated(
-        name = "Configuration",
-        _package = @Package("net.minecraftforge.common")
+        _package = @Package("net.minecraftforge.common"),
+        name = "Configuration"
 )
 @Deobfuscated(
-        name = "Configuration",
-        _package = @Package("net.minecraftforge.common.config")
+        _package = @Package("net.minecraftforge.common.config"),
+        name = "Configuration"
 )
 public class Configuration extends net.minecraftforge.common.config.Configuration {
 
