@@ -1,20 +1,22 @@
 package org.slave.lib.obfuscate_mapping;
 
 import com.google.common.collect.Lists;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.DescMapping.DescMappingImpl;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping.NameMappingImpl;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.SignatureMapping.SignatureMappingImpl;
 import org.slave.lib.resources.Obfuscation;
-import scala.actors.threadpool.Arrays;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import scala.actors.threadpool.Arrays;
 
 /**
  * Created by Master on 9/12/2018 at 11:27 PM.
@@ -127,7 +129,7 @@ public final class ObfuscateRemapping {
                     //Update our 'names' array from the given NameMapping
                     for(Obfuscation obfuscation : Obfuscation.values()) {
                         String name = nameMapping.getName(obfuscation);
-                        nameMapping.setName(obfuscation, name);
+                        names[obfuscation.ordinal()] = name;
                     }
                     return this;
                 }

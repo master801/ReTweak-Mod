@@ -1,8 +1,16 @@
 buildscript {
     repositories {
         mavenLocal()
-        mavenCentral()
-        jcenter()
+        // mavenCentral()
+        maven {
+            name = 'mavenCentral'
+            url = "http://repo.maven.apache.org/maven2"
+        }
+        // jcenter()
+        maven {
+            name = 'jcenter'
+            url = "http://jcenter.bintray.com"
+        }
         maven {
             name = 'plugins'
             url = 'https://plugins.gradle.org/m2/'
@@ -37,7 +45,11 @@ buildscript {
 }
 repositories {
     mavenLocal()
-    mavenCentral()
+    // mavenCentral()
+    maven {
+        name = 'mavenCentral'
+        url = "http://repo.maven.apache.org/maven2"
+    }
     maven {
         name = 'sponge'
         url = 'http://repo.spongepowered.org/maven'
@@ -67,7 +79,7 @@ minecraft {
 }
 
 lombok {
-    version = '1.18.2'
+    version = '1.18.4'
     sha256 = ''//idk - do not set sha256
 }
 

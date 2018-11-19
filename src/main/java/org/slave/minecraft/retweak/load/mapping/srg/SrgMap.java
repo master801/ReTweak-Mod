@@ -1,10 +1,13 @@
-package org.slave.minecraft.retweak.load.mapping;
+package org.slave.minecraft.retweak.load.mapping.srg;
 
 import com.google.common.collect.Lists;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import okio.Buffer;
+
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationField;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationField.FactoryObfuscationField;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.DescMapping;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMethod;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMethod.FactoryObfuscationMethod;
 import org.slave.lib.resources.Obfuscation;
 import org.slave.minecraft.retweak.ReTweak;
 import org.supercsv.io.CsvListReader;
@@ -15,6 +18,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import okio.Buffer;
 
 /**
  * Created by master on 10/26/18 at 8:55 PM
@@ -101,9 +109,40 @@ public final class SrgMap {
         }
     }
 
-    public List<MappedType> getMapped(final MapType argType) {
+    public List<MappedType> getMappedList(final MapType argType) {
         if (argType == null) return null;
         return lines.get(argType);
+    }
+
+    public MappedType getMapped(final MapType mapType, final Obfuscation obfuscation, final String name) {
+        return getMapped(mapType, obfuscation, name, null);
+    }
+
+    public MappedType getMapped(final MapType mapType, final Obfuscation obfuscation, final String name, final String desc) {
+        if (mapType == null || obfuscation == null || name == null) return null;
+
+        List<MappedType> mappedTypeList = lines.get(mapType);
+        for(MappedType mappedType : mappedTypeList) {
+            AliasString aliasClass = mappedType.getClassName(obfuscation);
+            AliasString aliasName = mappedType.getName(obfuscation);
+            AliasString aliasDesc = mappedType.getDesc(obfuscation);
+
+            switch(mapType) {
+                case CL:
+                    if (aliasClass.getValue().equals(name)) return mappedType;
+                    break;
+                case FD:
+                case MD:
+                    if (aliasName.getValue().equals(name)) {
+                        if (desc == null) return null;
+                        if (aliasDesc.getValue().equals(desc)) {
+                            return mappedType;
+                        }
+                    }
+                    break;
+            }
+        }
+        return null;
     }
 
     /**
@@ -222,12 +261,12 @@ public final class SrgMap {
         }
 
         public AliasString getClassName(final Obfuscation obfuscation) {
-            if (obfuscation == null || !args.containsKey(obfuscation)) return null;
+            if (obfuscation == null || !args.containsKey(obfuscation)) return AliasString.ALIAS_STRING_EMPTY;
             return args.get(obfuscation).get(ArgType.CLASS_NAME);
         }
 
         public AliasString getName(final Obfuscation obfuscation) {
-            if (obfuscation == null || !args.containsKey(obfuscation)) return null;
+            if (obfuscation == null || !args.containsKey(obfuscation)) return AliasString.ALIAS_STRING_EMPTY;
             return args.get(obfuscation).get(ArgType.NAME);
         }
 
@@ -235,8 +274,42 @@ public final class SrgMap {
          * Used only for MD
          */
         public AliasString getDesc(final Obfuscation obfuscation) {
-            if (obfuscation == null || !args.containsKey(obfuscation) || mapType != MapType.MD) return null;
+            if (obfuscation == null || !args.containsKey(obfuscation) || mapType != MapType.MD) return AliasString.ALIAS_STRING_EMPTY;
             return args.get(obfuscation).get(ArgType.DESC);
+        }
+
+        public ObfuscationField getAsObfuscationField(final boolean useAlias) {
+            if (mapType != MapType.FD) return null;
+            FactoryObfuscationField factoryObfuscationField = ObfuscationField.factory();
+
+            factoryObfuscationField.setName(
+                    NameMapping.factory()
+                            .setName(Obfuscation.OBFUSCATED, getName(Obfuscation.OBFUSCATED).getValue())
+                            .setName(Obfuscation.DEOBFUSCATED, useAlias && getName(Obfuscation.DEOBFUSCATED).getAlias() != null ? getName(Obfuscation.DEOBFUSCATED).getAlias() : getName(Obfuscation.DEOBFUSCATED).getValue())
+                            .create()
+            );
+
+            return factoryObfuscationField.create();
+        }
+
+        public ObfuscationMethod getAsObfuscationMethod(final boolean useAlias) {
+            if (mapType != MapType.MD) return null;
+            FactoryObfuscationMethod factoryObfuscationMethod = ObfuscationMethod.factory();
+
+            factoryObfuscationMethod.setName(
+                    NameMapping.factory()
+                            .setName(Obfuscation.OBFUSCATED, getName(Obfuscation.OBFUSCATED).getValue())
+                            .setName(Obfuscation.DEOBFUSCATED, useAlias && getName(Obfuscation.DEOBFUSCATED).getAlias() != null ? getName(Obfuscation.DEOBFUSCATED).getAlias() : getName(Obfuscation.DEOBFUSCATED).getValue())
+                            .create()
+            );
+            factoryObfuscationMethod.setDesc(
+                    DescMapping.factory()
+                            .setDesc(Obfuscation.OBFUSCATED, getDesc(Obfuscation.OBFUSCATED).getValue())
+                            .setDesc(Obfuscation.DEOBFUSCATED, getDesc(Obfuscation.DEOBFUSCATED).getValue())
+                            .create()
+            );
+
+            return factoryObfuscationMethod.create();
         }
 
         private static String[] cut(final String toCut) {
@@ -253,12 +326,25 @@ public final class SrgMap {
     @RequiredArgsConstructor
     public static final class AliasString {
 
+        public static final AliasString ALIAS_STRING_EMPTY = new AliasString("");
+
         @Getter
         private final String value;
 
         @Setter
         @Getter
         private String alias;
+
+        public static AliasString[] fromArray(final String[] strings) {
+            if (strings == null || strings.length < 1) return null;
+            AliasString[] aliasStrings = new AliasString[strings.length];
+            for (int i = 0; i < strings.length; i++) {
+                String string = strings[i];
+                if (string == null) continue;
+                aliasStrings[i] = string.isEmpty() ? AliasString.ALIAS_STRING_EMPTY : new AliasString(string);
+            }
+            return aliasStrings;
+        }
 
     }
 
@@ -294,9 +380,15 @@ public final class SrgMap {
 
         CLASS_NAME,
 
+        SUPER_CLASS_NAME,
+
+        INTERFACE,
+
         NAME,
 
-        DESC;
+        DESC,
+
+        SIGNATURE;
 
     }
 

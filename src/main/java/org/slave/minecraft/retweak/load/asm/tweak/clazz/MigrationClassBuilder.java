@@ -38,6 +38,12 @@ public final class MigrationClassBuilder {
         return this;
     }
 
+    public MigrationClassBuilder from(final Class<?> from) {
+        if (from == null) return this;
+        this.from = from.getName();
+        return this;
+    }
+
     public MigrationClassBuilder to(final Class<?> to) {
         if (to == null) return this;
         this.to = to;

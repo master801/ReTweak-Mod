@@ -3,6 +3,8 @@ package org.slave.minecraft.retweak.load.asm.tweak.clazz;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import lombok.Getter;
+
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MigrationClass;
 import org.slave.minecraft.retweak.load.util.GameVersion;
@@ -46,6 +48,14 @@ public abstract class TweakClass {
         for(MigrationClass migrationClass : classesToMigrate.values()) {
             MigrationMethod methodEntry = migrationClass.getMethod(name, desc);
             if (methodEntry != null) return methodEntry;
+        }
+        return null;
+    }
+
+    public final MigrationField getMigrationField(final String name, final String desc) {
+        for(MigrationClass migrationClass : classesToMigrate.values()) {
+            MigrationField fieldEntry = migrationClass.getField(name, desc);
+            if (fieldEntry != null) return fieldEntry;
         }
         return null;
     }

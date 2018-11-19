@@ -85,12 +85,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
             if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaking class {}", newName);
             try {
                 ReTweakClassASM reTweakClassASM = ReTweakClassASM.instance(gameVersion);
-                byte[] deobfuscatedClassData = reTweakClassASM.deobfuscate(inputStream);
-                byte[] tweakedClassData = reTweakClassASM.tweak(deobfuscatedClassData);
-
-                if (!ArrayHelper.isNullOrEmpty(deobfuscatedClassData)) {
-                    if (ReTweak.DEBUG) BasicTransformer.writeClassFile(ReTweak.FILE_DIRECTORY_RETWEAK_ASM_DEOBFUSCATED, newName, deobfuscatedClassData);
-                }
+                byte[] tweakedClassData = reTweakClassASM.tweak(inputStream);
 
                 if (!ArrayHelper.isNullOrEmpty(tweakedClassData)) {
                     if (ReTweak.DEBUG) BasicTransformer.writeClassFile(ReTweak.FILE_DIRECTORY_RETWEAK_ASM, newName, tweakedClassData);

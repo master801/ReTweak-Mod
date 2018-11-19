@@ -6,8 +6,29 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+
+import org.slave.lib.helpers.ReflectionHelper;
+import org.slave.lib.resources.ASMTable;
+import org.slave.minecraft.retweak.ReTweak;
+import org.slave.minecraft.retweak.load.ReTweakClassLoader;
+import org.slave.minecraft.retweak.load.util.EventAnnotation;
+import org.slave.minecraft.retweak.load.util.GameVersion;
+
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.cert.Certificate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ILanguageAdapter;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
@@ -15,6 +36,7 @@ import cpw.mods.fml.common.LoaderException;
 import cpw.mods.fml.common.MetadataCollection;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.ModMetadata;
+import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.event.FMLConstructionEvent;
@@ -24,26 +46,11 @@ import cpw.mods.fml.common.versioning.ArtifactVersion;
 import cpw.mods.fml.common.versioning.DefaultArtifactVersion;
 import cpw.mods.fml.common.versioning.VersionParser;
 import cpw.mods.fml.common.versioning.VersionRange;
+import cpw.mods.fml.relauncher.Side;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.slave.lib.helpers.ReflectionHelper;
-import org.slave.lib.resources.ASMTable;
-import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.ReTweakClassLoader;
-import org.slave.minecraft.retweak.load.util.EventAnnotation;
-import org.slave.minecraft.retweak.load.util.GameVersion;
-import org.slave.minecraft.retweak.load.util.GameVersion.GameVersionModIdentifier.Identifier;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.cert.Certificate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by master on 2/25/18 at 9:28 PM
@@ -52,8 +59,6 @@ import java.util.Set;
  */
 @SuppressWarnings("UnstableApiUsage")
 public final class ReTweakModContainer implements ModContainer  {
-
-    private static final String INFO_MOD_SYSTEM = "ReTweak";
 
     private final ReTweakModContainerEventHandler eventHandler = new ReTweakModContainerEventHandler(this);
 
@@ -236,7 +241,7 @@ public final class ReTweakModContainer implements ModContainer  {
     @Override
     public Map<String, String> getSharedModDescriptor() {
         Map<String,String> descriptor = Maps.newHashMap();
-        descriptor.put("modsystem", ReTweakModContainer.INFO_MOD_SYSTEM);
+        descriptor.put("modsystem", ReTweak.INFO_MOD_SYSTEM);
         descriptor.put("id", getModId());
         descriptor.put("version", getDisplayVersion());
         descriptor.put("name", getName());
@@ -269,6 +274,7 @@ public final class ReTweakModContainer implements ModContainer  {
      * @param clazz
      * @return Instance factory {@link cpw.mods.fml.common.Mod.InstanceFactory}
      */
+    @SuppressWarnings({ "EqualsBetweenInconvertibleTypes", "unchecked" })
     private Method gatherAnnotations(final Class<?> clazz) {
         Method factoryMethod = null;
         for(Method method : clazz.getDeclaredMethods()) {
@@ -306,7 +312,14 @@ public final class ReTweakModContainer implements ModContainer  {
 
                 EventAnnotation sidedProxyAnnotation = reTweakModContainer.getGameVersion().getSidedProxyAnnotation();
                 if (sidedProxyAnnotation != null) {
-                    injectProxy(reTweakModContainer, fmlConstructionEvent.getASMHarvestedData(), sidedProxyAnnotation);
+                    ReTweakModContainerEventHandler.injectProxy(
+                            FMLCommonHandler.instance().getSide(),
+                            reTweakModContainer,
+                            fmlConstructionEvent.getASMHarvestedData(),
+                            ReTweakClassLoader.getInstance(reTweakModContainer.getGameVersion()),
+                            sidedProxyAnnotation,
+                            reTweakModContainer.getLanguageAdapter()
+                    );
                 }
             } catch(Throwable e) {
                 ReTweak.LOGGER_RETWEAK.error(
@@ -335,7 +348,15 @@ public final class ReTweakModContainer implements ModContainer  {
                                     fmlStateEvent
                             }
                     );
-                    if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Invoked mod event method \"{}({})\" for mod \"{}\"", eventMethod.getName(), Joiner.on(", ").join(eventMethod.getParameterTypes()), reTweakModContainer.getName());
+                    if (ReTweak.DEBUG) {
+                        ReTweak.LOGGER_RETWEAK.info(
+                                "Invoked mod event method \"{}({})\" for mod \"{}\"",
+                                eventMethod.getName(),
+                                Joiner.on(", ").join(eventMethod.getParameterTypes()),
+
+                                reTweakModContainer.getName()
+                        );
+                    }
                 } catch (IllegalAccessException | InvocationTargetException e) {
                     ReTweak.LOGGER_RETWEAK.error(
                             "Failed to invoke a mod method!",
@@ -348,13 +369,148 @@ public final class ReTweakModContainer implements ModContainer  {
         /**
          * {@link cpw.mods.fml.common.ProxyInjector}
          */
-        private static void injectProxy(final ReTweakModContainer reTweakModContainer, final ASMDataTable asmHarvestedData, final EventAnnotation sidedProxyAnnotation) {
-            if (reTweakModContainer == null || asmHarvestedData == null || sidedProxyAnnotation == null) return;
-            if (sidedProxyAnnotation.getIdentifier() == Identifier.ANNOTATION) {
-                Set<ASMData> proxies = asmHarvestedData.getAnnotationsFor(reTweakModContainer).get(sidedProxyAnnotation.getName());
+        private static void injectProxy(final Side side, final ReTweakModContainer reTweakModContainer, final ASMDataTable asmHarvestedData, final ReTweakClassLoader retweakClassLoader, final EventAnnotation sidedProxyAnnotation, final ILanguageAdapter languageAdapter) {
+            if (side == null || reTweakModContainer == null || asmHarvestedData == null || sidedProxyAnnotation == null) return;
+            switch(sidedProxyAnnotation.getIdentifier()) {
+                case EXTENDS:
+                    //TODO
+                    break;
+                case ANNOTATION:
+                    SetMultimap<String, ASMData> annotationsFor = asmHarvestedData.getAnnotationsFor(reTweakModContainer);
+                    Set<ASMData> proxies = annotationsFor.get(sidedProxyAnnotation.getName().replace('/', '.'));
 
-                //TODO
-                ReTweak.LOGGER_RETWEAK.info("TODO: INJECT PROXY");
+                    for(ASMData proxy : proxies) {
+                        Class<?> targetClass;
+                        try {
+                            targetClass = Class.forName(
+                                    proxy.getClassName(),
+                                    true,
+                                    retweakClassLoader
+                            );
+                        } catch(ClassNotFoundException e) {
+                            ReTweak.LOGGER_RETWEAK.error(
+                                    "Could not find or load target mod class to inject proxy into?!",
+                                    e
+                            );
+                            continue;
+                        }
+
+                        try {
+                            Field targetProxyField = targetClass.getDeclaredField(proxy.getObjectName());
+
+                            if (targetProxyField == null) {
+                                ReTweak.LOGGER_RETWEAK.error(
+                                        "Failed to get target proxy field! This should not happen!"
+                                );
+                                if (ReTweak.DEBUG) {
+                                    ReTweak.LOGGER_RETWEAK.info(
+                                            "Class: {}, Field: {}",
+                                            proxy.getClassName(),
+                                            proxy.getObjectName()
+                                    );
+                                }
+                                continue;
+                            }
+
+                            targetProxyField.setAccessible(true);
+
+                            SidedProxy sidedProxy = targetProxyField.getAnnotation(SidedProxy.class);
+                            if (sidedProxy == null) {
+                                throw new IllegalStateException("Could not find SidedProxy annotation on proxy field?! This should not happen!");
+                            }
+
+                            String proxyClassString = side.isClient() ? sidedProxy.clientSide() : sidedProxy.serverSide();
+
+                            Class<?> proxyClass;
+                            try {
+                                proxyClass = Class.forName(
+                                        proxyClassString,
+                                        true,
+                                        retweakClassLoader
+                                );
+                            } catch (ClassNotFoundException e) {
+                                ReTweak.LOGGER_RETWEAK.info(
+                                        "Proxy class: {}",
+                                        proxyClassString
+                                );
+                                ReTweak.LOGGER_RETWEAK.error(
+                                        "Could not find proxy class!",
+                                        e
+                                );
+                                continue;
+                            }
+
+                            Constructor<?> proxyConstructor;
+                            try {
+                                proxyConstructor = ReflectionHelper.getConstructor(
+                                        proxyClass,
+                                        new Class<?>[0]
+                                );
+                            } catch(NoSuchMethodException e) {
+                                ReTweak.LOGGER_RETWEAK.error(
+                                        "Couldn't get the default constructor of the proxy class!",
+                                        e
+                                );
+                                if (ReTweak.DEBUG) {
+                                    ReTweak.LOGGER_RETWEAK.info(
+                                            "Proxy class: {}, Available constructors: {}",
+                                            proxyClassString,
+                                            proxyClass.getDeclaredConstructors()
+                                    );
+                                }
+                                continue;
+                            }
+
+                            Object proxyInstance;
+                            try {
+                                proxyInstance = ReflectionHelper.createFromConstructor(proxyConstructor, new Object[0]);
+                            } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
+                                ReTweak.LOGGER_RETWEAK.error(
+                                        "Couldn't create new instance of proxy class from constructor! This really should not happen!",
+                                        e
+                                );
+                                if (ReTweak.DEBUG) {
+                                    ReTweak.LOGGER_RETWEAK.info(
+                                            "Proxy class: {}",
+                                            proxyClassString
+                                    );
+                                }
+                                continue;
+                            }
+
+                            try {
+                                languageAdapter.setProxy(
+                                        targetProxyField,
+                                        proxyClass,
+                                        proxyInstance
+                                );
+                            } catch(IllegalAccessException e) {
+                                ReTweak.LOGGER_RETWEAK.error(
+                                        "Could not set proxy!",
+                                        e
+                                );
+                            }
+                        } catch(NoSuchFieldException e) {
+                            ReTweak.LOGGER_RETWEAK.error(
+                                    "Could not find proxy field?!",
+                                    e
+                            );
+                        }
+                    }
+                    break;
+            }
+
+            languageAdapter.setInternalProxies(
+                    reTweakModContainer,
+                    side,
+                    retweakClassLoader
+            );
+
+            if (ReTweak.DEBUG) {
+                ReTweak.LOGGER_RETWEAK.info(
+                        "Injected proxies for mod {}",
+                        reTweakModContainer.getModId()
+                );
             }
         }
 

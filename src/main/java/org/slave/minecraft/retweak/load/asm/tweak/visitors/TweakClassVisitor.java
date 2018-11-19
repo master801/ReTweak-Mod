@@ -28,8 +28,8 @@ public final class TweakClassVisitor extends ClassVisitor {
     private final TweakClass tweakClass;
     private final ASMTable asmTable;
 
-    public TweakClassVisitor(final ClassNode classNode, final GameVersion gameVersion, final ASMTable asmTable) {
-        super(Opcodes.ASM5, classNode);
+    public TweakClassVisitor(final int api, final ClassNode classNode, final GameVersion gameVersion, final ASMTable asmTable) {
+        super(api, classNode);
         this.gameVersion = gameVersion;
         tweakClass = gameVersion.getTweakClass();
         this.asmTable = asmTable;
@@ -173,9 +173,13 @@ public final class TweakClassVisitor extends ClassVisitor {
 
     @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+        String newName = name;
+        String newDesc = desc;
+        String newSignature = signature;
+
         return new TweakMethodVisitor(
                 super.api,
-                super.visitMethod(access, name, desc, signature, exceptions),
+                super.visitMethod(access, newName, newDesc, newSignature, exceptions),
                 gameVersion,
                 asmTable
         );

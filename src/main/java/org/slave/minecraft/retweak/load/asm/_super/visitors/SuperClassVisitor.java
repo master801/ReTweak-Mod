@@ -1,22 +1,31 @@
-package org.slave.minecraft.retweak.load.asm.deobfuscate.visitors;
+package org.slave.minecraft.retweak.load.asm._super.visitors;
 
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
+import org.slave.lib.resources.ASMTable;
+import org.slave.minecraft.retweak.load.mapping._super.SuperMap;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
+import lombok.Getter;
+
 /**
- * Created by master on 10/27/18 at 2:58 PM
+ * Created by master on 11/18/18 at 10:59 AM
  *
  * @author master
  */
-public final class DeobfuscateClassVisitor extends ClassVisitor {
+public final class SuperClassVisitor extends ClassVisitor {
 
     private final GameVersion gameVersion;
+    private final ASMTable asmTable;
 
-    public DeobfuscateClassVisitor(final int api, final GameVersion gameVersion) {
+    @Getter
+    private final SuperMap superMap = new SuperMap();
+
+    public SuperClassVisitor(final int api, final GameVersion gameVersion, final ASMTable asmTable) {
         super(api);
         this.gameVersion = gameVersion;
+        this.asmTable = asmTable;
     }
 
     @Override
@@ -25,25 +34,16 @@ public final class DeobfuscateClassVisitor extends ClassVisitor {
     }
 
     @Override
-    public void visitInnerClass(final String name, final String outerName, final String innerName, final int access) {
-        super.visitInnerClass(name, outerName, innerName, access);
-    }
-
-    @Override
     public FieldVisitor visitField(final int access, final String name, final String desc, final String signature, final Object value) {
-        FieldVisitor fv = super.visitField(access, name, desc, signature, value);
-        return new DeobfuscateFieldVisitor(
-                super.api,
-                fv
-        );
+        return super.visitField(access, name, desc, signature, value);
     }
 
     @Override
     public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
-        MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
-        return new DeobfuscateMethodVisitor(
+        return new SuperMethodVisitor(
                 super.api,
-                mv
+                super.visitMethod(access, name, desc, signature, exceptions),
+                superMap
         );
     }
 

@@ -1,23 +1,21 @@
 package org.slave.minecraft.retweak.asm;
 
-import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-import okio.Buffer;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping;
+
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationClass;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationClass.FactoryObfuscationClass;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationField;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationField.FactoryObfuscationField;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping;
+import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMethod;
 import org.slave.lib.resources.Obfuscation;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.ReTweakClassLoader;
 import org.slave.minecraft.retweak.load.ReTweakLoader;
-import org.slave.minecraft.retweak.load.mapping.SrgMap;
-import org.slave.minecraft.retweak.load.mapping.SrgMap.AliasString;
-import org.slave.minecraft.retweak.load.mapping.SrgMap.CsvType;
-import org.slave.minecraft.retweak.load.mapping.SrgMap.MapType;
-import org.slave.minecraft.retweak.load.mapping.SrgMap.MappedType;
+import org.slave.minecraft.retweak.load.mapping.srg.SrgMap;
+import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.AliasString;
+import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.CsvType;
+import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.MapType;
+import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.MappedType;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
 import java.io.BufferedInputStream;
@@ -29,6 +27,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import cpw.mods.fml.relauncher.IFMLCallHook;
+import okio.Buffer;
 
 /**
  * Created by master on 2/25/18 at 9:27 PM
@@ -73,7 +74,7 @@ public final class ReTweakSetup implements IFMLCallHook {
         Map<GameVersion, SrgMap> mappings;
 
         try {
-            Field fieldMappings = ReTweakLoader.class.getDeclaredField("mappings");
+            Field fieldMappings = ReTweakLoader.class.getDeclaredField("srgMaps");
             fieldMappings.setAccessible(true);
             mappings = (Map<GameVersion, SrgMap>)fieldMappings.get(ReTweakLoader.instance());
         } catch(NoSuchFieldException | IllegalAccessException e) {
@@ -171,10 +172,10 @@ public final class ReTweakSetup implements IFMLCallHook {
         for(GameVersion gameVersion : GameVersion.VALUES) {
             List<ObfuscationClass> obfuscationClassList = new ArrayList<>();
 
-            SrgMap srgMap = ReTweakLoader.instance().getMapping(gameVersion);
+            SrgMap srgMap = ReTweakLoader.instance().getSrgMap(gameVersion);
             if (srgMap == null) continue;
 
-            List<MappedType> clList = srgMap.getMapped(MapType.CL);
+            List<MappedType> clList = srgMap.getMappedList(MapType.CL);
             for(MappedType cl : clList) {
                 AliasString obfuscatedName = cl.getClassName(Obfuscation.OBFUSCATED);
                 AliasString deobfuscatedName = cl.getClassName(Obfuscation.DEOBFUSCATED);
@@ -188,29 +189,33 @@ public final class ReTweakSetup implements IFMLCallHook {
                                         .create()
                         );
 
-                List<MappedType> fdList = srgMap.getMapped(MapType.FD);
+                //Fields
+                List<MappedType> fdList = srgMap.getMappedList(MapType.FD);
                 for(MappedType fd : fdList) {
                     AliasString className = fd.getClassName(Obfuscation.DEOBFUSCATED);
                     if (className != null && className.getValue().equals(deobfuscatedName.getValue())) {
-                        AliasString fdNameObf = fd.getName(Obfuscation.OBFUSCATED);
-                        AliasString fdNameDeobf = fd.getName(Obfuscation.DEOBFUSCATED);
-                        if (fdNameObf == null || fdNameDeobf == null) continue;
-
-                        FactoryObfuscationField factoryObfuscationField = ObfuscationField.factory();
-                        factoryObfuscationField.setName(
-                                NameMapping.factory()
-                                        .setName(Obfuscation.OBFUSCATED, fdNameObf.getValue())
-                                        .setName(Obfuscation.DEOBFUSCATED, fdNameObf.getAlias())
-                                        .create()
-                        );
-
-                        ObfuscationField obfuscationField = factoryObfuscationField.create();
+                        ObfuscationField obfuscationField = fd.getAsObfuscationField(true);
+                        if (obfuscationField == null) {
+                            continue;
+                        }
                         factoryObfuscationClass.addField(obfuscationField);
                     }
                 }
 
-                ObfuscationClass obfuscationClass = factoryObfuscationClass.create();
+                //Methods
+                List<MappedType> mdList = srgMap.getMappedList(MapType.MD);
+                for(MappedType md : mdList) {
+                    AliasString className = md.getClassName(Obfuscation.DEOBFUSCATED);
+                    if (className != null && className.getValue().equals(deobfuscatedName.getValue())) {
+                        ObfuscationMethod obfuscationMethod = md.getAsObfuscationMethod(true);
+                        if (obfuscationMethod == null) {
+                            continue;
+                        }
+                        factoryObfuscationClass.addMethod(obfuscationMethod);
+                    }
+                }
 
+                ObfuscationClass obfuscationClass = factoryObfuscationClass.create();
                 obfuscationClassList.add(obfuscationClass);
             }
         }

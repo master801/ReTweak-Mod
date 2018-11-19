@@ -5,14 +5,20 @@ import net.minecraft.block.Block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraftforge.common.MinecraftForge;
+
 import org.objectweb.asm.Type;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MigrationClass;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_6_4.acf;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_6_4.aqz;
+import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_6_4.ms;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_6_4.yc;
+import org.slave.minecraft.retweak.load.fml.EventBusHandler;
 import org.slave.minecraft.retweak.load.util.GameVersion;
+
+import cpw.mods.fml.common.eventhandler.EventBus;
 
 /**
  * Created by Master on 8/30/2018 at 10:00 AM.
@@ -34,6 +40,7 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
                         .from("aqz")
                         .to(aqz.class)
 
+                        //<editor-fold desc="Fields">
                         .addFieldMapping(
                                 MigrationField.builder()
                                         .setObfuscatedName("h")
@@ -44,7 +51,9 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
 
                                         .build()
                         )
+                        //</editor-fold>
 
+                        //<editor-fold desc="Methods">
                         .addMethodMapping(
                                 MigrationMethod.builder()
                                         .setObfuscatedName("a")
@@ -53,6 +62,18 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
 
                                         .setDeobfuscatedName("setStepSound")
                                         .setDeobfuscatedDescArgumentTypes(Type.getType(SoundType.class))
+                                        .setDeobfuscatedDescReturnType(Type.getType(Block.class))
+
+                                        .build()
+                        )
+                        .addMethodMapping(
+                                MigrationMethod.builder()
+                                        .setObfuscatedName("a")
+                                        .setObfuscatedDescArgumentTypes(Type.getType("Lww;"))
+                                        .setObfuscatedDescReturnType(Type.getType("Laqz;"))
+
+                                        .setDeobfuscatedName("setCreativeTab")
+                                        .setDeobfuscatedDescArgumentTypes(Type.getType(CreativeTabs.class))
                                         .setDeobfuscatedDescReturnType(Type.getType(Block.class))
 
                                         .build()
@@ -81,6 +102,20 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
 
                                         .build()
                         )
+                        .addMethodMapping(
+                                MigrationMethod.builder()
+                                        .setObfuscatedName("c")
+                                        .setObfuscatedDescArgumentTypes(Type.getType(String.class))
+                                        .setObfuscatedDescReturnType(Type.getType("Laqz;"))
+
+                                        .setDeobfuscatedName("setUnlocalizedName")
+                                        .setDeobfuscatedDescArgumentTypes(Type.getType(String.class))
+                                        .setDeobfuscatedDescReturnType(Type.getType(Block.class))
+
+                                        .build()
+                        )
+                        //</editor-fold>
+
                         .build()
         );
 
@@ -166,6 +201,7 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
                         .build()
         );
 
+        //net.minecraft.block.material.Material
         super.addMigrationClass(
                 MigrationClass.builder()
                         .from("akc")
@@ -188,6 +224,55 @@ public final class TweakClass_1_6_4 extends AbstractTweakClass {
                 MigrationClass.builder()
                         .from("ard")
                         .to(SoundType.class)
+
+                        .build()
+        );
+
+        //net.minecraft.util.Icon
+        super.addMigrationClass(
+                MigrationClass.builder()
+                        .from("ms")
+                        .to(ms.class)
+
+                        .build()
+        );
+
+        super.addMigrationClass(
+                MigrationClass.builder()
+                        .from(MinecraftForge.class)
+                        .to(MinecraftForge.class)
+
+                        .addFieldMapping(
+                                MigrationField.builder()//New desc
+                                        .setObfuscatedName("EVENT_BUS")
+                                        .setFromDescType(Type.getType("Lnet/minecraftforge/event/EventBus;"))
+
+                                        .setDeobfuscatedName("EVENT_BUS")
+                                        .setToDescType(Type.getType(EventBus.class))
+
+                                        .build()
+                        )
+
+                        .build()
+        );
+
+        super.addMigrationClass(
+                MigrationClass.builder()
+                        .from("net/minecraftforge/event/EventBus")
+                        .to(EventBusHandler.class)
+
+                        .addMethodMapping(
+                                MigrationMethod.builder()
+                                        .setObfuscatedName("register")
+                                        .setObfuscatedDescArgumentTypes(Type.getType(Object.class))
+                                        .setObfuscatedDescReturnType(Type.VOID_TYPE)
+
+                                        .setDeobfuscatedName("register")
+                                        .setDeobfuscatedDescArgumentTypes(Type.getType(Type.class))
+                                        .setDeobfuscatedDescReturnType(Type.VOID_TYPE)
+
+                                        .build()
+                        )
 
                         .build()
         );
