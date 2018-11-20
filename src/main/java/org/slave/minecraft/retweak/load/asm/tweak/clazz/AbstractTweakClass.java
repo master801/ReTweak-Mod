@@ -1,10 +1,12 @@
 package org.slave.minecraft.retweak.load.asm.tweak.clazz;
 
-import cpw.mods.fml.common.Mod.EventHandler;
 import net.minecraftforge.common.config.Property;
+
 import org.slave.minecraft.retweak.load.asm.tweak.migrate.cpw.mods.fml.common.network.NetworkMod;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate.net.minecraftforge.common.Configuration;
 import org.slave.minecraft.retweak.load.util.GameVersion;
+
+import cpw.mods.fml.common.Mod.EventHandler;
 
 /**
  * Created by Master on 7/21/2018 at 1:42 AM.

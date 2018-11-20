@@ -28,4 +28,6 @@ public @interface Obfuscated {
 
     Class<?>[] parameters() default {};
 
+    Class<?> returnParameter() default Void.class;
+
 }

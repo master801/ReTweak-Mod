@@ -12,6 +12,8 @@ import cpw.mods.fml.common.eventhandler.IEventListener;
  */
 public final class EventBusHandler {
 
+    public static final EventBusHandler EVENT_BUS = new EventBusHandler();
+
     private ConcurrentHashMap<Object, ArrayList<IEventListener>> listeners = new ConcurrentHashMap<Object, ArrayList<IEventListener>>();
 
     public void register(final Object object) {

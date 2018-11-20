@@ -10,7 +10,6 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.slave.lib.resources.ASMTable;
@@ -71,6 +70,8 @@ public final class ReTweakClassASM {
         //wtf
         fixBadProgrammingGarbage(classNode);
 
+        backendTweak(classNode);
+
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
         classNode.accept(classWriter);
         return classWriter.toByteArray();
@@ -110,6 +111,58 @@ public final class ReTweakClassASM {
                             );
                             injection.put(i - 1, creativeTabReTweak);
                         }
+                    }
+                }
+            }
+
+            for(Entry<Integer, AbstractInsnNode> entry : injection.entrySet()) {
+                methodNode.instructions.set(
+                        methodNode.instructions.get(entry.getKey()),
+                        entry.getValue()
+                );
+            }
+        }
+    }
+
+    private void backendTweak(final ClassNode classNode) {
+        for(MethodNode methodNode : classNode.methods) {
+            Map<Integer, AbstractInsnNode> injection = Maps.newHashMap();
+
+            for(int i = 0; i < methodNode.instructions.size(); ++i) {
+                AbstractInsnNode abstractInsnNode = methodNode.instructions.get(i);
+                if (abstractInsnNode instanceof MethodInsnNode) {
+                    MethodInsnNode methodInsnNode = (MethodInsnNode)abstractInsnNode;
+                    if (methodInsnNode.getOpcode() == Opcodes.INVOKEVIRTUAL && methodInsnNode.owner.equals("net/minecraftforge/event/EventBus") && methodInsnNode.name.equals("register") && methodInsnNode.desc.equals("(Ljava/lang/Object;)V")) {
+                        int search = i - 4;
+                        if (methodNode.instructions.get(search) instanceof FieldInsnNode) {
+                            FieldInsnNode fieldInsnNode = (FieldInsnNode)methodNode.instructions.get(search);
+                            if (fieldInsnNode.getOpcode() != Opcodes.GETSTATIC || !fieldInsnNode.owner.equals("net/minecraftforge/common/MinecraftForge") || !fieldInsnNode.name.equals("EVENT_BUS")) {
+                                ReTweak.LOGGER_RETWEAK.warn(
+                                        "Incorrect FieldInsnNode! Class: {}, Method: {}, \"register\" index: {}",
+                                        classNode.name,
+                                        methodNode.name,
+                                        i
+                                );
+                                continue;
+                            }
+                            injection.put(
+                                    search,
+                                    new FieldInsnNode(Opcodes.GETSTATIC, "org/slave/minecraft/retweak/load/fml/EventBusHandler", "EVENT_BUS", "Lorg/slave/minecraft/retweak/load/fml/EventBusHandler;")
+                            );
+                        } else {
+                            ReTweak.LOGGER_RETWEAK.warn(
+                                    "Could not find \"EVENT_BUS\" field! Class: {}, Method: {}, \"register\" index: {}",
+                                    classNode.name,
+                                    methodNode.name,
+                                    i
+                            );
+                            continue;
+                        }
+
+                        injection.put(
+                                i,
+                                new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "org/slave/minecraft/retweak/load/fml/EventBusHandler", "register", "(Ljava/lang/Object;)V", false)
+                        );
                     }
                 }
             }
