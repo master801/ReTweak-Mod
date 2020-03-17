@@ -44,12 +44,20 @@ public class Configuration extends net.minecraftforge.common.config.Configuratio
         super(file, caseSensitiveCustomCategories);
     }
 
-    public Property getBlock(final String key, final int defaultID) {
-        return super.get(Configuration.CATEGORY_BLOCKS, key, defaultID);
+    public Property getBlock(final String category, final String key, final int defaultValue) {
+        return super.get(category, key, defaultValue);
     }
 
-    public Property getItem(final String key, final int defaultID) {
-        return super.get(Configuration.CATEGORY_ITEMS, key, defaultID);
+    public Property getItem(final String category, final String key, final int defaultValue) {
+        return super.get(category, key, defaultValue);
+    }
+
+    public Property getBlock(final String key, final int defaultValue) {
+        return super.get(Configuration.CATEGORY_BLOCKS, key, defaultValue);
+    }
+
+    public Property getItem(final String key, final int defaultValue) {
+        return super.get(Configuration.CATEGORY_ITEMS, key, defaultValue);
     }
 
 }

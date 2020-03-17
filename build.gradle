@@ -4,7 +4,7 @@ buildscript {
         // mavenCentral()
         maven {
             name = 'mavenCentral'
-            url = "http://repo.maven.apache.org/maven2"
+            url = "https://repo1.maven.org/maven2/"
         }
         // jcenter()
         maven {
@@ -33,14 +33,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath(
-                'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
-        )
-        classpath(
-                group: 'io.franzbecker',
-                name: 'gradle-lombok',
-                version: '1.14'
-        )
+        classpath('net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT')
+        classpath 'org.spongepowered:mixingradle:0.6-FG-1.2-A'
     }
 }
 repositories {
@@ -48,7 +42,7 @@ repositories {
     // mavenCentral()
     maven {
         name = 'mavenCentral'
-        url = "http://repo.maven.apache.org/maven2"
+        url = "https://repo1.maven.org/maven2/"
     }
     maven {
         name = 'sponge'
@@ -62,14 +56,13 @@ repositories {
 
 apply plugin: 'java'
 apply plugin: 'forge'
-apply plugin: 'io.franzbecker.gradle-lombok'
+apply plugin: 'org.spongepowered.mixin'
 
 version = project.properties['version']
 group = 'org.slave.minecraft'
 archivesBaseName = 'ReTweak-Mod'
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = targetCompatibility = '1.8'
 
 minecraft {
     version = '1.7.10-10.13.4.1614-1.7.10'
@@ -78,9 +71,8 @@ minecraft {
     replace '@MOD_VERSION@', project.version
 }
 
-lombok {
-    version = '1.18.4'
-    sha256 = ''//idk - do not set sha256
+mixin {
+    add sourceSets.main, 'main.refmap.json'
 }
 
 jar {
@@ -134,19 +126,20 @@ dependencies {
             version: '2.4.0'
     )
 
+    compileOnly 'org.projectlombok:lombok:1.18.12'
 
-    /*
+/*
     compile(
             group: 'org.spongepowered',
             name: 'spongeapi',
-            version: project.properties['mixin-version']
+            version: project.properties['sponge-version']
     )
+*/
     compile(
             group: 'org.spongepowered',
             name: 'mixin',
-            version: project.properties['mixin-version']
+            version: '0.7.8-SNAPSHOT'
     )
-    */
 }
 
 processResources {

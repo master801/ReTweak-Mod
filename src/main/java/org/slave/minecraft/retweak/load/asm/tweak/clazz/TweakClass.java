@@ -2,16 +2,14 @@ package org.slave.minecraft.retweak.load.asm.tweak.clazz;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MigrationClass;
+import lombok.Getter;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationField.MigrationField;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.MigrationClass;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
 import java.util.List;
 import java.util.Map;
-
-import lombok.Getter;
 
 /**
  * Created by Master on 7/12/2018 at 8:48 PM.

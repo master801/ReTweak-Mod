@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.slave.minecraft.tool.ControllerSuperMap">
+   <children>
+      <Label alignment="TOP_CENTER" contentDisplay="TOP" text="%key.title.label" textAlignment="CENTER">
+         <font>
+            <Font size="24.0" />
+         </font>
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </Label>
+      <HBox alignment="TOP_CENTER">
+         <children>
+            <VBox alignment="TOP_CENTER" minWidth="300.0">
+               <children>
+                  <Label alignment="CENTER" text="%key.input.label">
+                     <VBox.margin>
+                        <Insets bottom="2.0" left="7.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="textFieldInput" editable="false" prefWidth="170.0" />
+                        <Button fx:id="buttonInput" mnemonicParsing="false" onAction="#onButtonInput" prefWidth="90.0" text="%key.input.button">
+                           <HBox.margin>
+                              <Insets left="3.0" />
+                           </HBox.margin></Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets left="7.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox alignment="CENTER">
+               <children>
+                  <Button fx:id="buttonProcess" mnemonicParsing="false" onAction="#onButtonProcess" text="%key.process.button" />
+               </children>
+            </VBox>
+            <VBox alignment="TOP_CENTER" minWidth="300.0">
+               <children>
+                  <Label alignment="CENTER" text="%key.output.label">
+                     <VBox.margin>
+                        <Insets bottom="2.0" />
+                     </VBox.margin>
+                     <font>
+                        <Font size="14.0" />
+                     </font></Label>
+                  <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <TextField fx:id="textFieldOutput" editable="false" prefWidth="170.0" />
+                        <Button fx:id="buttonOutput" mnemonicParsing="false" onAction="#onButtonOutput" prefWidth="90.0" text="%key.output.button">
+                           <HBox.margin>
+                              <Insets left="3.0" />
+                           </HBox.margin></Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+         <VBox.margin>
+            <Insets bottom="5.0" left="5.0" right="5.0" />
+         </VBox.margin></HBox>
+   </children>
+</VBox>

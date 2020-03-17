@@ -3,6 +3,7 @@ package org.slave.minecraft.retweak.asm.transformers.access;
 import net.minecraft.launchwrapper.IClassTransformer;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.slave.lib.SlaveLib;
 import org.slave.lib.asm.transformers.BasicTransformer;
 import org.slave.minecraft.retweak.asm.ReTweakASM;
 
@@ -19,8 +20,8 @@ public final class TransformerItemStack extends BasicTransformer implements ICla
 
     @Override
     protected void transform(final ClassNode classNode) {
-        if ((classNode.access & Opcodes.ACC_FINAL) == Opcodes.ACC_FINAL) {////Has final
-            classNode.access ^= Opcodes.ACC_FINAL;//Remove final
+        if ((classNode.access & Opcodes.ACC_FINAL) == Opcodes.ACC_FINAL) {//Class has final modifier
+            classNode.access ^= Opcodes.ACC_FINAL;//Remove final modifier
         }
     }
 
@@ -31,12 +32,12 @@ public final class TransformerItemStack extends BasicTransformer implements ICla
 
     @Override
     protected boolean writeClassFile() {
-        return true;
+        return SlaveLib.DEBUG;
     }
 
     @Override
     protected boolean writeASMFile() {
-        return true;
+        return SlaveLib.DEBUG;
     }
 
 }

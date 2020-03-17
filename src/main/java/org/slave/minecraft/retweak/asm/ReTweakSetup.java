@@ -1,35 +1,19 @@
 package org.slave.minecraft.retweak.asm;
 
+import cpw.mods.fml.relauncher.IFMLCallHook;
 import net.minecraft.launchwrapper.LaunchClassLoader;
-
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationClass;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationClass.FactoryObfuscationClass;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationField;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping;
-import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMethod;
-import org.slave.lib.resources.Obfuscation;
+import okio.Buffer;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.ReTweakClassLoader;
-import org.slave.minecraft.retweak.load.ReTweakLoader;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.AliasString;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.CsvType;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.MapType;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap.MappedType;
+import org.slave.minecraft.retweak.load.mapping.SrgMap;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-
-import cpw.mods.fml.relauncher.IFMLCallHook;
-import okio.Buffer;
 
 /**
  * Created by master on 2/25/18 at 9:27 PM
@@ -65,73 +49,46 @@ public final class ReTweakSetup implements IFMLCallHook {
         //</editor-fold>
 
         loadMappings();
-        constructClassMappings();
         return null;
     }
 
     @SuppressWarnings("unchecked")
     private void loadMappings() throws IOException {
-        Map<GameVersion, SrgMap> mappings;
-
-        try {
-            Field fieldMappings = ReTweakLoader.class.getDeclaredField("srgMaps");
-            fieldMappings.setAccessible(true);
-            mappings = (Map<GameVersion, SrgMap>)fieldMappings.get(ReTweakLoader.instance());
-        } catch(NoSuchFieldException | IllegalAccessException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to get mappings field from ReTweakLoader?! This really should not happen!!"
-            );
-            return;
-        }
-
         for(GameVersion gameVersion : GameVersion.VALUES) {
             File mappingDir = new File(ReTweak.FILE_DIRECTORY_RETWEAK_MAPPINGS, gameVersion.getVersion());
 
-            ReTweak.LOGGER_RETWEAK.info(
-                    "Searching for {} mappings...",
-                    gameVersion.getVersion()
-            );
+            ReTweak.LOGGER_RETWEAK.info("Searching for {} mappings...", gameVersion.getVersion());
+
+            if (gameVersion.isDisabled()) {
+                ReTweak.LOGGER_RETWEAK.info("Game version is disabled. Not searching for mappings...");
+                continue;
+            }
 
             File notchMcpSrg = new File(mappingDir, "notch-mcp.srg");
             File packagedSrg = new File(mappingDir, "packaged.srg");
+            File _super = new File(mappingDir, String.format("MC-%s.super", gameVersion.getVersion()));
 
             SrgMap srgMap;
 
             FileInputStream srgFS;
             if (notchMcpSrg.exists()) {
                 srgFS = new FileInputStream(notchMcpSrg);
-                ReTweak.LOGGER_RETWEAK.info(
-                        "Found \"notch-mcp.srg\" mapping at \"{}\"",
-                        notchMcpSrg.getPath()
-                );
+                ReTweak.LOGGER_RETWEAK.info("Found mapping \"notch-mcp.srg\" in path \"{}\"", notchMcpSrg.getPath());
             } else if (packagedSrg.exists()) {
                 srgFS = new FileInputStream(packagedSrg);
-                ReTweak.LOGGER_RETWEAK.info(
-                        "Found \"packaged.srg\" mapping at \"{}\"",
-                        packagedSrg.getPath()
-                );
+                ReTweak.LOGGER_RETWEAK.info("Found mapping \"packaged.srg\" in path \"{}\"", packagedSrg.getPath());
             } else {
-                ReTweak.LOGGER_RETWEAK.warn(
-                        "Found no mapping for game version: {}",
-                        gameVersion.getVersion()
-                );
+                ReTweak.LOGGER_RETWEAK.warn("Found no mapping for game version: {}", gameVersion.getVersion());
                 continue;
             }
 
-            BufferedInputStream srgBIS = new BufferedInputStream(srgFS);
+            try(Buffer buffer = new Buffer()) {
+                buffer.readFrom(srgFS);
+                srgMap = SrgMap.loadFromSrgMapping(buffer);
+                buffer.clear();
+            }
 
-            Buffer buffer = new Buffer();
-            buffer.readFrom(srgFS);
-
-            srgMap = SrgMap.loadFromMapping(buffer);
-
-            buffer.clear();
-            buffer.close();
-
-            srgBIS.close();
-            srgFS.close();
-
-            if (!notchMcpSrg.exists() && packagedSrg.exists()) {//Make sure notch-mcp.srg does not exist when checking for packaged.srg - We don't want to load fields.csv and methods.csv for packaged.srg
+            if (!notchMcpSrg.exists() && packagedSrg.exists()) {//Make sure notch-mcp.srg does not exist when checking for packaged.srg - We don't want to load fields.csv and methods.csv for notch-mcp.srg
                 File fieldsCsv = new File(mappingDir, "fields.csv");
                 File methodsCsv = new File(mappingDir, "methods.csv");
 
@@ -146,78 +103,53 @@ public final class ReTweakSetup implements IFMLCallHook {
                     continue;
                 }
 
-                FileInputStream fieldsFIS = new FileInputStream(fieldsCsv);
-                InputStreamReader fieldsISR = new InputStreamReader(fieldsFIS);
-                srgMap.readCsv(CsvType.FIELDS, fieldsISR);
-                fieldsISR.close();
-                fieldsFIS.close();
-
-                FileInputStream methodsFIS = new FileInputStream(methodsCsv);
-                InputStreamReader methodsISR = new InputStreamReader(methodsFIS);
-                srgMap.readCsv(CsvType.METHODS, methodsISR);
-                methodsISR.close();
-                methodsFIS.close();
-            }
-
-            mappings.put(gameVersion, srgMap);
-
-            ReTweak.LOGGER_RETWEAK.info(
-                    "Loaded mappings for game version: {}",
-                    gameVersion.getVersion()
-            );
-        }
-    }
-
-    private void constructClassMappings() throws Exception {
-        for(GameVersion gameVersion : GameVersion.VALUES) {
-            List<ObfuscationClass> obfuscationClassList = new ArrayList<>();
-
-            SrgMap srgMap = ReTweakLoader.instance().getSrgMap(gameVersion);
-            if (srgMap == null) continue;
-
-            List<MappedType> clList = srgMap.getMappedList(MapType.CL);
-            for(MappedType cl : clList) {
-                AliasString obfuscatedName = cl.getClassName(Obfuscation.OBFUSCATED);
-                AliasString deobfuscatedName = cl.getClassName(Obfuscation.DEOBFUSCATED);
-                if (obfuscatedName == null || deobfuscatedName == null) continue;
-
-                FactoryObfuscationClass factoryObfuscationClass = ObfuscationClass.factory()
-                        .setName(
-                                NameMapping.factory()
-                                        .setName(Obfuscation.OBFUSCATED, obfuscatedName.getValue())
-                                        .setName(Obfuscation.DEOBFUSCATED, deobfuscatedName.getValue())
-                                        .create()
-                        );
-
-                //Fields
-                List<MappedType> fdList = srgMap.getMappedList(MapType.FD);
-                for(MappedType fd : fdList) {
-                    AliasString className = fd.getClassName(Obfuscation.DEOBFUSCATED);
-                    if (className != null && className.getValue().equals(deobfuscatedName.getValue())) {
-                        ObfuscationField obfuscationField = fd.getAsObfuscationField(true);
-                        if (obfuscationField == null) {
-                            continue;
+                try(FileInputStream fieldsFIS = new FileInputStream(fieldsCsv)) {
+                    try(InputStreamReader fieldsISR = new InputStreamReader(fieldsFIS)) {
+                        try {
+                            srgMap.readCsv(SrgMap.CsvType.FIELDS, fieldsISR);
+                        } catch(IOException e) {
+                            e.printStackTrace();
                         }
-                        factoryObfuscationClass.addField(obfuscationField);
                     }
                 }
 
-                //Methods
-                List<MappedType> mdList = srgMap.getMappedList(MapType.MD);
-                for(MappedType md : mdList) {
-                    AliasString className = md.getClassName(Obfuscation.DEOBFUSCATED);
-                    if (className != null && className.getValue().equals(deobfuscatedName.getValue())) {
-                        ObfuscationMethod obfuscationMethod = md.getAsObfuscationMethod(true);
-                        if (obfuscationMethod == null) {
-                            continue;
+                try(FileInputStream methodsFIS = new FileInputStream(methodsCsv)) {
+                    try(InputStreamReader methodsISR = new InputStreamReader(methodsFIS)) {
+                        try {
+                            srgMap.readCsv(SrgMap.CsvType.METHODS, methodsISR);
+                        } catch(IOException e) {
+                            e.printStackTrace();
                         }
-                        factoryObfuscationClass.addMethod(obfuscationMethod);
                     }
                 }
-
-                ObfuscationClass obfuscationClass = factoryObfuscationClass.create();
-                obfuscationClassList.add(obfuscationClass);
             }
+
+            if (_super.exists()) {
+                ReTweak.LOGGER_RETWEAK.info("Found super mapping \"{}\" in path \"{}\"", _super.getName(), _super.getPath());
+                try(FileInputStream superFIS = new FileInputStream(_super)) {
+                    try(Buffer superBuffer = new Buffer()) {
+                        superBuffer.readFrom(superFIS);
+                        srgMap.readSuper(superBuffer);
+                    }
+                }
+            } else {
+                ReTweak.LOGGER_RETWEAK.error("Super mapping \"{}\" was not found. No mappings will be loaded for this game version ({}) due to this.", _super.getPath(), gameVersion.getVersion());
+                continue;
+            }
+
+            srgMap.sort();
+
+            try {
+                Field field = GameVersion.class.getDeclaredField("srgMap");
+                field.setAccessible(true);
+                field.set(gameVersion, srgMap);
+            } catch(NoSuchFieldException e) {
+                ReTweak.LOGGER_RETWEAK.error("Failed to find field \"srgMap\" in class \"" + GameVersion.class.getName() + "\"!", e);
+            } catch (IllegalAccessException e) {
+                ReTweak.LOGGER_RETWEAK.error("Could not access field \"srgMap\" in class \"" + GameVersion.class.getName() + "\"!?", e);
+            }
+
+            ReTweak.LOGGER_RETWEAK.info("Loaded mappings for game version: {}", gameVersion.getVersion());
         }
     }
 

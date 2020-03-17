@@ -1,0 +1,66 @@
+plugins {
+    id 'io.freefair.lombok' version '5.0.0-rc4'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven {
+        url = 'https://jitpack.io'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'io.freefair.lombok'
+
+version = '1.0'
+group = 'org.slave.minecraft.tool'
+
+dependencies {
+    compile(
+            group: 'org.slave.lib',
+            name: 'io',
+            version: '1.1.5'
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'asm',
+            version: '1.1.5'
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'program',
+            version: '1.1.5'
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'task',
+            version: '1.1.5'
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'log4j',
+            version: '1.1.5'
+    )
+    compile(
+            group: 'org.slave.lib',
+            name: 'log4j-xml',
+            version: '1.1.5'
+    )
+
+    compile(
+            group: 'org.projectlombok',
+            name: 'lombok',
+            version: '1.18.12'
+    )
+    annotationProcessor(
+            group: 'org.projectlombok',
+            name: 'lombok',
+            version: '1.18.12'
+    )
+}
+
+lombok {
+    generateLombokConfig.enabled = false
+}
+

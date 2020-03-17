@@ -118,15 +118,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
         try {
             super.addURL(file.toURI().toURL());
         } catch (MalformedURLException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to add file to classpath!",
-                    e
-            );
-            ReTweak.LOGGER_RETWEAK.debug(
-                    "Game Version: {}, File: {}",
-                    gameVersion.getVersion(),
-                    file.getPath()
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to add file to classpath!", e);
+            ReTweak.LOGGER_RETWEAK.debug("Game Version: {}, File: {}", gameVersion.getVersion(), file.getPath());
         }
     }
 
@@ -138,8 +131,8 @@ public final class ReTweakClassLoader extends URLClassLoader {
     }
 
     public void addExclusion(final String path) {
-        getTransformerExceptions(parent).add(path);
-        getClassLoaderExceptions(parent).add(path);
+        ReTweakClassLoader.getTransformerExceptions(parent).add(path);
+        ReTweakClassLoader.getClassLoaderExceptions(parent).add(path);
     }
 
     public static ReTweakClassLoader getInstance(final GameVersion gameVersion) {
@@ -151,28 +144,16 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (launchClassLoader == null) return null;
         try {
             if (ReTweakClassLoader.fieldClassLoaderExceptions == null) {
-                ReTweakClassLoader.fieldClassLoaderExceptions = ReflectionHelper.getField(
-                        LaunchClassLoader.class,
-                        "classLoaderExceptions"
-                );
+                ReTweakClassLoader.fieldClassLoaderExceptions = ReflectionHelper.getField(LaunchClassLoader.class, "classLoaderExceptions");
             }
         } catch (NoSuchFieldException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to get field \"classLoaderExceptions\" in class LaunchClassLoader!",
-                    e
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to get field \"classLoaderExceptions\" in class LaunchClassLoader!", e);
             return null;
         }
         try {
-            return ReflectionHelper.getFieldValue(
-                    ReTweakClassLoader.fieldClassLoaderExceptions,
-                    launchClassLoader
-            );
+            return ReflectionHelper.getFieldValue(ReTweakClassLoader.fieldClassLoaderExceptions, launchClassLoader);
         } catch (IllegalAccessException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to get the value of field \"classLoaderExceptions\"!",
-                    e
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to get the value of field \"classLoaderExceptions\"!", e);
             return null;
         }
     }
@@ -181,29 +162,17 @@ public final class ReTweakClassLoader extends URLClassLoader {
         if (launchClassLoader == null) return null;
         try {
             if (ReTweakClassLoader.fieldTransformerExceptions == null) {
-                ReTweakClassLoader.fieldTransformerExceptions = ReflectionHelper.getField(
-                        LaunchClassLoader.class,
-                        "transformerExceptions"
-                );
+                ReTweakClassLoader.fieldTransformerExceptions = ReflectionHelper.getField(LaunchClassLoader.class, "transformerExceptions");
             }
         } catch (NoSuchFieldException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to get field \"transformerExceptions\" in class LaunchClassLoader!",
-                    e
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to get field \"transformerExceptions\" in class LaunchClassLoader!", e);
             return null;
         }
 
         try {
-            return ReflectionHelper.getFieldValue(
-                    ReTweakClassLoader.fieldTransformerExceptions,
-                    launchClassLoader
-            );
+            return ReflectionHelper.getFieldValue(ReTweakClassLoader.fieldTransformerExceptions, launchClassLoader);
         } catch (IllegalAccessException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to get the value of field \"transformerExceptions\"!",
-                    e
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to get the value of field \"transformerExceptions\"!", e);
             return null;
         }
     }

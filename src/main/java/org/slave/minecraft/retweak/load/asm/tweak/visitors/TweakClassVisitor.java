@@ -5,13 +5,12 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
 import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MigrationClass;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.MigrationClass;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
@@ -28,8 +27,8 @@ public final class TweakClassVisitor extends ClassVisitor {
     private final TweakClass tweakClass;
     private final ASMTable asmTable;
 
-    public TweakClassVisitor(final int api, final ClassNode classNode, final GameVersion gameVersion, final ASMTable asmTable) {
-        super(api, classNode);
+    public TweakClassVisitor(final int api, final ClassVisitor classVisitor, final GameVersion gameVersion, final ASMTable asmTable) {
+        super(api, classVisitor);
         this.gameVersion = gameVersion;
         tweakClass = gameVersion.getTweakClass();
         this.asmTable = asmTable;
@@ -93,7 +92,7 @@ public final class TweakClassVisitor extends ClassVisitor {
         }
 
         //Outer name
-        if (tweakClass.hasMigrationClass(outerName)) {
+        if (outerName != null && tweakClass.hasMigrationClass(outerName)) {
             newOuterName = tweakClass.getMigrationClass(outerName).getTo().getName().replace('.', '/');
         } else {
             newOuterName = outerName;
@@ -176,6 +175,26 @@ public final class TweakClassVisitor extends ClassVisitor {
         String newName = name;
         String newDesc = desc;
         String newSignature = signature;
+
+        MigrationMethod migrationMethod = tweakClass.getMigrationMethod(name, desc);
+        if (migrationMethod != null) {
+            newName = migrationMethod.getDeobfuscatedName();
+            newDesc = Type.getMethodDescriptor(
+                    migrationMethod.getDeobfuscatedReturnTypeDesc(),
+                    migrationMethod.getDeobfuscatedArgumentDescTypes()
+            );
+
+            if (ReTweak.DEBUG) {
+                ReTweak.LOGGER_RETWEAK.info(
+                        "Tweaked class method \"{} {}\" to \"{} {}\"",
+                        name,
+                        desc,
+
+                        newName,
+                        newDesc
+                );
+            }
+        }
 
         return new TweakMethodVisitor(
                 super.api,

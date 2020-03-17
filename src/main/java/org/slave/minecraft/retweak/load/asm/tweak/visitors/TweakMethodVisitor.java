@@ -7,9 +7,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.MigrationClass;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationField.MigrationField;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.MigrationClass;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
@@ -250,5 +250,7 @@ public final class TweakMethodVisitor extends MethodVisitor {
 
         super.visitLocalVariable(name, newDesc, signature, start, end, index);
     }
+
+
 
 }

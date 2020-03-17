@@ -2,24 +2,19 @@ package org.slave.minecraft.retweak.load;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
-import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.mapping._super.SuperMap;
-import org.slave.minecraft.retweak.load.mapping.srg.SrgMap;
-import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
-import org.slave.minecraft.retweak.load.mod.ReTweakModDiscoverer;
-import org.slave.minecraft.retweak.load.util.GameVersion;
-
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.ModContainer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.slave.minecraft.retweak.ReTweak;
+import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
+import org.slave.minecraft.retweak.load.mod.ReTweakModDiscoverer;
+import org.slave.minecraft.retweak.load.util.GameVersion;
+
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link cpw.mods.fml.common.Loader}
@@ -38,8 +33,6 @@ public final class ReTweakLoader {
     private Map<GameVersion, File> configDirs = null;
 
     private Map<GameVersion, List<ReTweakModContainer>> mods = null;
-
-    private final Map<GameVersion, SrgMap> srgMaps = new HashMap<>();//Used in org.slave.minecraft.retweak.asm.ReTweakSetup
 
     private Map<GameVersion, ReTweakModDiscoverer> reTweakModDiscoverers = null;
     private Map<GameVersion, ReTweakLoadController> reTweakLoadControllers = null;
@@ -186,16 +179,6 @@ public final class ReTweakLoader {
     public ReTweakLoadController getReTweakLoadController(final GameVersion gameVersion) {
         if (gameVersion == null || reTweakLoadControllers == null) return null;
         return reTweakLoadControllers.get(gameVersion);
-    }
-
-    public SrgMap getSrgMap(final GameVersion gameVersion) {
-        if (gameVersion == null) return null;
-        return srgMaps.get(gameVersion);
-    }
-
-    public SuperMap getSuperMap(final GameVersion gameVersion) {
-        if (gameVersion == null) return null;
-        return gameVersion.getSuperMap();
     }
 
     public static ReTweakLoader instance() {

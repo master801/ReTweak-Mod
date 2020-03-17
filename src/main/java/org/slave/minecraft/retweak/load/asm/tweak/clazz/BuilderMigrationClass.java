@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.objectweb.asm.Type;
 import org.slave.lib.helpers.ReflectionHelper;
 import org.slave.minecraft.retweak.ReTweak;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField.MigrationField;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationMethod.MigrationMethod;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationField.MigrationField;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
@@ -22,9 +22,9 @@ import java.util.Set;
  * @author Master
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class MigrationClassBuilder {
+public final class BuilderMigrationClass {
 
-    private static MigrationClassBuilder instance;
+    private static BuilderMigrationClass instance;
 
     private String from;
     private Class<?> to;
@@ -32,32 +32,32 @@ public final class MigrationClassBuilder {
     private Set<MigrationField> fieldEntries;
     private Set<MigrationMethod> methodEntries;
 
-    public MigrationClassBuilder from(final String from) {
+    public BuilderMigrationClass from(final String from) {
         if (from == null) return this;
         this.from = from;
         return this;
     }
 
-    public MigrationClassBuilder from(final Class<?> from) {
+    public BuilderMigrationClass from(final Class<?> from) {
         if (from == null) return this;
         this.from = from.getName();
         return this;
     }
 
-    public MigrationClassBuilder to(final Class<?> to) {
+    public BuilderMigrationClass to(final Class<?> to) {
         if (to == null) return this;
         this.to = to;
         return this;
     }
 
-    public MigrationClassBuilder addFieldMapping(final MigrationField fieldEntry) {
+    public BuilderMigrationClass addFieldMapping(final MigrationField fieldEntry) {
         if (fieldEntry == null) return this;
         if (fieldEntries == null) fieldEntries = Sets.newHashSet();
         fieldEntries.add(fieldEntry);
         return this;
     }
 
-    public MigrationClassBuilder addMethodMapping(final MigrationMethod methodEntry) {
+    public BuilderMigrationClass addMethodMapping(final MigrationMethod methodEntry) {
         if (methodEntry == null) return this;
         if (methodEntries == null) methodEntries = Sets.newHashSet();
         methodEntries.add(methodEntry);
@@ -81,9 +81,9 @@ public final class MigrationClassBuilder {
         return migrationClass;
     }
 
-    public static MigrationClassBuilder instance() {
-        if (MigrationClassBuilder.instance == null) MigrationClassBuilder.instance = new MigrationClassBuilder();
-        return MigrationClassBuilder.instance;
+    public static BuilderMigrationClass instance() {
+        if (BuilderMigrationClass.instance == null) BuilderMigrationClass.instance = new BuilderMigrationClass();
+        return BuilderMigrationClass.instance;
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
@@ -98,8 +98,8 @@ public final class MigrationClassBuilder {
         private Set<MigrationField> fieldMigrations;
         private Set<MigrationMethod> methodMigrations;
 
-        public static MigrationClassBuilder builder() {
-            return MigrationClassBuilder.instance();
+        public static BuilderMigrationClass builder() {
+            return BuilderMigrationClass.instance();
         }
 
         public Set<MigrationField> getFields() {

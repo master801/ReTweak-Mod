@@ -1,22 +1,21 @@
 package org.slave.lib.obfuscate_mapping;
 
 import com.google.common.collect.Lists;
-
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.DescMapping.DescMappingImpl;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping.NameMappingImpl;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.SignatureMapping.SignatureMappingImpl;
 import org.slave.lib.resources.Obfuscation;
+import org.slave.minecraft.retweak.ReTweak;
+import scala.actors.threadpool.Arrays;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import scala.actors.threadpool.Arrays;
 
 /**
  * Created by Master on 9/12/2018 at 11:27 PM.
@@ -109,12 +108,14 @@ public final class ObfuscateRemapping {
 
                 @Override
                 public NameMapping setName(final Obfuscation obfuscation, final String name) {
+                    if (obfuscation == null) return this;
                     names[obfuscation.ordinal()] = name;
                     return this;
                 }
 
                 @Override
                 public String getName(final Obfuscation obfuscation) {
+                    if (obfuscation == null) return null;
                     return names[obfuscation.ordinal()];
                 }
 
@@ -132,6 +133,16 @@ public final class ObfuscateRemapping {
                         names[obfuscation.ordinal()] = name;
                     }
                     return this;
+                }
+
+                @Override
+                public boolean equals(final Object obj) {
+                    if (obj instanceof NameMappingImpl) {
+                        NameMappingImpl nameMapping = (NameMappingImpl)obj;
+                        ReTweak.LOGGER_RETWEAK.debug("");
+                        return false;//TODO
+                    }
+                    return super.equals(obj);
                 }
 
             }

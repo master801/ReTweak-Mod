@@ -1,5 +1,7 @@
 package org.slave.minecraft.retweak;
 
+import cpw.mods.fml.common.Loader;
+import lombok.experimental.UtilityClass;
 import org.slave.lib.api.Configuration;
 import org.slave.lib.api.Configuration.Category;
 import org.slave.lib.api.Configuration.Item;
@@ -8,10 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.function.Function;
-
-import cpw.mods.fml.common.Loader;
-import lombok.experimental.UtilityClass;
 
 /**
  * Created by master on 2/25/18 at 9:25 PM
@@ -32,10 +30,7 @@ public final class ReTweak {
     public static final File FILE_DIRECTORY_RETWEAK_MAPPINGS = new File(ReTweak.FILE_DIRECTORY_RETWEAK, "mappings");
 
     public static final boolean DEBUG = Boolean.parseBoolean(
-            System.getProperty(
-                    "org.slave.minecraft.retweak.debug",
-                    Boolean.FALSE.toString()
-            ).toLowerCase()
+            System.getProperty("org.slave.minecraft.retweak.debug", Boolean.FALSE.toString()).toLowerCase()
     );
 
     private static File fileReTweakConfig = null;
@@ -48,21 +43,16 @@ public final class ReTweak {
                     .setFile(ReTweak.getFileReTweakConfig())
                     .setLogger(ReTweak.LOGGER_RETWEAK)
                     .setCreateDefault(
-                            new Function<Configuration, Configuration>() {
-
-                                @Override
-                                public Configuration apply(final Configuration configuration) {
-                                    Category categoryGameVersion = new Category("Game Versions");
-                                    Category categoryGameVersionEnable = new Category("Enable");
-                                    for(GameVersion gameVersion : GameVersion.values()) {
-                                        categoryGameVersionEnable.add(new Item<>(gameVersion.getVersion(), true));
-                                    }
-                                    categoryGameVersion.addSubCategory(categoryGameVersionEnable);
-
-                                    configuration.addCategory(categoryGameVersion);
-                                    return configuration;
+                            configuration -> {
+                                Category categoryGameVersion = new Category("Game Versions");
+                                Category categoryGameVersionEnable = new Category("Enable");
+                                for(GameVersion gameVersion : GameVersion.values()) {
+                                    categoryGameVersionEnable.add(new Item<>(gameVersion.getVersion(), true));
                                 }
+                                categoryGameVersion.addSubCategory(categoryGameVersionEnable);
 
+                                configuration.addCategory(categoryGameVersion);
+                                return configuration;
                             }
                     )
                     .build();

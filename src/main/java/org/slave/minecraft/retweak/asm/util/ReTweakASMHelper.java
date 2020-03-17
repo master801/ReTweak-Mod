@@ -24,16 +24,10 @@ public final class ReTweakASMHelper {
                     for(String _desc : _injection.getDesc()) {
                         if (_desc.equals(desc)) {
                             try {
-                                Constructor<? extends MethodVisitor> constructor = _injection.getMethodVisitorClass().getDeclaredConstructor(
-                                        int.class,
-                                        MethodVisitor.class
-                                );
+                                Constructor<? extends MethodVisitor> constructor = _injection.getMethodVisitorClass().getDeclaredConstructor(int.class, MethodVisitor.class);
                                 return constructor.newInstance(api, mv);
                             } catch (IllegalAccessException | InvocationTargetException | InstantiationException | NoSuchMethodException e) {
-                                logger.error(
-                                        "Caught exception while creating method visitor!",
-                                        e
-                                );
+                                logger.error("Caught exception while creating method visitor!", e);
                             }
                         }
                     }

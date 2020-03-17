@@ -22,12 +22,12 @@ import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
 )
 public abstract class abw extends World {
 
-    public abw(final ISaveHandler p_i45368_1_, final String p_i45368_2_, final WorldProvider p_i45368_3_, final WorldSettings p_i45368_4_, final Profiler p_i45368_5_) {
-        super(p_i45368_1_, p_i45368_2_, p_i45368_3_, p_i45368_4_, p_i45368_5_);
+    public abw(final ISaveHandler saveHandler, final String name, final WorldProvider provider, final WorldSettings settings, final Profiler profiler) {
+        super(saveHandler, name, provider, settings, profiler);
     }
 
-    public abw(final ISaveHandler p_i45369_1_, final String p_i45369_2_, final WorldSettings p_i45369_3_, final WorldProvider p_i45369_4_, final Profiler p_i45369_5_) {
-        super(p_i45369_1_, p_i45369_2_, p_i45369_3_, p_i45369_4_, p_i45369_5_);
+    public abw(final ISaveHandler saveHandler, final String name, final WorldSettings settings, final WorldProvider provider, final Profiler profiler) {
+        super(saveHandler, name, settings, provider, profiler);
     }
 
 }

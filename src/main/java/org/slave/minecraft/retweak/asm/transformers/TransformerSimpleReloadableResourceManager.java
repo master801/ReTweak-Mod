@@ -84,15 +84,10 @@ public final class TransformerSimpleReloadableResourceManager implements IClassT
 
         @Override
         public MethodVisitor visitMethod(final int access, final String name, final String desc, final String signature, final String[] exceptions) {
+            MethodVisitor mv = super.visitMethod(access, name, desc, signature, exceptions);
             return ReTweakASMHelper.visitMethod(
                     super.api,
-                    super.visitMethod(
-                            access,
-                            name,
-                            desc,
-                            signature,
-                            exceptions
-                    ),
+                    mv,
                     _Injection.values(),
                     ReTweakASM.LOGGER_RETWEAK_ASM,
 

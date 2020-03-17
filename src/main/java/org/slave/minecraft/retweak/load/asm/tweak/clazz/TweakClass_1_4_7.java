@@ -3,7 +3,7 @@ package org.slave.minecraft.retweak.load.asm.tweak.clazz;
 import net.minecraft.block.material.Material;
 import net.minecraft.item.ItemStack;
 import org.objectweb.asm.Type;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.MigrationClassBuilder.BuilderMigrationField;
+import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationField;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7.akm;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7.amq;
 import org.slave.minecraft.retweak.load.asm.tweak.migrate._1_4_7.axa;
@@ -31,19 +31,19 @@ public final class TweakClass_1_4_7 extends AbstractTweakClass {
         super(GameVersion.V_1_4_7);
 
         super.addMigrationClass(//net.minecraft.block.Block
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("amq")
                         .to(amq.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.block.BlockBreakable
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("akm")
                         .to(akm.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.block.material.Material
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("agi")
                         .to(Material.class)
                         .addFieldMapping(
@@ -57,49 +57,49 @@ public final class TweakClass_1_4_7 extends AbstractTweakClass {
                         .build()
         );
         super.addMigrationClass(//net.minecraft.client.model.ModelBase
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("axa")
                         .to(axa.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.client.renderer.entity.Render
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("bbv")
                         .to(bbv.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.client.renderer.entity.RenderLiving
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("bcj")
                         .to(bcj.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.item.Item
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("up")
                         .to(up.class)
                         .build()
         );
         super.addMigrationClass(
-                MigrationClassBuilder.instance()//net.minecraft.entity.EnumCreatureType
+                BuilderMigrationClass.instance()//net.minecraft.entity.EnumCreatureType
                         .from("me")
                         .to(me.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.world.biome.BiomeGenBase
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("yy")
                         .to(yy.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.creativetab.CreativeTabs
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("tj")
                         .to(tj.class)
                         .build()
         );
         super.addMigrationClass(//net.minecraft.item.ItemStack
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("ur")
                         .to(ItemStack.class)
                         .build()
@@ -107,19 +107,19 @@ public final class TweakClass_1_4_7 extends AbstractTweakClass {
 
         // FML/Forge classes
         super.addMigrationClass(
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("cpw/mods/fml/common/TickType")
                         .to(TickType.class)
                         .build()
         );
         super.addMigrationClass(
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("cpw/mods/fml/common/ITickHandler")
                         .to(ITickHandler.class)
                         .build()
         );
         super.addMigrationClass(
-                MigrationClassBuilder.instance()
+                BuilderMigrationClass.instance()
                         .from("cpw/mods/fml/client/registry/RenderingRegistry")
                         .to(RenderingRegistry.class)
                         .build()

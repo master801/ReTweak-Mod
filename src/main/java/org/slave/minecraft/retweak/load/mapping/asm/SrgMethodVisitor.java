@@ -1,21 +1,36 @@
-package org.slave.minecraft.retweak.load.asm._super.visitors;
+package org.slave.minecraft.retweak.load.mapping.asm;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.slave.minecraft.retweak.load.mapping._super.SuperMap;
+import org.slave.minecraft.retweak.load.util.GameVersion;
 
 /**
- * Created by master on 11/18/18 at 11:02 AM
+ * Created by Master on 3/17/2020 at 9:56 AM
  *
- * @author master
+ * @author Master
  */
-public final class SuperMethodVisitor extends MethodVisitor {
+public final class SrgMethodVisitor extends MethodVisitor {
 
-    private final SuperMap superMap;
+    private final GameVersion gameVersion;
 
-    public SuperMethodVisitor(final int api, final MethodVisitor mv, final SuperMap superMap) {
+    public SrgMethodVisitor(final int api, final MethodVisitor mv, final GameVersion gameVersion) {
         super(api, mv);
-        this.superMap = superMap;
+        this.gameVersion = gameVersion;
+    }
+
+    @Override
+    public void visitInsn(final int opcode) {
+        super.visitInsn(opcode);
+    }
+
+    @Override
+    public void visitIntInsn(final int opcode, final int operand) {
+        super.visitIntInsn(opcode, operand);
+    }
+
+    @Override
+    public void visitVarInsn(final int opcode, final int var) {
+        super.visitVarInsn(opcode, var);
     }
 
     @Override
@@ -31,6 +46,11 @@ public final class SuperMethodVisitor extends MethodVisitor {
     @Override
     public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc, final boolean itf) {
         super.visitMethodInsn(opcode, owner, name, desc, itf);
+    }
+
+    @Override
+    public void visitLdcInsn(final Object cst) {
+        super.visitLdcInsn(cst);
     }
 
     @Override
