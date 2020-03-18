@@ -8,6 +8,7 @@ import cpw.mods.fml.common.ModContainer;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.slave.minecraft.retweak.ReTweak;
+import org.slave.minecraft.retweak.load.mapping.SrgMap;
 import org.slave.minecraft.retweak.load.mod.ReTweakModContainer;
 import org.slave.minecraft.retweak.load.mod.ReTweakModDiscoverer;
 import org.slave.minecraft.retweak.load.util.GameVersion;
@@ -31,6 +32,8 @@ public final class ReTweakLoader {
 
     private Map<GameVersion, File> modDirs = null;
     private Map<GameVersion, File> configDirs = null;
+
+    private Map<GameVersion, SrgMap> srgMaps = null;
 
     private Map<GameVersion, List<ReTweakModContainer>> mods = null;
 
@@ -101,7 +104,14 @@ public final class ReTweakLoader {
             List<ModContainer> modContainers = reTweakModDiscoverer.identifyMods();
 
             List<ReTweakModContainer> reTweakModContainers = mods.get(gameVersion);
-            for(ModContainer modContainer : modContainers) reTweakModContainers.add((ReTweakModContainer)modContainer);
+            for(ModContainer modContainer : modContainers) {
+                ReTweakModContainer reTweakModContainer = (ReTweakModContainer)modContainer;
+
+                reTweakModContainers.add(reTweakModContainer);
+                if (gameVersion.getSrgMap() != null) gameVersion.getSrgMap().merge(reTweakModContainer.getReTweakModCandidate().getASMTable());
+            }
+            if (gameVersion.getSrgMap() != null) gameVersion.getSrgMap().sort();
+
             mods.put(gameVersion, reTweakModContainers);
         }
     }

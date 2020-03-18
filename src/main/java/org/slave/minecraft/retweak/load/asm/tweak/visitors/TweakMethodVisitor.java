@@ -5,7 +5,6 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
-import org.slave.lib.resources.ASMTable;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationField.MigrationField;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
@@ -25,13 +24,11 @@ public final class TweakMethodVisitor extends MethodVisitor {
     private final GameVersion gameVersion;
 
     private final TweakClass tweakClass;
-    private final ASMTable asmTable;
 
-    TweakMethodVisitor(final int api, final MethodVisitor mv, final GameVersion gameVersion, final ASMTable asmTable) {
+    TweakMethodVisitor(final int api, final MethodVisitor mv, final GameVersion gameVersion) {
         super(api, mv);
         this.gameVersion = gameVersion;
         this.tweakClass = gameVersion.getTweakClass();
-        this.asmTable = asmTable;
     }
 
     @Override

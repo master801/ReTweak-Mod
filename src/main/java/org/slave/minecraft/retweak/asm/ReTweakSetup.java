@@ -52,7 +52,6 @@ public final class ReTweakSetup implements IFMLCallHook {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
     private void loadMappings() throws IOException {
         for(GameVersion gameVersion : GameVersion.VALUES) {
             File mappingDir = new File(ReTweak.FILE_DIRECTORY_RETWEAK_MAPPINGS, gameVersion.getVersion());
@@ -136,8 +135,6 @@ public final class ReTweakSetup implements IFMLCallHook {
                 ReTweak.LOGGER_RETWEAK.error("Super mapping \"{}\" was not found. No mappings will be loaded for this game version ({}) due to this.", _super.getPath(), gameVersion.getVersion());
                 continue;
             }
-
-            srgMap.sort();
 
             try {
                 Field field = GameVersion.class.getDeclaredField("srgMap");

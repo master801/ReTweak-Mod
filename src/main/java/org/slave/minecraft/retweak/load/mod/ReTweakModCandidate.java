@@ -61,10 +61,7 @@ public final class ReTweakModCandidate extends ModCandidate {
     private static void setTable(final ReTweakModCandidate reTweakModCandidate, final ASMDataTable asmDataTable) {
         if (ReTweakModCandidate.fieldTable == null) {
             try {
-                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(
-                        ModCandidate.class,
-                        "table"
-                );
+                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(ModCandidate.class, "table");
             } catch (NoSuchFieldException e) {
                 ReTweak.LOGGER_RETWEAK.error("Failed to get field \"table\"!", e);
             }
@@ -81,10 +78,7 @@ public final class ReTweakModCandidate extends ModCandidate {
     private static ASMDataTable getTable(final ReTweakModCandidate reTweakModCandidate) {
         if (ReTweakModCandidate.fieldTable == null) {
             try {
-                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(
-                        ModCandidate.class,
-                        "table"
-                );
+                ReTweakModCandidate.fieldTable = ReflectionHelper.getField(ModCandidate.class, "table");
             } catch (NoSuchFieldException e) {
                 ReTweak.LOGGER_RETWEAK.error("Failed to get field \"table\"!", e);
             }
@@ -104,21 +98,11 @@ public final class ReTweakModCandidate extends ModCandidate {
         if (list == null) return;
         try {
             if (ReTweakModCandidate.fieldMods == null) {
-                ReTweakModCandidate.fieldMods = ReflectionHelper.getField(
-                        ModCandidate.class,
-                        "mods"
-                );
+                ReTweakModCandidate.fieldMods = ReflectionHelper.getField(ModCandidate.class, "mods");
             }
-            ReflectionHelper.setFieldValue(
-                    ReTweakModCandidate.fieldMods,
-                    modCandidate,
-                    list
-            );
+            ReflectionHelper.setFieldValue(ReTweakModCandidate.fieldMods, modCandidate, list);
         } catch(NoSuchFieldException | IllegalAccessException e) {
-            ReTweak.LOGGER_RETWEAK.error(
-                    "Failed to set field \"mods\" in ReTweakModCandidate!",
-                    e
-            );
+            ReTweak.LOGGER_RETWEAK.error("Failed to set field \"mods\" in ReTweakModCandidate!", e);
         }
     }
 

@@ -54,12 +54,12 @@ public final class  ReTweakClassASM {
         ASMTable asmTable = getASMTable(classReader.getClassName());
 
         //Tweak
-        TweakClassVisitor tweakClassVisitor = new TweakClassVisitor(Opcodes.ASM5, classNode, gameVersion, asmTable);
+        TweakClassVisitor tweakClassVisitor = new TweakClassVisitor(Opcodes.ASM5, classNode, gameVersion);
 
         //Deobfuscation
         SrgClassVisitor srgClassVisitor = new SrgClassVisitor(Opcodes.ASM5, tweakClassVisitor, gameVersion);
 
-        classReader.accept(srgClassVisitor, 0);//srg -> tweak -> classnode
+        classReader.accept(srgClassVisitor, 0);//srg is loaded first, then tweak
 
         //wtf
         fixBadProgrammingGarbage(classNode);

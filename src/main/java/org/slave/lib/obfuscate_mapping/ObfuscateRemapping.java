@@ -89,9 +89,7 @@ public final class ObfuscateRemapping {
                     NameMapping nameMapping = new NameMappingImpl();
 
                     //Copy from our 'names' field into the NameMapping
-                    for(Map.Entry<Obfuscation, String> entry : names.entrySet()) {
-                        nameMapping.setName(entry.getKey(), entry.getValue());
-                    }
+                    for(Map.Entry<Obfuscation, String> entry : names.entrySet()) nameMapping.setName(entry.getKey(), entry.getValue());
 
                     //Cleanup
                     names.clear();
@@ -180,6 +178,11 @@ public final class ObfuscateRemapping {
                     return this;
                 }
 
+                public FactoryDescMapping setDesc(final String desc) {
+                    for(Obfuscation obfuscation : Obfuscation.values()) setDesc(obfuscation, desc);
+                    return this;
+                }
+
                 public DescMapping create() {
                     //Do not create DescMapping if no desc is set
                     if (desc.isEmpty()) return null;
@@ -196,7 +199,6 @@ public final class ObfuscateRemapping {
 
                     return descMapping;
                 }
-
             }
 
             @NoArgsConstructor(access = AccessLevel.PRIVATE)

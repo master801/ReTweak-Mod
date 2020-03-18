@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import okio.Buffer;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping;
+import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.Obfuscation;
+import org.slave.lib.util.WrappingDataT;
 import org.slave.minecraft.retweak.ReTweak;
 import org.supercsv.io.CsvListReader;
 import org.supercsv.prefs.CsvPreference;
@@ -78,13 +80,69 @@ public final class SrgMap {
         }
     }
 
+    public void merge(final ASMTable asmTable) {
+        for(ASMTable.TableClass tableClass : asmTable.getTableClasses()) {
+            boolean conflicting = false;
+            for(SpiderClass spiderClass : classList) {
+                if (spiderClass.getName().getName(Obfuscation.OBFUSCATED).equals(tableClass.getName()) || spiderClass.getName().getName(Obfuscation.DEOBFUSCATED).equals(tableClass.getName())) {
+                    ReTweak.LOGGER_RETWEAK.warn("Class \"{}\" already has a SpiderClass!", tableClass.getName());
+                    conflicting = true;
+                }
+            }
+            if (conflicting) continue;
+            SpiderClass spiderClass = new SpiderClass(
+                    ObfuscateRemapping.ObfuscationMapping.NameMapping.factory()
+                            .setName(tableClass.getName())
+                            .create()
+            );
+            spiderClass.setSoftParent(tableClass.getSuperName());
+
+            for(ASMTable.TableClass.TableField tableField : tableClass.getFields()) {
+                spiderClass.addSpiderField(
+                        new SpiderField(
+                                spiderClass,
+                                ObfuscateRemapping.ObfuscationMapping.NameMapping.factory()
+                                        .setName(tableField.getName())
+                                        .create(),
+                                ObfuscateRemapping.ObfuscationMapping.DescMapping.factory()
+                                        .setDesc(tableField.getDesc())
+                                        .create()
+                        )
+                );
+            }
+
+            for(ASMTable.TableClass.TableMethod tableMethod : tableClass.getMethods()) {
+                spiderClass.addSpiderMethod(
+                        new SpiderMethod(
+                                spiderClass,
+                                ObfuscateRemapping.ObfuscationMapping.NameMapping.factory()
+                                        .setName(tableMethod.getName())
+                                        .create(),
+                                ObfuscateRemapping.ObfuscationMapping.DescMapping.factory()
+                                        .setDesc(tableMethod.getDesc())
+                                        .create()
+                        )
+                );
+            }
+
+            classList.add(spiderClass);
+        }
+    }
+
     public void sort() {
         for(SpiderClass spiderClass : classList) {
             if(spiderClass.getParent() == null && spiderClass.getSoftParent() == null) {
-                ReTweak.LOGGER_RETWEAK.warn("Spider class \"{}\" ({}) does not have a set parent nor \'soft parent\'", spiderClass.getName().getName(Obfuscation.OBFUSCATED), spiderClass.getName().getName(Obfuscation.DEOBFUSCATED));
+                ReTweak.LOGGER_RETWEAK.warn("Spider class \"{}\" (\"{}\") does not have a set parent nor \'soft parent\'", spiderClass.getName().getName(Obfuscation.OBFUSCATED), spiderClass.getName().getName(Obfuscation.DEOBFUSCATED));
+                continue;
+            } else if (spiderClass.getParent() == null && spiderClass.getSoftParent() != null) {
+                for(SpiderClass iterating : classList) {
+                    if (iterating.getName().getName(Obfuscation.OBFUSCATED).equals(spiderClass.getSoftParent())) {
+                        spiderClass.setParent(iterating);
+                        break;
+                    }
+                }
             }
         }
-        //TODO Sort classes, assign supers
     }
 
     public static SrgMap loadFromSrgMapping(final Buffer buffer) {
@@ -131,15 +189,15 @@ public final class SrgMap {
                                 continue;
                             }
 
-                            SpiderField spiderField = new SpiderField(
-                                    spiderClass,
-                                    ObfuscateRemapping.ObfuscationMapping.NameMapping.factory()
-                                            .setName(Obfuscation.OBFUSCATED, obfuscatedName)
-                                            .setName(Obfuscation.DEOBFUSCATED, deobfuscatedName)
-                                            .create()
+                            spiderClass.addSpiderField(
+                                    new SpiderField(
+                                            spiderClass,
+                                            ObfuscateRemapping.ObfuscationMapping.NameMapping.factory()
+                                                    .setName(Obfuscation.OBFUSCATED, obfuscatedName)
+                                                    .setName(Obfuscation.DEOBFUSCATED, deobfuscatedName)
+                                                    .create()
+                                    )
                             );
-
-                            spiderClass.addSpiderField(spiderField);
                             break;
                         case METHOD:
                             oi = parts[1].lastIndexOf('/');
@@ -183,10 +241,40 @@ public final class SrgMap {
         return srgMap;
     }
 
-    private SpiderClass getSpiderClass(final Obfuscation obfuscation, final String obfuscatedClass) {
+    public SpiderClass getSpiderClass(final Obfuscation obfuscation, final String obfuscatedClass) {
         if (obfuscation == null || obfuscatedClass == null) return null;
         for(SpiderClass spiderClass : classList) {
             if (spiderClass.getName().getName(obfuscation).equals(obfuscatedClass)) return spiderClass;
+        }
+        return null;
+    }
+
+    public WrappingDataT.WrappingDataT2<SpiderClass, SpiderField> getSpiderClassField(final Obfuscation obfuscation, final String className, final String name, final String desc) {
+        if (className == null || name == null) return null;
+        SpiderClass spiderClass = getSpiderClass(obfuscation, className);
+        if (spiderClass != null) {
+            SpiderField spiderField;
+            while((spiderField = spiderClass.getSpiderField(obfuscation, name, desc)) == null) {
+                spiderClass = spiderClass.getParent();
+                if (spiderClass == null) break;
+            }
+            if (spiderClass == null) return null;
+            return new WrappingDataT.WrappingDataT2<>(spiderClass, spiderField);
+        }
+        return null;
+    }
+
+    public WrappingDataT.WrappingDataT2<SpiderClass, SpiderMethod> getSpiderClassMethod(final Obfuscation obfuscation, final String className, final String name, final String desc) {
+        if (className == null || name == null || desc == null) return null;
+        SpiderClass spiderClass = getSpiderClass(obfuscation, className);
+        if (spiderClass != null) {
+            SpiderMethod spiderMethod;
+            while((spiderMethod = spiderClass.getSpiderMethod(obfuscation, name, desc)) == null) {
+                spiderClass = spiderClass.getParent();
+                if (spiderClass == null) break;
+            }
+            if (spiderClass == null) return null;
+            return new WrappingDataT.WrappingDataT2<>(spiderClass, spiderMethod);
         }
         return null;
     }

@@ -38,12 +38,22 @@ public final class SpiderClass implements Parent<SpiderClass>, ChildParent<Spide
     final List<SpiderMethod> methods =  new ArrayList<>();
 
     public SpiderField getSpiderField(final Obfuscation obfuscation, final String name) {
+        return getSpiderField(obfuscation, name, null);
+    }
+
+    public SpiderField getSpiderField(final Obfuscation obfuscation, final String name, final String desc) {
         if (obfuscation == null || name == null) return null;
+        for(SpiderField spiderField : fields) {
+            if (spiderField.getName().getName(obfuscation).equals(name) && (desc == null || spiderField.getDesc() == null || spiderField.getDesc().getDesc(obfuscation).equals(desc))) return spiderField;
+        }
         return null;
     }
 
     public SpiderMethod getSpiderMethod(final Obfuscation obfuscation, final String name, final String desc) {
         if (obfuscation == null || name == null || desc == null) return null;
+        for(SpiderMethod spiderMethod : methods) {
+            if (spiderMethod.getName().getName(obfuscation).equals(name) && spiderMethod.getDesc().getDesc(obfuscation).equals(desc)) return spiderMethod;
+        }
         return null;
     }
 
