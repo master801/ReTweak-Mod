@@ -34,7 +34,8 @@ public final class SpiderClass implements Parent<SpiderClass>, ChildParent<Spide
     @Getter
     private final ObfuscateRemapping.ObfuscationMapping.NameMapping name;
 
-    final List<SpiderClass> interfaces = new ArrayList<>();
+    @Getter
+    private final List<SpiderClass> interfaces = new ArrayList<>();
     final List<SpiderField> fields = new ArrayList<>();
     final List<SpiderMethod> methods =  new ArrayList<>();
 
@@ -45,6 +46,12 @@ public final class SpiderClass implements Parent<SpiderClass>, ChildParent<Spide
             return spiderClass.getName().equals(getName());
         }
         return super.equals(obj);
+    }
+
+    public SpiderClass getSpiderInterface(final String name) {
+        //TODO
+        ReTweak.LOGGER_RETWEAK.debug("");
+        return null;
     }
 
     public SpiderField getSpiderField(final Obfuscation obfuscation, final String name) {

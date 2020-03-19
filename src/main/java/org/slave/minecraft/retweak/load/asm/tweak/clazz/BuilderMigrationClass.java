@@ -132,14 +132,14 @@ public final class BuilderMigrationClass {
             Type returnType = Type.getReturnType(desc);
             Type[] argTypes = Type.getArgumentTypes(desc);
 
-            for (MigrationMethod methodEntry: methodMigrations) {
-                boolean descMatches = returnType.equals(methodEntry.getObfuscatedReturnTypeDesc());
-                if (methodEntry.getObfuscatedArgumentDescTypes() != null) {
-                    descMatches = descMatches && argTypes.length == methodEntry.getObfuscatedArgumentDescTypes().length;
-                    descMatches = descMatches && Arrays.equals(argTypes, methodEntry.getObfuscatedArgumentDescTypes());
+            for (MigrationMethod migrationMethod: methodMigrations) {
+                boolean descMatches = returnType.equals(migrationMethod.getObfuscatedReturnTypeDesc());
+                if (migrationMethod.getObfuscatedArgumentDescTypes() != null) {
+                    descMatches = descMatches && argTypes.length == migrationMethod.getObfuscatedArgumentDescTypes().length;
+                    descMatches = descMatches && Arrays.equals(argTypes, migrationMethod.getObfuscatedArgumentDescTypes());
                 }
 
-                if (methodEntry.getObfuscatedName().equals(name) && descMatches) return methodEntry;
+                if (migrationMethod.getObfuscatedName().equals(name) && descMatches) return migrationMethod;
             }
             return null;
         }

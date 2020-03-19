@@ -1,7 +1,7 @@
 package org.slave.minecraft.retweak.load;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 import org.apache.commons.lang3.StringUtils;
 import org.slave.lib.asm.transformers.BasicTransformer;
@@ -18,7 +18,6 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,7 +28,7 @@ import java.util.Set;
  */
 public final class ReTweakClassLoader extends URLClassLoader {
 
-    private static final List<String> ALWAYS_TWEAK_CLASS_LIST = Lists.newArrayList(
+    private static final Set<String> ALWAYS_TWEAK_CLASS_LIST = Sets.newHashSet(
             "net.minecraftforge.common.Configuration"
     );
 
@@ -76,13 +75,13 @@ public final class ReTweakClassLoader extends URLClassLoader {
 
         boolean tweak = false;
         inputStream = parent.getResourceAsStream(newName + ".class");//Load parent class before loading our custom class for transformation. This is to avoid mismatching classes - For example, FMLPreInitializationEvent. We don't want to load a custom version of this class, but the parent classloader's version, instead.
-        if (inputStream == null || (gameVersion.getTweakClass().hasMigrationClass(newName) && !ALWAYS_TWEAK_CLASS_LIST.contains(newName))) {//Load our class if parent is null or we have a migration class
+        if (inputStream == null || (gameVersion.getTweakClass().hasMigrationClass(newName, true) && !ALWAYS_TWEAK_CLASS_LIST.contains(newName))) {//Load our class if parent is null or we have a migration class
             inputStream = super.getResourceAsStream(newName + ".class");
             tweak = true;
         }
 
         if (inputStream != null && tweak) {
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaking class {}", newName);
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaking class \"{}\"", newName);
             try {
                 ReTweakClassASM reTweakClassASM = ReTweakClassASM.instance(gameVersion);
                 byte[] tweakedClassData = reTweakClassASM.tweak(inputStream);
@@ -101,10 +100,7 @@ public final class ReTweakClassLoader extends URLClassLoader {
                 try {
                     inputStream.close();
                 } catch (IOException e) {
-                    ReTweak.LOGGER_RETWEAK.error(
-                            "Failed to close input stream while loading class!",
-                            e
-                    );
+                    ReTweak.LOGGER_RETWEAK.error("Failed to close input stream while loading class!", e);
                 }
             }
         }

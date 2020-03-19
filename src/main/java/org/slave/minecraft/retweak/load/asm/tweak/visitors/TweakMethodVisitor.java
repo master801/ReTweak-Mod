@@ -22,7 +22,6 @@ import java.util.Arrays;
 public final class TweakMethodVisitor extends MethodVisitor {
 
     private final GameVersion gameVersion;
-
     private final TweakClass tweakClass;
 
     TweakMethodVisitor(final int api, final MethodVisitor mv, final GameVersion gameVersion) {
@@ -51,12 +50,15 @@ public final class TweakMethodVisitor extends MethodVisitor {
         String newDesc;
 
         Type descType = Type.getType(desc);
-        if (tweakClass.hasMigrationClass(descType.getClassName())) {
+        if (tweakClass.hasMigrationClass(descType.getClassName(), false)) {
             Type newDescType = Type.getType(tweakClass.getMigrationClass(descType.getClassName()).getTo());
             newDesc = newDescType.getDescriptor();
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked method annotation desc from \"{}\" to \"{}\"", desc, newDesc);
         } else {
             newDesc = desc;
+        }
+
+        if (!newDesc.equals(desc)) {
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked method annotation desc from \"{}\" to \"{}\"", desc, newDesc);
         }
 
         return super.visitAnnotation(newDesc, visible);
@@ -64,18 +66,12 @@ public final class TweakMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitFieldInsn(final int opcode, final String owner, final String name, final String desc) {
-        String newOwner;
-        String newName;
-        Type newDesc;
+        String newOwner = owner, newName = name, newDesc = desc;
+        Type typeNewDesc = null;
 
         //<editor-fold desc="Owner">
         MigrationClass ownerMigrationClass = tweakClass.getMigrationClass(owner);
-        if (ownerMigrationClass != null) {
-            newOwner = ownerMigrationClass.getTo().getName().replace('.', '/');
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Migrated field insn owner from \"{}\" to \"{}\"", owner, newOwner);
-        } else {
-            newOwner = owner;
-        }
+        if (ownerMigrationClass != null) newOwner = ownerMigrationClass.getTo().getName().replace('.', '/');
         //</editor-fold>
 
         if (ownerMigrationClass != null) {
@@ -92,11 +88,7 @@ public final class TweakMethodVisitor extends MethodVisitor {
         }
 
         MigrationField migrationField = tweakClass.getMigrationField(name, desc);
-        if (migrationField != null) {
-            newName = migrationField.getDeobfuscatedName();
-        } else {
-            newName = name;
-        }
+        if (migrationField != null) newName = migrationField.getDeobfuscatedName();
 
         //<editor-fold desc="Desc">
         Type descType = Type.getType(desc);
@@ -113,26 +105,27 @@ public final class TweakMethodVisitor extends MethodVisitor {
                 String[] array = new String[descType.getDimensions()];
                 Arrays.fill(array, "[");
 
-                newDesc = Type.getType(Joiner.on("").join(array) + Type.getDescriptor(descMigrationClass.getTo()));
+                typeNewDesc = Type.getType(Joiner.on("").join(array) + Type.getDescriptor(descMigrationClass.getTo()));
             } else {
-                newDesc = Type.getType(descMigrationClass.getTo());
+                typeNewDesc = Type.getType(descMigrationClass.getTo());
             }
-            if (ReTweak.DEBUG)
-                ReTweak.LOGGER_RETWEAK.info("Migrated field insn desc from \"{}\" to \"{}\"", desc, newDesc);
         } else if (migrationField != null) {
-            newDesc = migrationField.getToDescType();
-        } else {
-            newDesc = Type.getType(desc);
+            typeNewDesc = migrationField.getToDescType();
         }
-
         //</editor-fold>
 
-        super.visitFieldInsn(opcode, newOwner, newName, newDesc.getDescriptor());
+        if (typeNewDesc != null) newDesc = typeNewDesc.getDescriptor();
+
+        if (!newOwner.equals(owner) || !newName.equals(name) || !newDesc.equals(desc)) {
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Migrated field insn from \"{} {}{}\" to \"{} {}{}\"", owner, name, desc, newOwner, newName, newDesc);
+        }
+
+        super.visitFieldInsn(opcode, newOwner, newName, newDesc);
     }
 
     @Override
     public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc, final boolean itf) {
-        MigrationMethod methodEntry = tweakClass.getMigrationMethod(name, desc);
+        MigrationMethod methodEntry = tweakClass.getMigrationMethod(owner, name, desc);
 
         String newOwner;
         String newName;
@@ -142,7 +135,6 @@ public final class TweakMethodVisitor extends MethodVisitor {
         MigrationClass ownerMigrationClass = tweakClass.getMigrationClass(owner);
         if (ownerMigrationClass != null) {
             newOwner = ownerMigrationClass.getTo().getName().replace('.', '/');
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked method insn owner from \"{}\" to \"{}\"", owner, newOwner);
         } else {
             newOwner = owner;
         }
@@ -156,7 +148,7 @@ public final class TweakMethodVisitor extends MethodVisitor {
             return;
         }
 
-        MigrationMethod migrationMethod = tweakClass.getMigrationMethod(name, desc);
+        MigrationMethod migrationMethod = tweakClass.getMigrationMethod(owner, name, desc);
         if (migrationMethod != null) {
             newName = migrationMethod.getDeobfuscatedName();
         } else {
@@ -200,8 +192,7 @@ public final class TweakMethodVisitor extends MethodVisitor {
         if (returnType.getSort() == Type.ARRAY) {
             returnTypeMigrationClass = tweakClass.getMigrationClass(returnType.getElementType().getClassName());
         } else {
-            String xx = returnType.getClassName();
-            returnTypeMigrationClass = tweakClass.getMigrationClass(xx);
+            returnTypeMigrationClass = tweakClass.getMigrationClass(returnType.getClassName());
         }
 
         if (returnTypeMigrationClass != null) {
@@ -218,22 +209,22 @@ public final class TweakMethodVisitor extends MethodVisitor {
         //</editor-fold>
 
         if (migrationMethod != null) {
-            newDesc = Type.getMethodDescriptor(
-                    migrationMethod.getDeobfuscatedReturnTypeDesc(),
-                    migrationMethod.getDeobfuscatedArgumentDescTypes()
-            );
+            newDesc = Type.getMethodDescriptor(migrationMethod.getDeobfuscatedReturnTypeDesc(), migrationMethod.getDeobfuscatedArgumentDescTypes());
         } else {
             newDesc = Type.getMethodDescriptor(newReturnType, newArgumentTypes);
         }
-        if (!desc.equals(newDesc) && ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked method insn desc from \"{}\" to \"{}\"", desc, newDesc);
         //</editor-fold>
+
+        if (!newOwner.equals(owner) || !newName.equals(name) || !newDesc.equals(name)) {
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked method insn from \"{} {}{}\" to \"{} {}{}\"", owner, name, desc, newOwner, newName, newDesc);
+        }
 
         super.visitMethodInsn(opcode, newOwner, newName, newDesc, itf);
     }
 
     @Override
     public void visitLocalVariable(final String name, final String desc, final String signature, final Label start, final Label end, final int index) {
-        String newDesc;
+        String newName = name, newDesc;
 
         Type descType = Type.getType(desc);
         MigrationClass descMigrationClass = tweakClass.getMigrationClass(descType.getClassName());
@@ -243,9 +234,11 @@ public final class TweakMethodVisitor extends MethodVisitor {
             newDesc = desc;
         }
 
-        if (!desc.equals(newDesc) && ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked Local Variable desc from \"{}\" to \"{}\"", desc, newDesc);
+        if (!desc.equals(newDesc)) {
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked local variable from \"{} {}\" to \"{} {}\"", name, desc, newName, newDesc);
+        }
 
-        super.visitLocalVariable(name, newDesc, signature, start, end, index);
+        super.visitLocalVariable(newName, newDesc, signature, start, end, index);
     }
 
 

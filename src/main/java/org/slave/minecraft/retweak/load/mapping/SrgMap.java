@@ -284,8 +284,8 @@ public final class SrgMap {
                 if (spiderClass_iface == null) continue;
 
                 SpiderMethod spiderMethod = null;
-                if (!spiderClass_iface.interfaces.isEmpty()) {//Search interfaces first
-                    for(SpiderClass spiderClassInterface : spiderClass_iface.interfaces) {
+                if (!spiderClass_iface.getInterfaces().isEmpty()) {//Search interfaces first
+                    for(SpiderClass spiderClassInterface : spiderClass_iface.getInterfaces()) {
                         spiderMethod = spiderClassInterface.getSpiderMethod(obfuscation, name, desc);
                         if (spiderMethod != null) break;
                     }
