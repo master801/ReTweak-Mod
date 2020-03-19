@@ -1,5 +1,6 @@
 package org.slave.minecraft.retweak.load.mapping.asm;
 
+import com.google.common.base.Joiner;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -10,6 +11,8 @@ import org.slave.minecraft.retweak.load.mapping.SpiderClass;
 import org.slave.minecraft.retweak.load.mapping.SpiderField;
 import org.slave.minecraft.retweak.load.mapping.SpiderMethod;
 import org.slave.minecraft.retweak.load.util.GameVersion;
+
+import java.util.Arrays;
 
 /**
  * Created by Master on 3/17/2020 at 9:56 AM
@@ -53,6 +56,8 @@ public final class SrgMethodVisitor extends MethodVisitor {
         super.visitTypeInsn(opcode, newType);
     }
 
+
+
     @Override
     public void visitFieldInsn(final int opcode, final String owner, final String name, final String desc) {
         String newOwner = owner, newName = name, newDesc = desc;
@@ -66,14 +71,25 @@ public final class SrgMethodVisitor extends MethodVisitor {
             if (spiderFieldData.getObject2().getDesc() != null) newDesc = spiderFieldData.getObject2().getDesc().getDesc(Obfuscation.DEOBFUSCATED);
         }
 
-        Type descType = Type.getType(desc);
+        //Fix owner
+        SpiderClass spiderClassOwner = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, owner);
+        if (spiderClassOwner != null) newOwner = spiderClassOwner.getName().getName(Obfuscation.DEOBFUSCATED);
+
+        Type descType = Type.getType(newDesc), newDescType = descType;
         if (descType.getSort() == Type.ARRAY) {
-            ReTweak.LOGGER_RETWEAK.debug("ARRAY NOT SUPPORTED CURRENTLY");
+            SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, descType.getElementType().getClassName().replace('.', '/'));
+            if (spiderClass != null) {
+                String[] dimensions = new String[descType.getDimensions()];
+                Arrays.fill(dimensions, "[");
+                newDescType = Type.getType(Joiner.on("").join(dimensions) + "L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+            }
         } else if (descType.getSort() == Type.OBJECT) {
             String className = descType.getClassName().replace('.', '/');
             SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, className);
-            if (spiderClass != null) newDesc = "L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";";
+            if (spiderClass != null) newDescType = Type.getType("L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
         }
+
+        newDesc = newDescType.getDescriptor();
 
         if (!newOwner.equals(owner) || !newName.equals(name) || !newDesc.equals(desc)) {
             if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Deobfuscated field insn from \"{}/{} {}\" to \"{}/{} {}\"", owner, name, desc, newOwner, newName, newDesc);
@@ -86,7 +102,7 @@ public final class SrgMethodVisitor extends MethodVisitor {
     public void visitMethodInsn(final int opcode, final String owner, final String name, final String desc, final boolean itf) {
         String newOwner = owner, newName = name, newDesc = desc;
 
-        WrappingDataT.WrappingDataT2<SpiderClass, SpiderMethod> spiderMethodData = gameVersion.getSrgMap().getSpiderClassMethod(Obfuscation.OBFUSCATED, owner, name, desc);
+        WrappingDataT.WrappingDataT2<SpiderClass, SpiderMethod> spiderMethodData = gameVersion.getSrgMap().getSpiderClassMethod(Obfuscation.OBFUSCATED, owner, null, name, desc);
         if (!WrappingDataT.isNull(spiderMethodData)) {
             SpiderClass spiderClassOwner = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, owner);
             if (spiderClassOwner != null) newOwner = spiderClassOwner.getName().getName(Obfuscation.DEOBFUSCATED);
@@ -100,25 +116,35 @@ public final class SrgMethodVisitor extends MethodVisitor {
         Type[] typeArguments = Type.getArgumentTypes(newDesc);
         Type typeReturn = Type.getReturnType(newDesc);
 
-        Type[] newTypeArguments = new Type[typeArguments.length];
+        Type[] typeNewArguments = new Type[typeArguments.length];
         Type newTypeReturn = typeReturn;
 
-        System.arraycopy(typeArguments, 0, newTypeArguments, 0, typeArguments.length);
+        System.arraycopy(typeArguments, 0, typeNewArguments, 0, typeArguments.length);
 
         for(int i = 0; i < typeArguments.length; ++i) {
             Type typeArgument = typeArguments[i];
             if (typeArgument.getSort() == Type.ARRAY) {
-                ReTweak.LOGGER_RETWEAK.debug("ARRAY NOT SUPPORTED CURRENTLY");
+                SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeArgument.getElementType().getClassName().replace('.', '/'));
+                if (spiderClass != null) {
+                    String[] dimensions = new String[typeArgument.getDimensions()];
+                    Arrays.fill(dimensions, "[");
+                    typeNewArguments[i] = Type.getType(Joiner.on("").join(dimensions) + "L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+                }
             } else if (typeArgument.getSort() == Type.OBJECT) {
                 SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeArgument.getClassName().replace('.', '/'));
                 if (spiderClass != null) {//Obfuscated
-                    newTypeArguments[i] = Type.getType("L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+                    typeNewArguments[i] = Type.getType("L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
                 }
             }
         }
 
         if (typeReturn.getSort() == Type.ARRAY) {
-            ReTweak.LOGGER_RETWEAK.debug("ARRAY NOT SUPPORTED CURRENTLY");
+            SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeReturn.getElementType().getClassName().replace('.', '/'));
+            if (spiderClass != null) {
+                String[] dimensions = new String[typeReturn.getDimensions()];
+                Arrays.fill(dimensions, "[");
+                newTypeReturn = Type.getType(Joiner.on("").join(dimensions) + "L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+            }
         } else if (typeReturn.getSort() == Type.OBJECT) {
             SpiderClass spiderClassTypeReturn = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeReturn.getClassName().replace('.', '/'));
             if (spiderClassTypeReturn != null) {//Obfuscated
@@ -126,7 +152,7 @@ public final class SrgMethodVisitor extends MethodVisitor {
             }
         }
 
-        newDesc = Type.getMethodDescriptor(newTypeReturn, newTypeArguments);
+        newDesc = Type.getMethodDescriptor(newTypeReturn, typeNewArguments);
 
         if (!newOwner.equals(owner) || !newName.equals(name) || !newDesc.equals(desc)) {
             if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Deobfuscated method insn from \"{}/{} {}\" to \"{}/{} {}\"", owner, name, desc, newOwner, newName, newDesc);
@@ -142,7 +168,28 @@ public final class SrgMethodVisitor extends MethodVisitor {
 
     @Override
     public void visitLocalVariable(final String name, final String desc, final String signature, final Label start, final Label end, final int index) {
-        super.visitLocalVariable(name, desc, signature, start, end, index);
+        String newName = name, newDesc = desc, newSignature = signature;
+        Type typeDesc = Type.getType(desc), typeNewDesc = typeDesc;
+
+        if (typeDesc.getSort() == Type.ARRAY) {
+            SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeDesc.getElementType().getClassName().replace('.', '/'));
+            if (spiderClass != null) {
+                String[] dimensions = new String[typeDesc.getDimensions()];
+                Arrays.fill(dimensions, "[");
+                typeNewDesc = Type.getType(Joiner.on("").join(dimensions) + "L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+            }
+        } else if (typeDesc.getSort() == Type.OBJECT) {
+            SpiderClass spiderClass = gameVersion.getSrgMap().getSpiderClass(Obfuscation.OBFUSCATED, typeDesc.getClassName().replace('.', '/'));
+            if (spiderClass != null) typeNewDesc = Type.getType("L" + spiderClass.getName().getName(Obfuscation.DEOBFUSCATED) + ";");
+        }
+
+        newDesc = typeNewDesc.getDescriptor();
+
+        if (!newDesc.equals(desc)) {
+            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Deobfuscated local variable from \"{} {}\" to \"{} {}\"", name, desc, newName, newDesc);
+        }
+
+        super.visitLocalVariable(name, newDesc, newSignature, start, end, index);
     }
 
 }

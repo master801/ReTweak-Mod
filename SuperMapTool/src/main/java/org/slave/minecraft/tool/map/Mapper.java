@@ -19,6 +19,9 @@ public final class Mapper {
     public void write(final Writer writer) throws IOException {
         for(ASMTable.TableClass tableClass : asmTable.getTableClasses()) {
             writer.write(String.format("%s: %s %s\n", "SUPER", tableClass.getName(), tableClass.getSuperName()));
+            if (tableClass.getInterfaces() != null) {
+                for(String iface : tableClass.getInterfaces()) writer.write(String.format("%s: %s %s\n", "INTERFACE", tableClass.getName(), iface));
+            }
         }
     }
 

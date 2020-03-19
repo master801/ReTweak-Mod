@@ -34,8 +34,18 @@ public final class SpiderClass implements Parent<SpiderClass>, ChildParent<Spide
     @Getter
     private final ObfuscateRemapping.ObfuscationMapping.NameMapping name;
 
+    final List<SpiderClass> interfaces = new ArrayList<>();
     final List<SpiderField> fields = new ArrayList<>();
     final List<SpiderMethod> methods =  new ArrayList<>();
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof SpiderClass) {
+            SpiderClass spiderClass = (SpiderClass)obj;
+            return spiderClass.getName().equals(getName());
+        }
+        return super.equals(obj);
+    }
 
     public SpiderField getSpiderField(final Obfuscation obfuscation, final String name) {
         return getSpiderField(obfuscation, name, null);
@@ -55,6 +65,20 @@ public final class SpiderClass implements Parent<SpiderClass>, ChildParent<Spide
             if (spiderMethod.getName().getName(obfuscation).equals(name) && spiderMethod.getDesc().getDesc(obfuscation).equals(desc)) return spiderMethod;
         }
         return null;
+    }
+
+    void addSpiderClassInterface(final SpiderClass spiderClass) {
+        if (spiderClass == null) return;
+        if (interfaces.contains(spiderClass)) {
+            ReTweak.LOGGER_RETWEAK.warn(
+                    "Class \"{}\" already contains interface \"{}\"!",
+                    getName().getName(Obfuscation.OBFUSCATED),
+                    spiderClass.getName().getName(Obfuscation.OBFUSCATED)
+            );
+            return;
+        }
+
+        interfaces.add(spiderClass);
     }
 
     void addSpiderField(final SpiderField spiderField) {

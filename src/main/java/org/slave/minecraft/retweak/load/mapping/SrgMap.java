@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import okio.Buffer;
+import org.slave.lib.helpers.ArrayHelper;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping;
 import org.slave.lib.resources.ASMTable;
 import org.slave.lib.resources.Obfuscation;
@@ -73,6 +74,17 @@ public final class SrgMap {
 
                         if (spiderClass.getParent() == null) {
                             spiderClass.setSoftParent(parts[2]);
+                        }
+                    }
+                }
+            } else if (parts[0].equals(MapType.INTERFACE.getHeader())) {
+                for(SpiderClass spiderClass : classList) {
+                    if(spiderClass.getName().getName(Obfuscation.DEOBFUSCATED).equals(parts[1])) {
+                        for(SpiderClass spiderClassInterface  : classList) {
+                            if (spiderClassInterface.getName().getName(Obfuscation.DEOBFUSCATED).equals(parts[2])) {
+                                spiderClass.addSpiderClassInterface(spiderClassInterface);
+                                break;
+                            }
                         }
                     }
                 }
@@ -264,8 +276,30 @@ public final class SrgMap {
         return null;
     }
 
-    public WrappingDataT.WrappingDataT2<SpiderClass, SpiderMethod> getSpiderClassMethod(final Obfuscation obfuscation, final String className, final String name, final String desc) {
+    public WrappingDataT.WrappingDataT2<SpiderClass, SpiderMethod> getSpiderClassMethod(final Obfuscation obfuscation, final String className, final String[] interfaces, final String name, final String desc) {
         if (className == null || name == null || desc == null) return null;
+        if (!ArrayHelper.isNullOrEmpty(interfaces)) {
+            for(String iface : interfaces) {
+                SpiderClass spiderClass_iface = getSpiderClass(Obfuscation.DEOBFUSCATED, iface);//Super class and interfaces are already deobfuscated before visiting fields and methods
+                if (spiderClass_iface == null) continue;
+
+                SpiderMethod spiderMethod = null;
+                if (!spiderClass_iface.interfaces.isEmpty()) {//Search interfaces first
+                    for(SpiderClass spiderClassInterface : spiderClass_iface.interfaces) {
+                        spiderMethod = spiderClassInterface.getSpiderMethod(obfuscation, name, desc);
+                        if (spiderMethod != null) break;
+                    }
+                }
+                if (spiderMethod == null) {
+                    while ((spiderMethod = spiderClass_iface.getSpiderMethod(obfuscation, name, desc)) == null) {
+                        spiderClass_iface = spiderClass_iface.getParent();
+                        if (spiderClass_iface == null) break;
+                    }
+                }
+                return new WrappingDataT.WrappingDataT2<>(spiderClass_iface, spiderMethod);
+            }
+        }
+
         SpiderClass spiderClass = getSpiderClass(obfuscation, className);
         if (spiderClass != null) {
             SpiderMethod spiderMethod;
@@ -273,8 +307,13 @@ public final class SrgMap {
                 spiderClass = spiderClass.getParent();
                 if (spiderClass == null) break;
             }
-            if (spiderClass == null) return null;
-            return new WrappingDataT.WrappingDataT2<>(spiderClass, spiderMethod);
+            if (spiderMethod != null) {
+                if (spiderMethod.getName().getName(Obfuscation.OBFUSCATED).equals(name) && spiderMethod.getName().getName(Obfuscation.DEOBFUSCATED).equals(name) && spiderMethod.getDesc().getDesc(Obfuscation.OBFUSCATED).equals(desc) && spiderMethod.getDesc().getDesc(Obfuscation.DEOBFUSCATED).equals(desc)) {
+                    return getSpiderClassMethod(obfuscation, spiderClass.getSoftParent(), interfaces, name, desc);
+                }
+                return new WrappingDataT.WrappingDataT2<>(spiderClass, spiderMethod);
+            }
+            return null;
         }
         return null;
     }
@@ -290,7 +329,9 @@ public final class SrgMap {
 
         METHOD("MD:", 4),
 
-        SUPER("SUPER:", 2);
+        SUPER("SUPER:", 2),
+
+        INTERFACE("INTERFACE:", 2);
 
         public static final MapType[] VALUES = MapType.values();
 

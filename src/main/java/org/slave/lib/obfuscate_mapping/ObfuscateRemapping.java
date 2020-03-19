@@ -9,7 +9,6 @@ import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.Des
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.NameMapping.NameMappingImpl;
 import org.slave.lib.obfuscate_mapping.ObfuscateRemapping.ObfuscationMapping.SignatureMapping.SignatureMappingImpl;
 import org.slave.lib.resources.Obfuscation;
-import org.slave.minecraft.retweak.ReTweak;
 import scala.actors.threadpool.Arrays;
 
 import java.util.EnumMap;
@@ -137,8 +136,14 @@ public final class ObfuscateRemapping {
                 public boolean equals(final Object obj) {
                     if (obj instanceof NameMappingImpl) {
                         NameMappingImpl nameMapping = (NameMappingImpl)obj;
-                        ReTweak.LOGGER_RETWEAK.debug("");
-                        return false;//TODO
+                        boolean equals = true;
+                        for(Obfuscation obf : Obfuscation.VALUES) {
+                            if (!nameMapping.getName(obf).equals(getName(obf))) {
+                                equals = false;
+                                break;
+                            }
+                        }
+                        return equals;
                     }
                     return super.equals(obj);
                 }
@@ -231,6 +236,22 @@ public final class ObfuscateRemapping {
                         setDesc(obfuscation, toDesc);
                     }
                     return this;
+                }
+
+                @Override
+                public boolean equals(final Object obj) {
+                    if (obj instanceof DescMappingImpl) {
+                        DescMappingImpl descMapping = (DescMappingImpl)obj;
+                        boolean equals = true;
+                        for(Obfuscation obf : Obfuscation.VALUES) {
+                            if (!descMapping.getDesc(obf).equals(getDesc(obf))) {
+                                equals = false;
+                                break;
+                            }
+                        }
+                        return equals;
+                    }
+                    return super.equals(obj);
                 }
 
             }
