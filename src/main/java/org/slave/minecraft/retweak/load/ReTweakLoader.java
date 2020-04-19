@@ -98,6 +98,14 @@ public final class ReTweakLoader {
     @SuppressWarnings({ "unused" })
     public void identifyMods() {
         for(GameVersion gameVersion : GameVersion.values()) {
+            if (gameVersion.isDisabled()) {
+                ReTweak.LOGGER_RETWEAK.info("Game version \"{}\" has been disabled. Not finding mods...", gameVersion.getVersion());
+                continue;
+            } else if (gameVersion.getSrgMap() == null) {
+                ReTweak.LOGGER_RETWEAK.warn("No SRG map was specified for game version \"{}\"!", gameVersion.getVersion());
+                continue;
+            }
+
             ReTweakModDiscoverer reTweakModDiscoverer = reTweakModDiscoverers.get(gameVersion);
             reTweakModDiscoverer.findModDirMods(getModDirectory(gameVersion));
 
@@ -108,9 +116,9 @@ public final class ReTweakLoader {
                 ReTweakModContainer reTweakModContainer = (ReTweakModContainer)modContainer;
 
                 reTweakModContainers.add(reTweakModContainer);
-                if (gameVersion.getSrgMap() != null) gameVersion.getSrgMap().merge(reTweakModContainer.getReTweakModCandidate().getASMTable());
+                gameVersion.getSrgMap().merge(reTweakModContainer.getReTweakModCandidate().getASMTable());
             }
-            if (gameVersion.getSrgMap() != null) gameVersion.getSrgMap().sort();
+            gameVersion.getSrgMap().sort();
 
             mods.put(gameVersion, reTweakModContainers);
         }
@@ -127,14 +135,32 @@ public final class ReTweakLoader {
      * {@link org.slave.minecraft.retweak.load.ReTweakLoadController#distributeStateMessage(cpw.mods.fml.common.LoaderState, Object...)}
      */
     public void distributeStateMessage(final LoadController loadController, final LoaderState state, final Object... eventData) {
-        if (loadController.getClass() == LoadController.class) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
+        if (loadController.getClass() == LoadController.class && state != null) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
             for(GameVersion gameVersion: GameVersion.values()) {
                 if (gameVersion.isDisabled()) {//TODO Read from config
-                    ReTweak.LOGGER_RETWEAK.info("Game version {} has been disabled and no mods for it will be loaded.", gameVersion.getVersion());
+                    ReTweak.LOGGER_RETWEAK.info("Game version \"{}\" has been disabled. Not distributing state message \"{}\"", gameVersion.getVersion(), state.name());
                     continue;
                 }
                 ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
                 reTweakLoadController.distributeStateMessage(state, eventData);
+            }
+        }
+    }
+
+    /**
+     * Lazy
+     *
+     * {@link org.slave.minecraft.retweak.load.ReTweakLoadController#distributeStateMessage(Class)}
+     */
+    public void distributeStateMessage(final LoadController loadController, final Class<?> customEvent) {
+        if (loadController.getClass() == LoadController.class && customEvent != null) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
+            for(GameVersion gameVersion: GameVersion.values()) {
+                if (gameVersion.isDisabled()) {//TODO Read if disabled from config
+                    ReTweak.LOGGER_RETWEAK.info("Game version \"{}\" has been disabled. Not distributing state message \"{}\"", gameVersion.getVersion(), customEvent);
+                    continue;
+                }
+                ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
+                reTweakLoadController.distributeStateMessage(customEvent);
             }
         }
     }
@@ -149,24 +175,6 @@ public final class ReTweakLoader {
             for(GameVersion gameVersion: GameVersion.values()) {
                 ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
                 reTweakLoadController.transition(desiredState, forceState);
-            }
-        }
-    }
-
-    /**
-     * Lazy
-     *
-     * {@link org.slave.minecraft.retweak.load.ReTweakLoadController#distributeStateMessage(Class)}
-     */
-    public void distributeStateMessage(final LoadController loadController, final Class<?> customEvent) {
-        if (loadController.getClass() == LoadController.class) {//Make sure to check if the load controller we're invoking from is LoadController. If it is ReTweakLoadController, this method will keep getting called - causing a infinite loop -- not pretty
-            for(GameVersion gameVersion: GameVersion.values()) {
-                if (gameVersion.isDisabled()) {//TODO Read if disabled from config
-                    ReTweak.LOGGER_RETWEAK.info("Game version {} has been disabled and no mods for it will be loaded.", gameVersion.getVersion());
-                    continue;
-                }
-                ReTweakLoadController reTweakLoadController = getReTweakLoadController(gameVersion);
-                reTweakLoadController.distributeStateMessage(customEvent);//FIXME
             }
         }
     }

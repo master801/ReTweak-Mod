@@ -61,6 +61,12 @@ abstract class AbstractTweakClass extends TweakClass {
                         .to(Configuration.class)
                         .build()
         );
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from("net/minecraftforge/common/Configuration")
+                        .to(Configuration.class)
+                        .build()
+        );
         super.addMigrationClass(
                 BuilderMigrationClass.instance()
                         .from("net/minecraftforge/common/Property")

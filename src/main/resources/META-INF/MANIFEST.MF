@@ -5,3 +5,4 @@ FMLCorePluginContainsFMLMod: true
 FMLAT: 'META-INF/ReTweak_AT.cfg'
 TweakClass: org.spongepowered.asm.launch.MixinTweaker
 TweakOrder: 0
+MixinConfigs: Main.ReTweak.json

@@ -18,7 +18,7 @@ For the technical people, ReTweak-Mod does all of the following (in chronologica
 
 Goals
 -------------
-ReTweak-Mod ***will*** support multiple version of Minecraft (in the future) instead of only one version.<br/><br/>
+ReTweak-Mod ***will*** support multiple versions of Minecraft (in the future) instead of only one version.<br/><br/>
 Currently, the focus is to work on only one version of Minecraft to make sure everything works properly, then work on the next version,
 which will be voted upon. If no votes are casted, then a version shall be picked instead.
 
@@ -39,6 +39,8 @@ Mods being tested
 
 - 1.5.2 - **Currently Being Worked On**
     - Campfire Mod - JSOne Studios - **NOT WORKING**
+    - [Growing Flowers - gelber_kaktus](https://www.curseforge.com/minecraft/mc-mods/growing-flowers) - **NOT WORKING**
+    - [Aquaculture - Team Metallurgy](https://www.curseforge.com/minecraft/mc-mods/aquaculture) - **NOT WORKING**
 
 - 1.6.2 - **NOT BEING WORKED ON**
 
@@ -51,7 +53,7 @@ Currently ***not*** working.
 
 Misconception
 -------------
-No, this project is not the same as Intermediary by FyberOptic, although the goals are similarly aligned.<br/>
+No, this project is not the same as [Intermediary by FyberOptic](https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/minecraft-mods/wip-mods/2360685), although the goals are similarly aligned.<br/>
 It seems we had the same idea around the same time and they were the one to actually make it possible, albeit for '1.2.5'.
 
 Credit

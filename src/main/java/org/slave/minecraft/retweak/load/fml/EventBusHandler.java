@@ -1,9 +1,10 @@
 package org.slave.minecraft.retweak.load.fml;
 
+import cpw.mods.fml.common.eventhandler.IEventListener;
+import org.slave.minecraft.retweak.ReTweak;
+
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
-
-import cpw.mods.fml.common.eventhandler.IEventListener;
 
 /**
  * Created by master on 11/19/18 at 12:01 AM
@@ -18,6 +19,8 @@ public final class EventBusHandler {
 
     public void register(final Object object) {
         if (object == null || listeners.containsKey(object)) return;
+
+        ReTweak.LOGGER_RETWEAK.debug("");
 
         //TODO
     }

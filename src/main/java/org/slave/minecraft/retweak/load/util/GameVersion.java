@@ -71,7 +71,7 @@ public enum GameVersion {
                     EventAnnotation.EVENT_ANNOTATION_EVENT_HANDLER
             ),
             EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
-            false
+            true
     ),
 
     V_1_6_2(
@@ -97,7 +97,7 @@ public enum GameVersion {
             ),
             EventAnnotation.EVENT_ANNOTATION_INSTANCE_FACTORY,
             EventAnnotation.EVENT_ANNOTATION_SIDED_PROXY,
-            true
+            false
     );
 
     public static final GameVersion[] VALUES = GameVersion.values();

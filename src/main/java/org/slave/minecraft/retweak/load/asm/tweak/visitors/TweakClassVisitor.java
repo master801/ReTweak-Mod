@@ -5,14 +5,9 @@ import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import org.slave.lib.helpers.ArrayHelper;
-import org.slave.lib.resources.Obfuscation;
 import org.slave.minecraft.retweak.ReTweak;
 import org.slave.minecraft.retweak.load.asm.tweak.Tweak;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod;
-import org.slave.minecraft.retweak.load.asm.tweak.clazz.BuilderMigrationClass.MigrationClass;
 import org.slave.minecraft.retweak.load.asm.tweak.clazz.TweakClass;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
@@ -38,42 +33,13 @@ public final class TweakClassVisitor extends ClassVisitor {
 
     @Override
     public void visit(final int version, final int access, final String name, final String signature, final String superName, final String[] interfaces) {
-        String newSignature = signature;
-        String newSuperName = superName;
+        int newVersion = version, newAccess = access;
+        String newName = name, newSignature = signature, newSuperName = superName;
         String[] newInterfaces = interfaces != null ? Arrays.copyOf(interfaces, interfaces.length) : null;
 
-        //Super name
-        if (tweakClass.hasMigrationClass(superName, false)) {
-            MigrationClass migrationClass = tweakClass.getMigrationClass(superName);
-            newSuperName = migrationClass.getTo().getName().replace('.', '/');
-
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked super name of class \"{}\" from \"{}\" to \"{}\"", name, superName, newSuperName);
-        }
-
-        //Interfaces
-        if (!ArrayHelper.isNullOrEmpty(interfaces)) {
-            for(int i = 0; i < interfaces.length; ++i) {
-                String _interface = interfaces[i];
-                String newInterface = null;
-
-                MigrationClass migrationClass = tweakClass.getMigrationClass(_interface);
-                if (migrationClass != null) {
-                    newInterface = migrationClass.getTo().getName().replace('.', '/');
-                }
-
-                if (newInterface != null) newInterfaces[i] = newInterface;
-            }
-
-            if (!Arrays.equals(interfaces, newInterfaces)) {
-                if (ReTweak.DEBUG) {
-                    ReTweak.LOGGER_RETWEAK.info(
-                            "Tweaked interfaces of class \"{}\" from \"[ {} ]\" to \"[ {} ]\"",
-                            name,
-
-                            Joiner.on(", ").join(interfaces),
-                            Joiner.on(", ").join(newInterfaces)
-                    );
-                }
+        if (ReTweak.DEBUG) {
+            if (newVersion != version || newAccess != access || !newName.equals(name) || !newSignature.equals(signature) || !newSuperName.equals(superName) || !Arrays.deepEquals(interfaces, newInterfaces)) {
+                ReTweak.LOGGER_RETWEAK.info("Tweaked class from \"{} {} [ {} ]\" to \"{} {} [ {} ]\"", name, superName, interfaces != null ? Joiner.on(", ").join(interfaces) : "", name, newSuperName, newInterfaces != null ? Joiner.on(", ").join(newInterfaces) : "");
             }
         }
 
@@ -82,39 +48,13 @@ public final class TweakClassVisitor extends ClassVisitor {
 
     @Override
     public void visitInnerClass(final String name, final String outerName, final String innerName, final int access) {
-        String newName;
-        String newOuterName;
-        String newInnerName;
+        String newName = name, newOuterName = outerName, newInnerName = innerName;
+        int newAccess = access;
 
-        //Name
-        if (tweakClass.hasMigrationClass(name, false)) {
-            newName = tweakClass.getMigrationClass(name.replace('/', '.')).getTo().getName().replace('.', '/');
-        } else {
-            newName = name;
-        }
-
-        //Outer name
-        if (outerName != null && tweakClass.hasMigrationClass(outerName, false)) {
-            newOuterName = tweakClass.getMigrationClass(outerName).getTo().getName().replace('.', '/');
-        } else {
-            newOuterName = outerName;
-        }
-
-        //Inner name
-        if (!newName.equals(name)) {
-            if (newName.indexOf('$') != -1) {//Inner class
-                newInnerName = newName.substring(newName.indexOf('$') + 1);
-            } else {
-                if (newName.lastIndexOf('/') != -1) {
-                    newInnerName = newName.substring(newName.lastIndexOf('/') + 1);
-                } else {
-                    newInnerName = newName;
-                }
+        if (ReTweak.DEBUG) {
+            if (!newName.equals(name) || !newOuterName.equals(outerName) || !newInnerName.equals(innerName) || access != newAccess) {
+                ReTweak.LOGGER_RETWEAK.info("Tweaked inner-class from \"{} {} {} {}\" to \"{} {} {} {}\"", name, outerName, innerName, access, newName, newOuterName, newInnerName, newAccess);
             }
-
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked inner-class from \"{}\" to \"{}\"", name, newName);
-        } else {
-            newInnerName = innerName;
         }
 
         super.visitInnerClass(newName, newOuterName, newInnerName, access);
@@ -122,17 +62,7 @@ public final class TweakClassVisitor extends ClassVisitor {
 
     @Override
     public AnnotationVisitor visitAnnotation(final String desc, final boolean visible) {
-        String newDesc;
-
-        Type descType = Type.getType(desc);
-        String descName = descType.getClassName();
-        if (tweakClass.hasMigrationClass(descName, false)) {
-            MigrationClass migrationClass = tweakClass.getMigrationClass(descName);
-            newDesc = Type.getType(migrationClass.getTo()).getDescriptor();
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked annotation desc from \"{}\" to \"{}\"", desc, newDesc);
-        } else {
-            newDesc = desc;
-        }
+        String newDesc = desc;
 
         return new TweakAnnotationVisitor(
                 super.api,
@@ -143,32 +73,15 @@ public final class TweakClassVisitor extends ClassVisitor {
 
     @Override
     public FieldVisitor visitField(final int access, final String name, final String desc, final String signature, final Object value) {
-        Type descType = Type.getType(desc);
-        Type newDescType;
+        String newName = name, newDesc = desc;
 
-        MigrationClass migrationClassDesc;
-        if (descType.getSort() == Type.ARRAY) {
-            migrationClassDesc = tweakClass.getMigrationClass(descType.getElementType().getClassName().replace('.', '/'));
-        } else {
-            migrationClassDesc = tweakClass.getMigrationClass(descType.getClassName().replace('.', '/'));
+        if (ReTweak.DEBUG) {
+            if (!newName.equals(name) || !newDesc.equals(desc)) ReTweak.LOGGER_RETWEAK.info("Tweaked field from \"{} {}\" to \"{} {}\"", name, desc, newName, newDesc);
         }
-        if (migrationClassDesc != null) {
-            if (descType.getSort() == Type.ARRAY) {
-                String[] array = new String[descType.getDimensions()];
-                Arrays.fill(array, "[");
-                newDescType = Type.getType(Joiner.on("").join(array) + Type.getDescriptor(migrationClassDesc.getTo()));
-            } else {
-                newDescType = Type.getType(migrationClassDesc.getTo());
-            }
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked field desc from \"{}\" to \"{}\"", desc, newDescType);
-        } else {
-            newDescType = descType;
-        }
-
         return new TweakFieldVisitor(
                 super.api,
                 gameVersion,
-                super.visitField(access, name, newDescType.getDescriptor(), signature, value)
+                super.visitField(access, newName, newDesc, signature, value)
         );
     }
 
@@ -178,17 +91,9 @@ public final class TweakClassVisitor extends ClassVisitor {
         String newDesc = desc;
         String newSignature = signature;
 
-        MigrationMethod migrationMethod = tweakClass.getMigrationMethod(gameVersion.getSrgMap(), Obfuscation.DEOBFUSCATED, classNode.interfaces, classNode.name, name, desc);//This is ran after deobfuscation (SrgClassVisitor), so use deobfuscated
-        if (migrationMethod != null) {
-            newName = migrationMethod.getDeobfuscatedName();
-            newDesc = Type.getMethodDescriptor(
-                    migrationMethod.getDeobfuscatedReturnTypeDesc(),
-                    migrationMethod.getDeobfuscatedArgumentDescTypes()
-            );
-
-            if (ReTweak.DEBUG) ReTweak.LOGGER_RETWEAK.info("Tweaked class method \"{} {}\" to \"{} {}\"", name, desc, newName, newDesc);
+        if (ReTweak.DEBUG) {
+            if (!newName.equals(name) || !newDesc.equals(desc) || !newSignature.equals(signature)) ReTweak.LOGGER_RETWEAK.info("Tweaked class method \"{} {}\" to \"{} {}\"", name, desc, newName, newDesc);
         }
-
 
         return Tweak.getSpecificTweaker(gameVersion).getMethodVisitor(
                 super.api,

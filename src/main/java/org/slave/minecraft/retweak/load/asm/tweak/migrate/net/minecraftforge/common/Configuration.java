@@ -4,6 +4,7 @@ import net.minecraftforge.common.config.Property;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation.Deobfuscated;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation.Obfuscated;
 import org.slave.minecraft.retweak.load.asm.tweak.annotation._class.Package;
+import org.slave.minecraft.retweak.load.asm.tweak.migrate.Migrate;
 
 import java.io.File;
 
@@ -20,7 +21,7 @@ import java.io.File;
         _package = @Package("net.minecraftforge.common.config"),
         name = "Configuration"
 )
-public class Configuration extends net.minecraftforge.common.config.Configuration {
+public class Configuration extends net.minecraftforge.common.config.Configuration implements Migrate {
 
     private static final String CATEGORY_BLOCKS = "blocks", CATEGORY_ITEMS = "items";
 
@@ -44,16 +45,24 @@ public class Configuration extends net.minecraftforge.common.config.Configuratio
         super(file, caseSensitiveCustomCategories);
     }
 
-    public Property getBlock(final String category, final String key, final int defaultValue) {
-        return super.get(category, key, defaultValue);
+    public Property getBlock(final String category, final String key, final int defaultValue, final String comment) {
+        return super.get(category, key, defaultValue, comment);
     }
 
-    public Property getItem(final String category, final String key, final int defaultValue) {
+    public Property getBlock(final String category, final String key, final int defaultValue) {
         return super.get(category, key, defaultValue);
     }
 
     public Property getBlock(final String key, final int defaultValue) {
         return super.get(Configuration.CATEGORY_BLOCKS, key, defaultValue);
+    }
+
+    public Property getItem(final String category, final String key, final int defaultValue, final String comment) {
+        return super.get(category, key, defaultValue, comment);
+    }
+
+    public Property getItem(final String category, final String key, final int defaultValue) {
+        return super.get(category, key, defaultValue);
     }
 
     public Property getItem(final String key, final int defaultValue) {

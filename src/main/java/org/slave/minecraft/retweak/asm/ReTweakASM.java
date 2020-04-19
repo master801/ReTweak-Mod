@@ -37,6 +37,11 @@ public final class ReTweakASM implements IFMLLoadingPlugin {
 
     public static final Logger LOGGER_RETWEAK_ASM = LoggerFactory.getLogger("ReTweak-ASM");
 
+    public ReTweakASM() {
+//        MixinBootstrap.init();
+//        Mixins.addConfiguration("ReTweak.Mixin.json");
+    }
+
     @Override
     public String[] getASMTransformerClass() {
         return new String[] {

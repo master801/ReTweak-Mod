@@ -296,7 +296,7 @@ public final class SrgMap {
                         if (spiderClass_iface == null) break;
                     }
                 }
-                return new WrappingDataT.WrappingDataT2<>(spiderClass_iface, spiderMethod);
+                if (spiderClass_iface != null && spiderMethod != null) return new WrappingDataT.WrappingDataT2<>(spiderClass_iface, spiderMethod);
             }
         }
 

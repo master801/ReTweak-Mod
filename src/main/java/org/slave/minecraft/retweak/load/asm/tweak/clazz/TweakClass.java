@@ -27,6 +27,7 @@ public abstract class TweakClass {
     private final GameVersion gameVersion;
 
     private final Map<String, MigrationClass> migrationClasses = Maps.newHashMap();
+    private final List<BuilderSuperMigration.SuperMigration> superMigrationList = Lists.newArrayList();
 
     @Getter
     private final List<String> classesToTweak = Lists.newArrayList();
@@ -53,7 +54,21 @@ public abstract class TweakClass {
         return migrationClasses.get(name.replace('/', '.'));
     }
 
-    public MigrationMethod getMigrationMethod(final SrgMap srgMap, final Obfuscation obfuscation, final List<String> interfaces, final String className, final String name, final String desc) {
+    public final void addSuperMigration(final BuilderSuperMigration.SuperMigration superMigration) {
+        if (superMigration == null) return;
+        if (!superMigrationList.contains(superMigration)) superMigrationList.add(superMigration);
+    }
+
+    public final BuilderSuperMigration.SuperMigration getSuperMigration(final String from) {
+        if (from == null) return null;
+        String newFrom = from.replace('.', '/');
+        for(BuilderSuperMigration.SuperMigration superMigration : superMigrationList) {
+            if (superMigration.getFrom().equals(newFrom)) return superMigration;
+        }
+        return null;
+    }
+
+    public final MigrationMethod getMigrationMethod(final SrgMap srgMap, final Obfuscation obfuscation, final List<String> interfaces, final String className, final String name, final String desc) {
         if (className == null || name == null || desc == null) return null;
         if (!IterableHelper.isNullOrEmpty(interfaces)) {
             for(String iface : interfaces) {
@@ -105,11 +120,19 @@ public abstract class TweakClass {
     }
 
     public final MigrationMethod getMigrationMethod(final String className, final String name, final String desc) {
-        if (className == null || name == null || desc == null) return null;
-        MigrationClass migrationClass = migrationClasses.get(className.replace('/', '.'));
-        if (migrationClass != null) {
-            return migrationClass.getMethod(name, desc);
+        return getMigrationMethod(className, name, desc, false);
+    }
 
+    public final MigrationMethod getMigrationMethod(final String className, final String name, final String desc, final boolean ignoreOwner) {
+        if ((!ignoreOwner && className == null) || name == null || desc == null) return null;
+        if (!ignoreOwner) {
+            MigrationClass migrationClass = migrationClasses.get(className.replace('/', '.'));
+            if (migrationClass != null) return migrationClass.getMethod(name, desc);
+        } else {
+            for(MigrationClass migrationClass : migrationClasses.values()) {
+                MigrationMethod mm = migrationClass.getMethod(name, desc);
+                if (mm != null) return mm;
+            }
         }
         return null;
     }

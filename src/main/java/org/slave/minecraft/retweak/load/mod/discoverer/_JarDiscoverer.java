@@ -63,7 +63,11 @@ public final class _JarDiscoverer implements ITypeDiscoverer {
                 ReTweak.LOGGER_RETWEAK.info("Found mcmod.info for mod {}", candidate.getModContainer().getName());
 
                 try(InputStream inputStream = jarFile.getInputStream(modInfoEntry)) {
-                    metadata = MetadataCollection.from(inputStream, candidate.getModContainer().getName());
+                    try {
+                        metadata = MetadataCollection.from(inputStream, candidate.getModContainer().getName());
+                    } catch(NullPointerException e) {
+                        ReTweak.LOGGER_RETWEAK.error("WTF!! THIS SHOULD NOT HAPPEN!!", e);
+                    }
                 } catch(IOException e) {
                     ReTweak.LOGGER_RETWEAK.error("Failed to open stream to \"mcmod.info\" entry!", e);
                     ReTweak.LOGGER_RETWEAK.debug("Jar File: {}", jarFile.getName());

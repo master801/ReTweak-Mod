@@ -99,21 +99,10 @@ public final class ReTweakModDiscoverer extends ModDiscoverer {
         @NonNull
         static Pattern getPatternZipJar() {
             try {
-                if (ArchiveFileFilter.fieldZipJar == null) {
-                    ArchiveFileFilter.fieldZipJar = ReflectionHelper.getField(
-                            ModDiscoverer.class,
-                            "zipJar"
-                    );
-                }
-                return ReflectionHelper.getFieldValue(
-                        ArchiveFileFilter.fieldZipJar,
-                        null
-                );
+                if (ArchiveFileFilter.fieldZipJar == null) ArchiveFileFilter.fieldZipJar = ReflectionHelper.getField(ModDiscoverer.class, "zipJar");
+                return ReflectionHelper.getFieldValue(ArchiveFileFilter.fieldZipJar, null);
             } catch(NoSuchFieldException | IllegalAccessException e) {
-                ReTweak.LOGGER_RETWEAK.error(
-                        "Failed to get Field Pattern \"zipJar\"",
-                        e
-                );
+                ReTweak.LOGGER_RETWEAK.error("Failed to get Field Pattern \"zipJar\"", e);
             }
             throw new NullPointerException("No pattern for \"zipJar\"!");
         }

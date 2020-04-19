@@ -1,14 +1,5 @@
 package org.slave.minecraft.retweak.load.asm.tweak.clazz;
 
-import cpw.mods.fml.relauncher.Side;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import org.objectweb.asm.Type;
-import org.slave.minecraft.retweak.load.asm.tweak.migrate.cpw.mods.fml.common.IScheduledTickHandler;
-import org.slave.minecraft.retweak.load.asm.tweak.migrate.cpw.mods.fml.common.TickType;
-import org.slave.minecraft.retweak.load.asm.tweak.migrate.cpw.mods.fml.common.registry.TickRegistry;
 import org.slave.minecraft.retweak.load.util.GameVersion;
 
 /**
@@ -24,6 +15,7 @@ public final class TweakClass_1_5_2 extends AbstractTweakClass {
         super(GameVersion.V_1_5_2);
 
         //<editor-fold desc="Minecraft">
+        /*
         super.addMigrationClass(
                 BuilderMigrationClass.instance()
                         .from(Block.class)
@@ -37,6 +29,28 @@ public final class TweakClass_1_5_2 extends AbstractTweakClass {
                                         .setDeobfuscatedName("onBlockPlacedBy")
                                         .setDeobfuscatedDescArgumentTypes(Type.getArgumentTypes("(Lnet/minecraft/world/World;IIILnet/minecraft/entity/EntityLivingBase;Lnet/minecraft/item/ItemStack;)V"))
                                         .setDeobfuscatedDescReturnType(Type.VOID_TYPE)
+                                        .build()
+                        )
+                        .addMethodMapping(
+                                BuilderMigrationClass.BuilderMigrationMethod.instance()
+                                        .setObfuscatedName("setLightValue")
+                                        .setObfuscatedDescArgumentTypes(Type.FLOAT_TYPE)
+                                        .setObfuscatedDescReturnType(Type.getType(Block.class))
+
+                                        .setDeobfuscatedName("setLightLevel")
+                                        .setDeobfuscatedDescArgumentTypes(Type.FLOAT_TYPE)
+                                        .setDeobfuscatedDescReturnType(Type.getType(Block.class))
+                                        .build()
+                        )
+                        .addMethodMapping(
+                                BuilderMigrationClass.BuilderMigrationMethod.instance()
+                                        .setObfuscatedName("setUnlocalizedName")
+                                        .setObfuscatedDescArgumentTypes(Type.getType(String.class))
+                                        .setObfuscatedDescReturnType(Type.getType(Block.class))
+
+                                        .setDeobfuscatedName("setBlockName")
+                                        .setDeobfuscatedDescArgumentTypes(Type.getType(String.class))
+                                        .setDeobfuscatedDescReturnType(Type.getType(Block.class))
                                         .build()
                         )
                         .build()
@@ -58,7 +72,6 @@ public final class TweakClass_1_5_2 extends AbstractTweakClass {
                         )
                         .build()
         );
-
         super.addMigrationClass(
                 BuilderMigrationClass.instance()
                         .from(ItemStack.class)
@@ -74,6 +87,63 @@ public final class TweakClass_1_5_2 extends AbstractTweakClass {
                                         .setDeobfuscatedDescReturnType(Type.VOID_TYPE)
                                         .build()
                         )
+                        .build()
+        );
+        super.addMigrationClass(
+                BuilderMigrationClass.instance()
+                        .from(Achievement.class)
+                        .to(Achievement.class)
+                        .addMethodMapping(
+                                BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod.builder()
+                                        .setObfuscatedName("registerAchievement")
+                                        .setObfuscatedDescReturnType(Type.getType(Achievement.class))
+
+                                        .setDeobfuscatedName("registerStat")
+                                        .setDeobfuscatedDescReturnType(Type.getType(Achievement.class))
+                                        .build()
+                        )
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(BlockContainer.class)
+                        .to(Migrate152BlockContainer.class)
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(BlockFlower.class)
+                        .to(Migrate152BlockBush.class)
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(Item.class)
+                        .to(Migrate152Item.class)
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(ItemBlock.class)
+                        .to(Migrate152ItemBlock.class)
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(ItemFood.class)
+                        .to(Migrate152ItemFood.class)
+                        .build()
+        );
+
+        super.addSuperMigration(
+                BuilderSuperMigration.instance()
+                        .from(Achievement.class)
+                        .to(Migrate152Achievement.class)
                         .build()
         );
         //</editor-fold>
@@ -109,6 +179,24 @@ public final class TweakClass_1_5_2 extends AbstractTweakClass {
                         )
                         .build()
         );
+        super.addMigrationClass(
+                BuilderMigrationClass.instance()
+                        .from(GameRegistry.class)
+                        .to(GameRegistry.class)
+                        .addMethodMapping(
+                                BuilderMigrationClass.BuilderMigrationMethod.MigrationMethod.builder()
+                                        .setObfuscatedName("registerBlock")
+                                        .setObfuscatedDescArgumentTypes(Type.getType(Block.class), Type.getType(Class.class), Type.getType(String.class))
+                                        .setObfuscatedDescReturnType(Type.VOID_TYPE)
+
+                                        .setDeobfuscatedName("registerBlock")
+                                        .setDeobfuscatedDescArgumentTypes(Type.getType(Block.class), Type.getType(Class.class), Type.getType(String.class))
+                                        .setDeobfuscatedDescReturnType(Type.getType(Block.class))
+                                        .build()
+                        )
+                        .build()
+        );
+        */
         //</editor-fold>
     }
 
